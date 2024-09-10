@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # Composer (PHP dependencies)
+  - package-ecosystem: "composer"
+    directory: "/"  # Location of composer.json in the root directory
+    schedule:
+      interval: "weekly"  # Check for updates every week
+    ignore:
+      - dependency-name: "php"  # Ignore updates to PHP itself (if needed)
+    commit-message:
+      prefix: "composer update"
+
+  # NPM (JavaScript dependencies)
+  - package-ecosystem: "npm"
+    directory: "/"  # Location of package.json in the root directory
+    schedule:
+      interval: "weekly"  # Check for updates every week
+    commit-message:
+      prefix: "npm update"

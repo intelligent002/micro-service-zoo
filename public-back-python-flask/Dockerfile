@@ -1,6 +1,9 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12.5-alpine3.20
 
+# Install system requirements
+RUN apk add --no-cache jq curl nano
+
 # Create the www-data user and group if they don't already exist
 RUN adduser -u 82 -D -S -G www-data www-data
 
