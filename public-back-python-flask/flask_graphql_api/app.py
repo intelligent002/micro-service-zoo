@@ -8,16 +8,37 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 from prometheus_flask_exporter import PrometheusMetrics
 
+
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
 # Initialize Prometheus metrics
 metrics = PrometheusMetrics(app)
+
 # Custom metrics for tracking health check failures
 health_check_failures = metrics.counter(
     'health_check_failures', 'Number of health check failures'
 )
+
+# Health check route
+@app.route('/health')
+def health():
+    try:
+        # Try to connect to the MySQL database
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            if result.fetchone():
+                return jsonify(status="OK"), 200
+    except OperationalError:
+        # Increment the health check failure metric
+        health_check_failures.inc() # count health check failures
+        # Return a JSON response with status 200 (but indicating error in the response body)
+        return jsonify(status="ERROR", message="Cannot connect to the database"), 200
+    except Exception as e:
+        # Catch any other exceptions and return them as JSON
+        return jsonify(status="ERROR", message=str(e)), 200
+
 
 # Configure logging to debug level
 logging.basicConfig(level=logging.DEBUG)
@@ -35,22 +56,6 @@ def index():
 
 # Create the SQLAlchemy engine
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-
-
-# Health check route
-@app.route('/health')
-def health():
-    try:
-        # Try to connect to the MySQL database
-        with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
-            if result.fetchone():
-                return jsonify(status="OK"), 200
-    except OperationalError:
-        # Increment the health check failure metric
-        health_check_failures.inc()
-        return jsonify(status="ERROR", message="Cannot connect to the database"), 500
-
 
 app.add_url_rule(
     '/graphql',

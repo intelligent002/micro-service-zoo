@@ -38,7 +38,7 @@ services:
             - DB_USERNAME=zoo_user
             - DB_PASSWORD=zoo_password
         healthcheck:
-            test: ["CMD-SHELL", "response=$(curl -s http://localhost:8003/health | jq -r '.status'); if [ \"$response\" != \"OK\" ]; then echo \"Healthcheck failed: $response\"; exit 1; fi"]
+            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8003/health | jq -r .status) != \"OK\" ]; then exit 1; fi"]
             interval: 30s
             retries: 3
             start_period: 5s
@@ -59,9 +59,9 @@ services:
         container_name: public-back-python-flask
         restart: unless-stopped
         environment:
-            - DB_DSN=mysql+pymysql://root:007@mysql-master.intel.r7g.org:3306/laravel_test
+            - DB_DSN=mysql+pymysql://zoo_user:zoo_password@zoo-mysql:3306/zoo_db
         healthcheck:
-            test: ["CMD-SHELL", "response=$(curl -s http://localhost:8001/health | jq -r '.status'); if [ \"$response\" != \"OK\" ]; then echo \"Healthcheck failed: $response\"; exit 1; fi"]
+            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8001/health | jq -r .status) != \"OK\" ]; then exit 1; fi"]
             interval: 30s
             retries: 3
             start_period: 5s
