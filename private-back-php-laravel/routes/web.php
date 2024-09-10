@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\HealthController;
+
+// Route for HealthCheck
+Route::get('/health', [HealthController::class, 'health'])->name('health');
 
 // Route for list of a tasks
 Route::controller(TaskController::class)->group(function () {

@@ -23,7 +23,7 @@ RUN npm run build
 FROM php:8.2-fpm-alpine
 
 # Install system requirements
-RUN apk update && apk add curl nano
+RUN apk update && apk add --no-cache curl jq nano
 RUN docker-php-ext-install pdo pdo_mysql
 
 # Install Composer
