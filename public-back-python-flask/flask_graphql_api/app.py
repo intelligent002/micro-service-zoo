@@ -1,17 +1,30 @@
 import logging
+import sys
+
 from flask import Flask, request, jsonify
 from flask_graphql import GraphQLView
+from prometheus_flask_exporter import PrometheusMetrics
+from pythonjsonlogger import jsonlogger
+from sqlalchemy import create_engine, text
+
+from config import Config
 from models import db
 from schema import schema
-from config import Config
-from sqlalchemy import create_engine, text
-from sqlalchemy.exc import OperationalError
-from prometheus_flask_exporter import PrometheusMetrics
-
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Initialize the database with the app
 db.init_app(app)
+
+# Set up logging to JSON format for app.logger
+logHandler = logging.StreamHandler(sys.stdout)
+formatter = jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+logHandler.setFormatter(formatter)
+
+# Add the handler to the Flask app's logger
+app.logger.addHandler(logHandler)
+app.logger.setLevel(logging.DEBUG)
 
 # Initialize Prometheus metrics
 metrics = PrometheusMetrics(app)
@@ -21,28 +34,30 @@ health_check_failures = metrics.counter(
     'health_check_failures', 'Number of health check failures'
 )
 
-# Health check route
-@app.route('/health')
-def health():
+# Health check liveness - test local scope only
+@app.route('/liveness')
+def liveness():
+    return jsonify(status="OK"), 200
+
+# Create the SQLAlchemy engine
+engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+
+# Health check readiness - test subsidiary services too
+@app.route('/readiness')
+def readiness():
     try:
         # Try to connect to the MySQL database
         with engine.connect() as connection:
             result = connection.execute(text("SELECT 1"))
             if result.fetchone():
                 return jsonify(status="OK"), 200
-    except OperationalError:
-        # Increment the health check failure metric
-        health_check_failures.inc() # count health check failures
-        # Return a JSON response with status 200 (but indicating error in the response body)
-        return jsonify(status="ERROR", message="Cannot connect to the database"), 200
     except Exception as e:
-        # Catch any other exceptions and return them as JSON
+        # Log subsidiary system failures
+        app.logger.error("readiness check failed: %s", str(e))
+        # Catch any exceptions and return them as JSON
         return jsonify(status="ERROR", message=str(e)), 200
 
-
-# Configure logging to debug level
-logging.basicConfig(level=logging.DEBUG)
-
+# Logging into STDOUT
 @app.before_request
 def log_request_info():
     # Log full request information
@@ -51,11 +66,7 @@ def log_request_info():
 
 @app.route('/')
 def index():
-    return "GraphQL API for Projects and Tasks"
-
-
-# Create the SQLAlchemy engine
-engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+    return "Welcome to GraphQL API for Projects and Tasks"
 
 app.add_url_rule(
     '/graphql',
