@@ -29,11 +29,6 @@ app.logger.setLevel(logging.DEBUG)
 # Initialize Prometheus metrics
 metrics = PrometheusMetrics(app)
 
-# Custom metrics for tracking health check failures
-health_check_failures = metrics.counter(
-    'health_check_failures', 'Number of health check failures'
-)
-
 # Health check liveness - test local scope only
 @app.route('/liveness')
 def liveness():

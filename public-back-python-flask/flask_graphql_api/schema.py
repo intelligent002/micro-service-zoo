@@ -1,14 +1,14 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from prometheus_client import Counter, Histogram
 
+from app import metrics
 from models import Project as ProjectModel, Task as TaskModel
 
 # Prometheus metrics
-get_projects_counter = Counter('graphql_get_projects_requests_total', 'Total number of requests to getProjects')
-get_projects_duration = Histogram('graphql_get_projects_duration_seconds', 'Duration of getProjects method')
-get_tasks_counter = Counter('graphql_get_tasks_requests_total', 'Total number of requests to getTasks')
-get_tasks_duration = Histogram('graphql_get_tasks_duration_seconds', 'Duration of getTasks method')
+get_projects_counter = metrics.counter('graphql_get_projects_requests_total', 'Total number of requests to getProjects')
+get_projects_duration = metrics.histogram('graphql_get_projects_duration_seconds', 'Duration of getProjects method')
+get_tasks_counter = metrics.counter('graphql_get_tasks_requests_total', 'Total number of requests to getTasks')
+get_tasks_duration = metrics.histogram('graphql_get_tasks_duration_seconds', 'Duration of getTasks method')
 
 
 class Project(SQLAlchemyObjectType):
