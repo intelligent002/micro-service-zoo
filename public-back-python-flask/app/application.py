@@ -24,11 +24,6 @@ def create_app():
     # Initialize SQLAlchemy with the Flask app
     db.init_app(app)
 
-    # Check if this is the main Gunicorn process and not a worker
-    if 'gunicorn' in os.environ.get('SERVER_SOFTWARE', ''):
-        if os.getppid() == 1:  # The master process in Gunicorn
-            prometheus_client.start_http_server(8002)
-
     # Initialize Prometheus metrics
     PrometheusMetrics(app)
 
