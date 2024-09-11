@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 
 DB_HOSTNAME='mysql-master.intel.r7g.org' \
 DB_USERNAME='root' \
