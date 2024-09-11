@@ -7,11 +7,16 @@ from app.config import Config
 
 
 def configure_logging(app):
-    # Set up logging to JSON format for app.logger
-    handler = logging.StreamHandler(sys.stdout)
-    formatter = jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
+    # Remove any existing handlers
+    for handler in app.logger.handlers:
+        app.logger.removeHandler(handler)
 
-    # Add the handler to the Flask app's logger
-    app.logger.addHandler(handler)
+    # Set up logging to JSON format for app.logger
+    json_handler = logging.StreamHandler(sys.stdout)
+    json_formatter = jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+    json_handler.setFormatter(json_formatter)
+
+    # Add the JSON handler to the Flask app's logger
+    app.logger.addHandler(json_handler)
     app.logger.setLevel(Config.LOG_LEVEL)
+
