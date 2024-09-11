@@ -73,6 +73,7 @@ services:
             timeout: 10s
         ports:
             - "8001:8001"
+            - "8002:8002"
         depends_on:
             - zoo-mysql
         networks:
