@@ -1,31 +1,38 @@
 from flask import Blueprint, jsonify, current_app
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 
-from app.config import Config
+from app.config import db
 
 routes_health = Blueprint('routes_health', __name__)
 
-# Create the SQLAlchemy engine
-engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-
-
-# Health check liveness - app local scope only
 @routes_health.route('/liveness')
 def liveness():
+    """
+    Health check liveness - app local scope only
+    """
     return jsonify(status="OK"), 200
 
 
-# Health check readiness - app subsidiary services too
 @routes_health.route('/readiness')
 def readiness():
+    """
+    Health check readiness - app subsidiary services too
+    """
+    readiness_status = {"MySQL": "OK"}
+
+    # Check MySQL Database
     try:
-        # Try to connect to the MySQL database
-        with engine.connect() as connection:
+        with db.engine.connect() as connection:
             result = connection.execute(text("SELECT 1"))
-            if result.fetchone():
-                return jsonify(status="OK"), 200
+            if not result.fetchone():
+                raise Exception("MySQL connection failed")
+        current_app.logger.info("Readiness check passed. MySQL is available.")
     except Exception as e:
-        # Log subsidiary system failures
-        current_app.logger.error("readiness check failed: %s", str(e))
-        # Catch any exceptions and return them as JSON
-        return jsonify(status="ERROR", message=str(e)), 200
+        current_app.logger.error("Readiness check failed: %s. Failed service: MySQL", str(e))
+        readiness_status["MySQL"] = "ERROR"
+
+    # If any service fails, return 503
+    if "ERROR" in readiness_status.values():
+        return jsonify(status="ERROR", services=readiness_status), 503
+
+    return jsonify(status="OK", services=readiness_status), 200

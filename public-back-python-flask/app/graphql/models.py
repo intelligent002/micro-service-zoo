@@ -1,4 +1,4 @@
-from app.app import db  # Import the db instance
+from app.config import db  # Import the db instance
 
 
 class Project(db.Model):

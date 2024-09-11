@@ -1,14 +1,16 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from prometheus_flask_exporter import PrometheusMetrics
 
 from app.config import Config
+from app.config import db
 from app.logger import configure_logging
+from app.routes import routes
 
-db = SQLAlchemy()
-
-
+#
 def create_app():
+    """
+    method will instantiate a flask app
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -20,8 +22,6 @@ def create_app():
 
     # Initialize Prometheus metrics
     PrometheusMetrics(app)
-
-    from app.routes import routes
 
     app.register_blueprint(routes)
     return app
