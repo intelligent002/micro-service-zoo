@@ -63,7 +63,7 @@ services:
             - DB_USERNAME=zoo_user
             - DB_PASSWORD=zoo_password
             - DB_DATABASE=zoo_db
-            - DEBUG_MODE=True
+            - DEBUG_MODE=False
             - LOG_LEVEL=DEBUG
         healthcheck:
             test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8001/liveness | jq -r .status) != \"OK\" ]; then exit 1; fi"]
