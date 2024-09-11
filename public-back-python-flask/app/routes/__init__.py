@@ -1,8 +1,8 @@
 from flask import Blueprint, request, current_app
 
-from .graphql import routes_graphql
-from .health import routes_health
-from .index import routes_index
+from app.routes.graphql import routes_graphql
+from app.routes.health import routes_health
+from app.routes.index import routes_index
 
 routes = Blueprint('routes', __name__)
 routes.register_blueprint(routes_health)
