@@ -10,7 +10,7 @@ def liveness():
     """
     Health check liveness - app local scope only
     """
-    current_app.logger.debug("Liveness check passed.")
+    current_app.logger.info("Liveness check passed.")
     return jsonify(status="OK"), 200
 
 
