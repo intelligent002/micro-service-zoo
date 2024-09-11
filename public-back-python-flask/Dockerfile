@@ -23,11 +23,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the project into app
-COPY flask_graphql_api/ /app
+COPY app /app/app
+COPY main.py /app
 
 # Expose the Flask port (8001)
 EXPOSE 8001
 
 # Command to run the Flask application
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8001", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8001", "main:app"]
 

@@ -1,6 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
+from app.app import db  # Import the db instance
 
-db = SQLAlchemy()
 
 class Project(db.Model):
     __tablename__ = 'projects'
@@ -8,6 +7,7 @@ class Project(db.Model):
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=False)
+
 
 class Task(db.Model):
     __tablename__ = 'tasks'
