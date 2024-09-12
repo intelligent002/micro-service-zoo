@@ -1,6 +1,6 @@
 import graphene
 from flask import current_app
-from graphene_sqlalchemy import SQLAlchemyObjectType
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 
 from app.graphql.models import Project as ProjectModel, Task as TaskModel
 from app.metrics import projects_counter, projects_duration, tasks_counter, tasks_duration
