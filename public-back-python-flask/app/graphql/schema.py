@@ -30,12 +30,12 @@ class Task(SQLAlchemyObjectType):
 
 class Query(graphene.ObjectType):
     # Define the List type for simpler resolvers
-    # get_projects = graphene.List(Project)
-    # get_tasks = graphene.List(Task)
+    get_projects = graphene.List(Project)
+    get_tasks = graphene.List(Task)
 
     # this is currently not exactly working
-    get_projects = SQLAlchemyConnectionField(Project, name=graphene.String())
-    get_tasks = SQLAlchemyConnectionField(Task, name=graphene.String())
+    # get_projects = SQLAlchemyConnectionField(Project, name=graphene.String())
+    # get_tasks = SQLAlchemyConnectionField(Task, name=graphene.String())
 
     # Measure the duration of this method
     @projects_duration.time()
