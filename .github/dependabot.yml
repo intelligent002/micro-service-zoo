@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # Python (e.g., for a microservice using `pip` or `poetry`)
+  - package-ecosystem: "pip"
+    directory: "/public-back-python-flask" # Location of requirements.txt in the microservice directory
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "python package update"
+    target-branch: "main" # Optional: specify the target branch
+    
+  # Composer (PHP dependencies)
+  - package-ecosystem: "composer"
+    directory: "/private-back-php-laravel"  # Location of composer.json in the microservice directory
+    schedule:
+      interval: "daily"  # Check for updates every day
+    ignore:
+      - dependency-name: "php"  # Ignore updates to PHP itself (if needed)
+    commit-message:
+      prefix: "composer package update"
+    target-branch: "main" # Optional: specify the target branch
+
+  # NPM (JavaScript dependencies)
+  - package-ecosystem: "npm"
+    directory: "/public-front-typescript-nextjs"  # Location of package.json in the microservice directory
+    schedule:
+      interval: "daily"  # Check for updates every day
+    commit-message:
+      prefix: "npm package update"
+    target-branch: "main" # Optional: specify the target branch
