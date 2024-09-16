@@ -1,5 +1,6 @@
 import graphene
 from flask import current_app
+from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 
 from app.graphql.models import Project as ProjectModel, Task as TaskModel
@@ -29,6 +30,8 @@ class Task(SQLAlchemyObjectType):
 
 
 class Query(graphene.ObjectType):
+    node = relay.Node.Field()
+
     # Define the List type for simpler resolvers
     get_projects = graphene.List(Project)
     get_tasks = graphene.List(Task)
@@ -48,12 +51,10 @@ class Query(graphene.ObjectType):
             # Get the name filter
             name = kwargs.get('name', None)
 
-            query = ProjectModel.query
             if name:
                 current_app.logger.debug(f"Fetching tasks with name filter: {name}")
-                query = query.filter(ProjectModel.name.ilike(f"%{name}%"))
-
-            return query
+                return ProjectModel.query.filter(ProjectModel.name.ilike(f"%{name}%"))
+            return ProjectModel.query
         except Exception as e:
             current_app.logger.error(f"Error while fetching projects {str(e)}")
             return []
@@ -69,12 +70,10 @@ class Query(graphene.ObjectType):
             # Get the name filter
             name = kwargs.get('name', None)
 
-            query = TaskModel.query
             if name:
                 current_app.logger.debug(f"Fetching tasks with name filter: {name}")
-                query = query.filter(TaskModel.name.ilike(f"%{name}%"))
-
-            return query
+                return TaskModel.query.filter(TaskModel.name.ilike(f"%{name}%"))
+            return TaskModel.query
         except Exception as e:
             current_app.logger.error(f"Error while fetching tasks {str(e)}")
             return []
