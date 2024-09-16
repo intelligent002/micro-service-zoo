@@ -3,6 +3,7 @@ updates:
   # Python (e.g., for a microservice using `pip` or `poetry`)
   - package-ecosystem: "pip"
     directory: "/public-back-python-flask" # Location of requirements.txt in the microservice directory
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"
     commit-message:
@@ -12,6 +13,7 @@ updates:
   # Composer (PHP dependencies)
   - package-ecosystem: "composer"
     directory: "/private-back-php-laravel"  # Location of composer.json in the microservice directory
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"  # Check for updates every day
     ignore:
@@ -23,6 +25,7 @@ updates:
   # NPM (JavaScript dependencies)
   - package-ecosystem: "npm"
     directory: "/public-front-typescript-nextjs"  # Location of package.json in the microservice directory
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"  # Check for updates every day
     commit-message:
