@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: "daily"
     commit-message:
-      prefix: "python package update"
+      prefix: "python"
     target-branch: "main" # Optional: specify the target branch
     
   # Composer (PHP dependencies)
@@ -17,7 +17,7 @@ updates:
     ignore:
       - dependency-name: "php"  # Ignore updates to PHP itself (if needed)
     commit-message:
-      prefix: "composer package update"
+      prefix: "php"
     target-branch: "main" # Optional: specify the target branch
 
   # NPM (JavaScript dependencies)
@@ -26,5 +26,5 @@ updates:
     schedule:
       interval: "daily"  # Check for updates every day
     commit-message:
-      prefix: "npm package update"
+      prefix: "npm"
     target-branch: "main" # Optional: specify the target branch
