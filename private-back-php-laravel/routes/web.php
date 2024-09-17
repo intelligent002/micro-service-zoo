@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\TaskController;
+use Illuminate\Support\Facades\Route;
 
 // Route for HealthCheck
-Route::get('/health', [HealthController::class, 'health'])->name('health');
+Route::get('/liveness', [HealthController::class, 'liveness'])->name('liveness');
+Route::get('/readiness', [HealthController::class, 'readiness'])->name('readiness');
 
 // Route for list of a tasks
 Route::controller(TaskController::class)->group(function () {
