@@ -18,21 +18,21 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
 
-//        $exceptions->render(function (Exception $e, Request $request) {
-//
-//            // Get route information
-//            $routeAction = $request->route()->getActionName(); // Get the controller and method
-//            $uri = $request->getRequestUri(); // Get the requested URI
-//            $method = $request->getMethod(); // Get the HTTP method (GET, POST, etc.)
-//
-//            // Log the error with route and method information
-//            Log::error("Failed to execute {$routeAction} - {$method} {$uri} - " . $e->getCode());
-//
-//            // Return json with custom error
-//            return response()->json([
-//                'status'  => 'ERROR',
-//                'message' => 'Request Failed, investigate the logs for additional details'
-//            ], Response::HTTP_OK);
-//        });
+        $exceptions->render(function (Exception $e, Request $request) {
+
+            // Get route information
+            $routeAction = $request->route()->getActionName(); // Get the controller and method
+            $uri = $request->getRequestUri(); // Get the requested URI
+            $method = $request->getMethod(); // Get the HTTP method (GET, POST, etc.)
+
+            // Log the error with route and method information
+            Log::error("Failed to execute {$routeAction} - {$method} {$uri} - " . $e->getCode());
+
+            // Return json with custom error
+            return response()->json([
+                'status'  => 'ERROR',
+                'message' => 'Request Failed, investigate the logs for additional details'
+            ], Response::HTTP_OK);
+        });
 
     })->create();

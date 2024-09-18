@@ -1,35 +1,39 @@
 # Use the official PHP image
 FROM php:8.2-fpm-alpine
 
-# Install system dependencies
-RUN apk update && apk add curl nano
+# Install system requirements
+RUN apk update && apk add --no-cache curl jq nano
 RUN docker-php-ext-install pdo pdo_mysql
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy custom PHP-FPM and PHP configurations
-COPY ./php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
-COPY ./php-fpm/php.ini /usr/local/etc/php/php.ini
-
 # Set working directory
 WORKDIR /var/www/html
+
+# Switch to the unprivileged user for running the app
+USER www-data
 
 # Copy the existing application directory
 COPY --chown=www-data:www-data . .
 RUN mv .env.example .env
 
-# Switch to the unprivileged user for running the app
-USER www-data
+# Copy default configuration files
+COPY php-fpm/php.ini /usr/local/etc/php/
+COPY php-fpm/www.conf /usr/local/etc/php-fpm.d/
 
 # Install PHP dependencies with Composer
 RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Set defaults for the build
+ARG APP_URL="http://localhost:8002"
+ENV APP_URL=${APP_URL}
 
 # Generate application key
 RUN php artisan key:generate
 
 # Expose app port to access the application
-EXPOSE 9000
+EXPOSE 8002
 
-# Start app in the foreground
+# Start PHP-FPM service
 CMD ["php-fpm"]
