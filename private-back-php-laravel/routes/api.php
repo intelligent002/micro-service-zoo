@@ -7,7 +7,7 @@ use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 // Route for index
-Route::get('api', [
+Route::get('/', [
     IndexController::class,
     'index'
 ])->name('index');
