@@ -23,13 +23,13 @@ services:
             - zoo
 
     # Private Backend written in PHP/Laravel (php:8.2-fpm-alpine)
-    private-back-php-laravel:
+    zoo-php-laravel:
         build:
-            context: ./private-back-php-laravel # Set build context to the respective folder
+            context: ./zoo-php-laravel # Set build context to the respective folder
             dockerfile: Dockerfile
             args:
                 APP_URL: "http://localhost:8003/"
-        container_name: private-back-php-laravel
+        container_name: zoo-php-laravel
         restart: unless-stopped
         environment:
             - APP_URL=http://localhost:82/
@@ -52,11 +52,11 @@ services:
             - zoo
 
     # Public Backend written in Python/Flask (python:3.12.5-alpine3.20)
-    public-back-python-flask:
+    zoo-python-flask:
         build:
-            context: ./public-back-python-flask # Set build context to the respective folder
+            context: ./zoo-python-flask # Set build context to the respective folder
             dockerfile: Dockerfile
-        container_name: public-back-python-flask
+        container_name: zoo-python-flask
         restart: unless-stopped
         environment:
             - DB_HOSTNAME=zoo-mysql
@@ -90,8 +90,8 @@ services:
         environment:
             - document_root=/var/www/html/public
         depends_on:
-            - public-back-python-flask
-            - private-back-php-laravel
+            - zoo-python-flask
+            - zoo-php-laravel
             - zoo-mysql
         networks:
             - zoo
