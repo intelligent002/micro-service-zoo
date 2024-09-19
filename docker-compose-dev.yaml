@@ -86,7 +86,7 @@ services:
         ports:
             - "82:80"  # Expose NGINX on port 8080
         volumes:
-            - ./nginx/some.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
+            - ./zoo-nginx/some.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
         environment:
             - document_root=/var/www/html/public
         depends_on:
