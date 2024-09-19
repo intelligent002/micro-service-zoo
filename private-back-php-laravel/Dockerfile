@@ -17,7 +17,7 @@ WORKDIR /var/www/html
 
 # Copy the existing application directory
 COPY --chown=www-data:www-data . .
-RUN mv .env.example .env
+RUN mv .env.example.docker .env
 
 # Switch to the unprivileged user for running the app
 USER www-data

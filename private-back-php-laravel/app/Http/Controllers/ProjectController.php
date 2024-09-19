@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProjectController extends Controller
@@ -50,6 +51,8 @@ class ProjectController extends Controller
      */
     public function show(Project $project): JsonResponse
     {
+        Log::info("project was found ");
+
         return response()->json([
             'status' => 'OK',
             'data'   => $project

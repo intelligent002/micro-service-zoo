@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
 
 return [
@@ -49,36 +50,33 @@ return [
 
     'channels' => [
 
-        'stack' => [
-            'driver'            => 'stack',
-            'channels'          => [
-                'stdout',
-                'stderr'
-            ],
-            // Log to both stdout and stderr based on log level
-            'ignore_exceptions' => false,
+        // Local environment (Apache, logs to a file)
+        'file'   => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/laravel.log'),
+            'level'  => env('LOG_LEVEL', 'debug'),
+            'days'   => 14,
         ],
 
-        'stdout' => [
-            'driver'  => 'monolog',
-            'handler' => StreamHandler::class,
-            'with'    => [
-                'stream' => 'php://stdout',
-            ],
-            'level'   => 'debug',
-            // Capture debug and higher (info, notice) levels
-        ],
-
+        // Docker environment (logs to stderr)
         'stderr' => [
-            'driver'  => 'monolog',
-            'handler' => StreamHandler::class,
-            'with'    => [
+            'driver'    => 'monolog',
+            'handler'   => StreamHandler::class,
+            'formatter' => JsonFormatter::class,
+            'with'      => [
                 'stream' => 'php://stderr',
             ],
-            'level'   => 'warning',
-            // Capture warning and higher (error, critical, alert, emergency) levels
+            'level'     => env('LOG_LEVEL', 'debug'),
         ],
 
+        // Stack channel that can use multiple channels
+        'stack'  => [
+            'driver'   => 'stack',
+            'channels' => [
+                env('LOG_STACK_CHANNEL_1', 'file'),
+                env('LOG_STACK_CHANNEL_2', 'stderr'),
+            ],
+        ],
     ],
 
 ];

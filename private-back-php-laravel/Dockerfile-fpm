@@ -16,7 +16,7 @@ USER www-data
 
 # Copy the existing application directory
 COPY --chown=www-data:www-data . .
-RUN mv .env.example .env
+RUN mv .env.example.local-apache .env
 
 # Copy default configuration files
 COPY php-fpm/php.ini /usr/local/etc/php/
