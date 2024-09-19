@@ -2,7 +2,7 @@
 FROM php:8.2-fpm-alpine
 
 # Install system dependencies
-RUN apk update && apk add curl nano
+RUN apk update && apk add curl nano jq fcgi
 RUN docker-php-ext-install pdo pdo_mysql
 
 # Install Composer
@@ -10,6 +10,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy custom PHP-FPM and PHP configurations
 COPY ./php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./php-fpm/docker.conf /usr/local/etc/php-fpm.d/docker.conf
 COPY ./php-fpm/php.ini /usr/local/etc/php/php.ini
 
 # Set working directory

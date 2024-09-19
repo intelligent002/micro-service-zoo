@@ -38,7 +38,7 @@ services:
             - DB_DATABASE=zoo_db
             - DB_USERNAME=zoo_user
         healthcheck:
-            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:9000/liveness | jq -r .status) != \"OK\" ]; then exit 1; fi"]
+            test: ["CMD-SHELL", "REQUEST_URI=/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 | sed -n '/^{/,$$p' | jq -e '.status == \"OK\"' > /dev/null || exit 1"]
             interval: 30s
             retries: 3
             start_period: 5s
