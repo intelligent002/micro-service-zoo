@@ -34,6 +34,6 @@ def readiness():
 
     # If any service fails, return 503
     if "ERROR" in readiness_status.values():
-        return jsonify(status="ERROR", services=readiness_status), 503
+        return jsonify(status="ERROR", data=readiness_status), 503
 
-    return jsonify(status="OK", services=readiness_status), 200
+    return jsonify(status="OK", data=readiness_status), 200
