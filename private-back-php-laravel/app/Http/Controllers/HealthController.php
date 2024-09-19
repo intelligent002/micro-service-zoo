@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class HealthController extends Controller
 {
@@ -44,14 +44,14 @@ class HealthController extends Controller
             // not found - return "status: OK"
             Log::info("Readiness check passed.");
             return response()->json([
-                'status'   => 'OK',
-                'services' => $readiness_status
+                'status' => 'OK',
+                'data'   => $readiness_status
             ], Response::HTTP_OK); // 200 is the default status
         } else {
             // found - return "status: ERROR"
             return response()->json([
-                'status'   => 'ERROR',
-                'services' => $readiness_status
+                'status' => 'ERROR',
+                'data'   => $readiness_status
             ], Response::HTTP_SERVICE_UNAVAILABLE); // 503
         }
     }

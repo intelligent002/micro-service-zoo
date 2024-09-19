@@ -19,7 +19,7 @@ class TaskController extends Controller
         $tasks = Task::where('project_id', $project->id)->orderBy('priority', 'asc')->get();
         return response()->json([
             'status' => 'OK',
-            'tasks'  => $tasks
+            'data'   => $tasks
         ], Response::HTTP_OK);
 
     }
@@ -58,11 +58,11 @@ class TaskController extends Controller
 
         return response()->json([
             'status' => 'OK',
-            'task'   => $task
+            'data'   => $task
         ], Response::HTTP_CREATED);
     }
 
-    public function update(Project $project,Task $task, Request $request)
+    public function update(Project $project, Task $task, Request $request)
     {
         // Validate request data
         $validatedData = $request->validate([
@@ -76,7 +76,7 @@ class TaskController extends Controller
 
         return response()->json([
             'status' => 'OK',
-            'task'   => $task
+            'data'   => $task
         ], Response::HTTP_CREATED);
     }
 
@@ -85,11 +85,11 @@ class TaskController extends Controller
      * @param Task $task
      * @return JsonResponse
      */
-    public function show(Project $project,Task $task): JsonResponse
+    public function show(Project $project, Task $task): JsonResponse
     {
         return response()->json([
             'status' => 'OK',
-            'task'   => $task
+            'data'   => $task
         ], Response::HTTP_OK);
     }
 
@@ -98,7 +98,7 @@ class TaskController extends Controller
      * @param Task $task
      * @return JsonResponse
      */
-    public function destroy(Project $project,Task $task): JsonResponse
+    public function destroy(Project $project, Task $task): JsonResponse
     {
         // Delete the task
         $task->delete();

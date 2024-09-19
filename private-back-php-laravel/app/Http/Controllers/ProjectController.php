@@ -17,8 +17,8 @@ class ProjectController extends Controller
     {
         $projects = Project::all();
         return response()->json([
-            'status'   => 'OK',
-            'projects' => $projects
+            'status' => 'OK',
+            'data'   => $projects
         ], Response::HTTP_OK);
     }
 
@@ -38,8 +38,8 @@ class ProjectController extends Controller
         $project = Project::create($validatedData);
 
         return response()->json([
-            'status'  => 'OK',
-            'project' => $project
+            'status' => 'OK',
+            'data'   => $project
         ], Response::HTTP_CREATED);
     }
 
@@ -51,8 +51,8 @@ class ProjectController extends Controller
     public function show(Project $project): JsonResponse
     {
         return response()->json([
-            'status'  => 'OK',
-            'project' => $project
+            'status' => 'OK',
+            'data'   => $project
         ], Response::HTTP_OK);
     }
 
@@ -73,8 +73,8 @@ class ProjectController extends Controller
         $project->update($validatedData);
 
         return response()->json([
-            'status'  => 'OK',
-            'project' => $project
+            'status' => 'OK',
+            'data'   => $project
         ], Response::HTTP_OK);
     }
 
