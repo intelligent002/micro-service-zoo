@@ -22,7 +22,7 @@ services:
         networks:
             - zoo
 
-    # Private Backend written in PHP/Laravel (php:8.2-fpm-alpine)
+    # Backend written in PHP/Laravel (php:8.2-fpm-alpine)
     zoo-php-laravel:
         build:
             context: ./zoo-php-laravel # Set build context to the respective folder
@@ -51,7 +51,7 @@ services:
         networks:
             - zoo
 
-    # Public Backend written in Python/Flask (python:3.12.5-alpine3.20)
+    # Backend written in Python/Flask (python:3.12.5-alpine3.20)
     zoo-python-flask:
         build:
             context: ./zoo-python-flask # Set build context to the respective folder
