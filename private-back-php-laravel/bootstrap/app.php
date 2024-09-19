@@ -26,12 +26,12 @@ return Application::configure(basePath: dirname(__DIR__))
             $method = $request->getMethod(); // Get the HTTP method (GET, POST, etc.)
 
             // Log the error with route and method information
-            Log::error("Failed to execute {$routeAction} - {$method} {$uri} - " . $e->getCode());
+            Log::error("Failed to execute {$routeAction} - {$method} {$uri} - " . $e->getCode() . ":" . $e->getMessage());
 
             // Return json with custom error
             return response()->json([
                 'status'  => 'ERROR',
-                'message' => 'Request Failed, investigate the logs for additional details'
+                'message' => 'Request Failed, investigate the logs for additional details' . $e->getMessage()
             ], Response::HTTP_OK);
         });
 

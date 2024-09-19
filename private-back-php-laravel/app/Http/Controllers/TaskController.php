@@ -62,7 +62,7 @@ class TaskController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    public function update(Task $task, Request $request)
+    public function update(Project $project,Task $task, Request $request)
     {
         // Validate request data
         $validatedData = $request->validate([
@@ -85,7 +85,7 @@ class TaskController extends Controller
      * @param Task $task
      * @return JsonResponse
      */
-    public function show(Task $task): JsonResponse
+    public function show(Project $project,Task $task): JsonResponse
     {
         return response()->json([
             'status' => 'OK',
@@ -98,7 +98,7 @@ class TaskController extends Controller
      * @param Task $task
      * @return JsonResponse
      */
-    public function destroy(Task $task): JsonResponse
+    public function destroy(Project $project,Task $task): JsonResponse
     {
         // Delete the task
         $task->delete();
