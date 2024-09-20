@@ -1,17 +1,20 @@
 # Use the official PHP image
-FROM php:8.2-fpm-alpine
+FROM docker.artifactory.intel.r7g.org/php:8.2-fpm-alpine
 
 # Install system dependencies
 RUN apk update && apk add curl nano jq fcgi
 RUN docker-php-ext-install pdo pdo_mysql
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=docker.artifactory.intel.r7g.org/composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy custom PHP-FPM and PHP configurations
+# Copy custom PHP-FPM configurations
 COPY ./php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY ./php-fpm/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 COPY ./php-fpm/docker.conf /usr/local/etc/php-fpm.d/docker.conf
+# Copy custom PHP configurations
 COPY ./php-fpm/php.ini /usr/local/etc/php/php.ini
+RUN chmod 0777 /usr/local/var/log/ -R
 
 # Set working directory
 WORKDIR /var/www/html

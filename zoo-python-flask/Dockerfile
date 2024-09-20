@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.12.5-alpine3.20
+FROM docker.artifactory.intel.r7g.org/python:3.12.5-alpine3.20
 
 # Install system requirements
 RUN apk update && apk add --no-cache curl jq nano

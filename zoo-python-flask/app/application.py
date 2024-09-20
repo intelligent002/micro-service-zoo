@@ -1,6 +1,3 @@
-import os
-
-import prometheus_client
 from flask import Flask
 from prometheus_flask_exporter import PrometheusMetrics
 
@@ -27,5 +24,5 @@ def create_app():
     # Initialize Prometheus metrics
     PrometheusMetrics(app)
 
-    app.register_blueprint(routes)
+    app.register_blueprint(routes, url_prefix='/graphql')
     return app

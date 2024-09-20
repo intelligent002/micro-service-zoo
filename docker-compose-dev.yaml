@@ -1,14 +1,15 @@
 services:
+
     # MySQL Service
     zoo-mysql:
         image: mysql:8.0
         container_name: zoo-mysql
         restart: unless-stopped
         environment:
-            MYSQL_ROOT_PASSWORD: root_password
-            MYSQL_DATABASE: zoo_db
-            MYSQL_USER: zoo_user
-            MYSQL_PASSWORD: zoo_password
+            MYSQL_ROOT_PASSWORD: root-password
+            MYSQL_DATABASE: zoo-db
+            MYSQL_USER: zoo-user
+            MYSQL_PASSWORD: zoo-password
         healthcheck:
             test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
             interval: 30s
@@ -32,24 +33,44 @@ services:
         container_name: zoo-php-laravel
         restart: unless-stopped
         environment:
-            - APP_URL=http://localhost:82/
+            - APP_URL=http://localhost:8003/
             - DB_HOSTNAME=zoo-mysql
-            - DB_PASSWORD=zoo_password
-            - DB_DATABASE=zoo_db
-            - DB_USERNAME=zoo_user
+            - DB_PASSWORD=zoo-password
+            - DB_DATABASE=zoo-db
+            - DB_USERNAME=zoo-user
         healthcheck:
-            test: ["CMD-SHELL", "REQUEST_URI=/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 | sed -n '/^{/,$$p' | jq -e '.status == \"OK\"' > /dev/null || exit 1"]
+            test: ["CMD-SHELL", "REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8003 | sed -n '/^{/,$$p' | jq -e '.status == \"OK\"' > /dev/null || exit 1"]
             interval: 30s
             retries: 3
             start_period: 5s
             timeout: 10s
         ports:
-            - "9000:9000"
+            - "8003:8003"
         depends_on:
             - zoo-mysql
         command: /bin/sh -c "php artisan migrate --force && php-fpm"
         networks:
             - zoo
+
+    # HTTP to PHP-FPM converter
+    zoo-http2fpm:
+        image: docker.artifactory.intel.r7g.org/nginx:latest
+        container_name: zoo-http2fpm
+        restart: unless-stopped
+        volumes:
+            - ./zoo-nginx/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
+            - ./zoo-nginx/probe/:/var/www/html/
+        healthcheck:
+            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8004/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
+            interval: 30s
+            retries: 3
+            start_period: 5s
+            timeout: 10s
+        ports:
+            - "8004:8004"
+        networks:
+            - zoo
+
 
     # Backend written in Python/Flask (python:3.12.5-alpine3.20)
     zoo-python-flask:
@@ -60,13 +81,13 @@ services:
         restart: unless-stopped
         environment:
             - DB_HOSTNAME=zoo-mysql
-            - DB_USERNAME=zoo_user
-            - DB_PASSWORD=zoo_password
-            - DB_DATABASE=zoo_db
+            - DB_USERNAME=zoo-user
+            - DB_PASSWORD=zoo-password
+            - DB_DATABASE=zoo-db
             - DEBUG_MODE=False
             - LOG_LEVEL=DEBUG
         healthcheck:
-            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8001/liveness | jq -r .status) != \"OK\" ]; then exit 1; fi"]
+            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8001/graphql/liveness | jq -r .status) != \"OK\" ]; then exit 1; fi"]
             interval: 30s
             retries: 3
             start_period: 5s
@@ -79,19 +100,24 @@ services:
             - zoo
 
     # NGINX Service (Reverse Proxy + Caching + Static File Serving)
-    zoo-nginx:
-        image: nginx:latest
-        container_name: zoo-nginx
+    zoo-router:
+        image: docker.artifactory.intel.r7g.org/nginx:latest
+        container_name: zoo-router
         restart: unless-stopped
         ports:
-            - "82:80"  # Expose NGINX on port 8080
+            - "82:80"
         volumes:
-            - ./zoo-nginx/some.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
-        environment:
-            - document_root=/var/www/html/public
+            - ./zoo-nginx/router.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
+            - ./zoo-nginx/probe/:/var/www/html/
+        healthcheck:
+            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:80/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
+            interval: 30s
+            retries: 3
+            start_period: 5s
+            timeout: 10s
         depends_on:
             - zoo-python-flask
-            - zoo-php-laravel
+            - zoo-http2fpm
             - zoo-mysql
         networks:
             - zoo
