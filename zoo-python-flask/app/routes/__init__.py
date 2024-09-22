@@ -17,7 +17,7 @@ def log_request_info():
     Log request headers and body to STDOUT if DEBUG_MODE is enabled.
     Avoid logging sensitive information like POST/PUT/PATCH bodies.
     """
-    if current_app.config.get('DEBUG_MODE', False):
+    if current_app.config.get('DEBUG_MODE', True):
         # Log headers (filter out sensitive information like Authorization, Cookies)
         filtered_headers = {k: v for k, v in request.headers.items() if k.lower() not in ['authorization', 'cookie']}
         current_app.logger.debug("Headers: %s", filtered_headers)

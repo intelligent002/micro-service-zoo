@@ -39,7 +39,7 @@ services:
             - DB_USERNAME=zoo-user
             - DB_PASSWORD=zoo-password
             - DB_DATABASE=zoo-db
-            - DEBUG_MODE=False
+            - DEBUG_MODE=True
             - LOG_LEVEL=DEBUG
         healthcheck:
             # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ

@@ -8,4 +8,4 @@ app = create_app()
 
 if __name__ == "__main__":
     # Toggle debug mode using an environment variable
-    app.run(debug=Config.DEBUG_MODE)
+    app.run(debug=Config.DEBUG_MODE,port=82)

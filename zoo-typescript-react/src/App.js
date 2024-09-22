@@ -7,22 +7,25 @@ import { gql } from '@apollo/client';
 
 // GraphQL Queries
 const GET_PROJECTS = gql`
-  query GetProjects {
-    projects {
-      id
-      name
+    query getProjects {
+        getProjects {
+            id
+            name
+            rawId
+            __typename
+        }
     }
-  }
 `;
 
 const GET_TASKS = gql`
-  query GetTasks($projectId: ID!) {
-    tasks(projectId: $projectId) {
-      id
-      name
-      project_id
+    query GetTasks($projectId: Int!) {
+        getTasks(projectId: $projectId) {
+            id
+            name
+            rawId
+            __typename
+        }
     }
-  }
 `;
 
 function ProjectsList({ onSelect }) {
@@ -35,9 +38,9 @@ function ProjectsList({ onSelect }) {
       <div>
         <h3>Projects</h3>
         <ul>
-          {data.projects.map((project) => (
+          {data.getProjects.map((project) => (
               <li key={project.id}>
-                <button onClick={() => onSelect(project.id)}>{project.name}</button>
+                <button onClick={() => onSelect(project.rawId)}>{project.name}</button>
               </li>
           ))}
         </ul>
@@ -57,7 +60,7 @@ function TasksList({ projectId }) {
       <div>
         <h3>Tasks for Project {projectId}</h3>
         <ul>
-          {data.tasks.map((task) => (
+          {data.getTasks.map((task) => (
               <li key={task.id}>{task.name}</li>
           ))}
         </ul>

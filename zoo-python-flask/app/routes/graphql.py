@@ -1,18 +1,29 @@
-from flask import Blueprint
+import json
+
+from flask import Blueprint, current_app
 from flask_graphql import GraphQLView
+from graphql.language.location import SourceLocation
+
 from app.graphql.schema import schema
 
 routes_graphql = Blueprint('routes_graphql', __name__)
 
-def format_error(error):
+# Custom error formatter
+def custom_format_error(error):
     """
-    Define format for errors.
+    Define format for GraphQL errors.
     """
-    return {
-        'message': error.message,
-        'locations': error.locations,
-        'path': error.path
+    formatted_error = {
+        'message': str(error),
+        'locations': [
+            {
+                'line': loc.line,
+                'column': loc.column
+            } for loc in getattr(error, 'locations', [])
+        ] if getattr(error, 'locations', None) else None,
+        'path': getattr(error, 'path', None)
     }
+    return formatted_error
 
 # Create the GraphQL view with GraphiQL disabled
 routes_graphql.add_url_rule(
@@ -20,9 +31,9 @@ routes_graphql.add_url_rule(
     view_func=GraphQLView.as_view(
         'graphql',
         schema=schema,
-        batch=True,  # Enable batch processing for GraphQL queries
+        batch=False,  # Enable batch processing for GraphQL queries
         graphiql=True,  # Disable the GraphiQL interface for security purposes
-        format_error=format_error  # Custom error handler
+        format_error=custom_format_error    # Custom error handler
     ),
     methods=['GET', 'POST']  # Allow GET and POST requests for the GraphQL endpoint
 )

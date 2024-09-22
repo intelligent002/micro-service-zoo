@@ -32,13 +32,16 @@ class Task(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
 
-    # Define the List type for simpler resolvers
-    get_projects = graphene.List(Project)
-    get_tasks = graphene.List(Task)
-
     # this is currently not exactly working
     # get_projects = SQLAlchemyConnectionField(Project, name=graphene.String())
     # get_tasks = SQLAlchemyConnectionField(Task, name=graphene.String())
+
+    # Define the List type for simpler resolvers
+    get_projects = graphene.List(Project)
+
+    # Add the projectId argument to the get_tasks field
+    get_tasks = graphene.List(Task, name=graphene.String(), project_id=graphene.Int())
+
 
     # Measure the duration of this method
     @projects_duration.time()
@@ -67,13 +70,24 @@ class Query(graphene.ObjectType):
             current_app.logger.debug(f"Received arguments: {kwargs}")
             # Increment counter
             tasks_counter.inc()
-            # Get the name filter
-            name = kwargs.get('name', None)
 
+            # Get the name and project_id filters
+            name = kwargs.get('name', None)
+            project_id = kwargs.get('project_id', None)
+
+            query = TaskModel.query
+
+            # Apply the name filter if provided
             if name:
                 current_app.logger.debug(f"Fetching tasks with name filter: {name}")
-                return TaskModel.query.filter(TaskModel.name.ilike(f"%{name}%"))
-            return TaskModel.query
+                query = query.filter(TaskModel.name.ilike(f"%{name}%"))
+
+            # Apply the project_id filter if provided
+            if project_id:
+                current_app.logger.debug(f"Fetching tasks for project_id: {project_id}")
+                query = query.filter(TaskModel.project_id == project_id)
+
+            return query
         except Exception as e:
             current_app.logger.error(f"Error while fetching tasks {str(e)}")
             return []
