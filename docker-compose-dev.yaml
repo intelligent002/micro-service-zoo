@@ -55,6 +55,29 @@ services:
         networks:
             - zoo
 
+    # Frontend written in TypeScript/React (node:18-alpine3.20)
+    zoo-typescript-react:
+        build:
+            context: ./zoo-typescript-react # Set build context to the respective folder
+            dockerfile: Dockerfile
+        container_name: zoo-typescript-react
+        restart: unless-stopped
+        environment:
+            - LOG_LEVEL=DEBUG
+        healthcheck:
+            # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
+            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8002/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
+            interval: 60s
+            retries: 3
+            start_period: 5s
+            timeout: 10s
+        ports:
+            - "8002:8002"
+        depends_on:
+            - zoo-python-flask
+        networks:
+            - zoo
+
     # Backend written in PHP/Laravel (php:8.2-fpm)
     zoo-php-laravel:
         build:
@@ -94,8 +117,8 @@ services:
         container_name: zoo-http2fpm
         restart: unless-stopped
         volumes:
-            - ./zoo-nginx/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
-            - ./zoo-nginx/probe/:/var/www/html/
+            - ./zoo-http2fpm/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
+            - ./zoo-http2fpm/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
             test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8004/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
@@ -118,8 +141,8 @@ services:
         ports:
             - "82:80"
         volumes:
-            - ./zoo-nginx/router.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
-            - ./zoo-nginx/probe/:/var/www/html/
+            - ./zoo-router/router.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
+            - ./zoo-router/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
             test: ["CMD-SHELL", "if [ $(curl -s http://localhost:80/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
