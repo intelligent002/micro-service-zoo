@@ -23,7 +23,7 @@ def log_request_info():
         current_app.logger.debug("Headers: %s", filtered_headers)
 
         # Avoid logging the full body for sensitive methods like PUT/POST/PATCH, while we do read only
-        if request.method in ['PUT','PATCH']:
+        if request.method in ['PUT','POST','PATCH']:
             current_app.logger.debug("Body logging skipped for %s request.", request.method)
         else:
             current_app.logger.debug("Body: %s", request.get_data(as_text=True))

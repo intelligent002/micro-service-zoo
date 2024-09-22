@@ -27,7 +27,7 @@ COPY app /app/app
 COPY main.py /app
 
 # Expose the Flask port (8001)
-EXPOSE 8001
+EXPOSE 8001/tcp
 
 # Command to run the Flask application
 CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:8001", "main:app"]

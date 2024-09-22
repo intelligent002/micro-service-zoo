@@ -2,3 +2,6 @@
 .idea
 # Virtual environment
 *.venv
+
+# garbage
+starter.*

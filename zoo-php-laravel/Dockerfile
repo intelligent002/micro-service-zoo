@@ -35,7 +35,7 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev
 RUN php artisan key:generate
 
 # Expose app port to access the application
-EXPOSE 9000
+EXPOSE 8003/tcp
 
 # Start app in the foreground
 CMD ["php-fpm"]
