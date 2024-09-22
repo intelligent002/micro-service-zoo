@@ -112,13 +112,13 @@ services:
             - zoo
 
     # NGINX Service (Reverse Proxy + HTTP to PHP-FPM converter + Static File Serving)
-    zoo-http2fpm:
+    zoo-php-laravel-http2fpm:
         image: docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
-        container_name: zoo-http2fpm
+        container_name: zoo-php-laravel-http2fpm
         restart: unless-stopped
         volumes:
-            - ./zoo-http2fpm/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
-            - ./zoo-http2fpm/probe/:/var/www/html/
+            - ./zoo-php-laravel-http2fpm/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
+            - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
             test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8004/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
@@ -151,8 +151,9 @@ services:
             start_period: 5s
             timeout: 10s
         depends_on:
+            - zoo-typescript-react
             - zoo-python-flask
-            - zoo-http2fpm
+            - zoo-php-laravel-http2fpm
         networks:
             - zoo
 
