@@ -17,7 +17,8 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve with Nginx
-FROM nginx:stable-alpine
+FROM docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
+RUN apk update && apk add curl jq
 
 # Copy the built React files from the previous stage to Nginx's html directory
 COPY --from=build /app/build /usr/share/nginx/html

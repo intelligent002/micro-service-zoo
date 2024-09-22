@@ -1,8 +1,5 @@
-import json
-
-from flask import Blueprint, current_app
+from flask import Blueprint
 from flask_graphql import GraphQLView
-from graphql.language.location import SourceLocation
 
 from app.graphql.schema import schema
 

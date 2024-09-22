@@ -18,7 +18,7 @@ services:
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
         entrypoint: ["/bin/bash", "-c", "chmod +x /mysql-health.sh && docker-entrypoint.sh mysqld"]
         healthcheck:
-            # Test availabiltiy of mysql service, listening & serving - via mounted script
+            # Test availabiltiy of mysql service, listening & actually serving - via mounted script
             test: [ "CMD", "/mysql-health.sh" ]
             interval: 60s
             retries: 5
@@ -43,7 +43,8 @@ services:
             - LOG_LEVEL=DEBUG
         healthcheck:
             # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ
-            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8001/graphql/liveness | jq -r .status) != \"OK\" ]; then exit 1; fi"]
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8001/graphql/liveness | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
@@ -65,8 +66,9 @@ services:
         environment:
             - LOG_LEVEL=DEBUG
         healthcheck:
-            # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
-            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8002/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
+            # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8002/liveness | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
@@ -97,7 +99,8 @@ services:
             - ./zoo-mysql/mysql-wait.sh:/mysql-wait.sh
         healthcheck:
             # Test availabiltiy of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
-            test: ["CMD-SHELL", "REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8003 | sed -n '/^{/,$$p' | jq -e '.status == \"OK\"' > /dev/null || exit 1"]
+            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8003 | sed -n '/^{/,$$p' | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
@@ -113,6 +116,9 @@ services:
 
     # NGINX Service (Reverse Proxy + HTTP to PHP-FPM converter + Static File Serving)
     zoo-php-laravel-http2fpm:
+        build:
+            context: ./zoo-php-laravel-http2fpm # Set build context to the respective folder
+            dockerfile: Dockerfile
         image: docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
         container_name: zoo-php-laravel-http2fpm
         restart: unless-stopped
@@ -120,8 +126,9 @@ services:
             - ./zoo-php-laravel-http2fpm/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
             - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/
         healthcheck:
-            # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
-            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:8004/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
+            # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8004/liveness | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
@@ -135,7 +142,9 @@ services:
 
     # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
     zoo-router:
-        image: docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
+        build:
+            context: ./zoo-php-laravel-http2fpm # Set build context to the respective folder
+            dockerfile: Dockerfile
         container_name: zoo-router
         restart: unless-stopped
         ports:
@@ -145,7 +154,8 @@ services:
             - ./zoo-router/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
-            test: ["CMD-SHELL", "if [ $(curl -s http://localhost:80/liveness ) != '{\"status\":\"OK\"}' ]; then exit 1; fi"]
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:80/liveness | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
