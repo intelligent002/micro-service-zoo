@@ -1,7 +1,7 @@
 server {
     
     # The server listens on port 8004 and is set as the default server.
-    listen 8004 default_server;
+    listen ${NGINX_PORT} default_server;
     
     # The server responds to requests directed to 'localhost'.
     server_name localhost;
@@ -22,7 +22,7 @@ server {
     location ~ \.php$ {
         
         # Forwards the request to PHP-FPM running on port 8003 in the 'zoo-php-laravel' container.
-        fastcgi_pass zoo-php-laravel:8003;
+        fastcgi_pass zoo-php-laravel:${ZOO_PHP_LARAVEL_PORT};
 
         # Includes standard FastCGI parameters needed for NGINX to communicate with PHP-FPM.
         include fastcgi_params;

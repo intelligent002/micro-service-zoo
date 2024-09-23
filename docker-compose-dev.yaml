@@ -6,13 +6,14 @@ services:
         container_name: zoo-mysql
         restart: unless-stopped
         ports:
-            - "3306:3306"
+            - "3307:3307"
         environment:
             MYSQL_ROOT_PASSWORD: root-password
             MYSQL_DATABASE: zoo-db
             MYSQL_USER: zoo-user
             MYSQL_PASSWORD: zoo-password
             MYSQL_HOSTNAME: localhost
+            MYSQL_TCP_PORT: 3307
         volumes:
             - mysql-data:/var/lib/mysql
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
@@ -39,18 +40,20 @@ services:
             - DB_USERNAME=zoo-user
             - DB_PASSWORD=zoo-password
             - DB_DATABASE=zoo-db
+            - DB_PORT=3307
             - DEBUG_MODE=False
             - LOG_LEVEL=DEBUG
+            - APP_PORT=8101
         healthcheck:
             # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8001/graphql/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/graphql/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
             timeout: 10s
         ports:
-            - "8001:8001"
+            - "8101:8101"
         depends_on:
             - zoo-mysql
         networks:
@@ -65,16 +68,17 @@ services:
         restart: unless-stopped
         environment:
             - LOG_LEVEL=DEBUG
+            - NGINX_PORT=8102
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8002/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8102/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
             timeout: 10s
         ports:
-            - "8002:8002"
+            - "8102:8102"
         depends_on:
             - zoo-python-flask
         networks:
@@ -95,18 +99,20 @@ services:
             - DB_PASSWORD=zoo-password
             - DB_DATABASE=zoo-db
             - DB_USERNAME=zoo-user
+            - DB_PORT=3307
+            - APP_PORT=8103
         volumes:
             - ./zoo-mysql/mysql-wait.sh:/mysql-wait.sh
         healthcheck:
             # Test availabiltiy of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8003 | sed -n '/^{/,$$p' | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
             start_period: 5s
             timeout: 10s
         ports:
-            - "8003:8003"
+            - "8103:8103"
         depends_on:
             - zoo-mysql
         # dont start the migrations before mysql is really ready to serve requests
@@ -119,15 +125,16 @@ services:
         build:
             context: ./zoo-php-laravel-http2fpm # Set build context to the respective folder
             dockerfile: Dockerfile
-        image: docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
         container_name: zoo-php-laravel-http2fpm
         restart: unless-stopped
+        environment:
+            - NGINX_PORT=8104
+            - ZOO_PHP_LARAVEL_PORT=8103
         volumes:
-            - ./zoo-php-laravel-http2fpm/http2fpm.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
             - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8004/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8104/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
@@ -136,25 +143,29 @@ services:
         depends_on:
             - zoo-php-laravel
         ports:
-            - "8004:8004"
+            - "8104:8104"
         networks:
             - zoo
 
     # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
     zoo-router:
         build:
-            context: ./zoo-php-laravel-http2fpm # Set build context to the respective folder
+            context: ./zoo-router # Set build context to the respective folder
             dockerfile: Dockerfile
         container_name: zoo-router
         restart: unless-stopped
+        environment:
+            - NGINX_PORT=8120
+            - ZOO_PYTHON_FLASK_PORT=8101
+            - ZOO_TYPESCRIPT_REACT_PORT=8102
+            - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
         ports:
-            - "82:80"
+            - "8120:8120"
         volumes:
-            - ./zoo-router/router.conf:/etc/nginx/conf.d/default.conf:ro  # Use custom NGINX config
             - ./zoo-router/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:80/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8120/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3

@@ -23,11 +23,13 @@ RUN apk update && apk add curl jq
 # Copy the built React files from the previous stage to Nginx's html directory
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy custom Nginx configuration (if needed)
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Copy configuration and starter files
+COPY nginx/nginx.conf.template /etc/nginx/conf.d/default.conf.template
+COPY nginx/start.sh /start.sh
+RUN chmod +x /start.sh && rm -f /etc/nginx/conf.d/default.conf
 
 # Expose the default Nginx port
 EXPOSE 8002/tcp
 
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Start Nginx server via new starter
+CMD ["/start.sh"]
