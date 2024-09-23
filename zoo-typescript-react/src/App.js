@@ -1,9 +1,8 @@
 // src/App.js
-import React, { useState } from 'react';
-import { ApolloProvider, useQuery } from '@apollo/client';
-import client from './apollo-client';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import { gql } from '@apollo/client';
+import React, {useEffect, useState} from 'react';
+import {ApolloProvider, gql, useQuery} from '@apollo/client';
+import {getApolloClient} from './apollo-client';
+import {BrowserRouter as Router} from 'react-router-dom';
 
 // GraphQL Queries
 const GET_PROJECTS = gql`
@@ -18,7 +17,7 @@ const GET_PROJECTS = gql`
 `;
 
 const GET_TASKS = gql`
-    query GetTasks($projectId: Int!) {
+    query getTasks($projectId: Int!) {
         getTasks(projectId: $projectId) {
             id
             name
@@ -28,59 +27,79 @@ const GET_TASKS = gql`
     }
 `;
 
-function ProjectsList({ onSelect }) {
-  const { loading, error, data } = useQuery(GET_PROJECTS);
+function ProjectsList({onSelect}) {
+    const {loading, error, data} = useQuery(GET_PROJECTS);
 
-  if (loading) return <p>Loading projects...</p>;
-  if (error) return <p>Error loading projects</p>;
+    if (loading) return <p>Loading projects...</p>;
+    if (error) return <p>Error loading projects</p>;
 
-  return (
-      <div>
-        <h3>Projects</h3>
-        <ul>
-          {data.getProjects.map((project) => (
-              <li key={project.id}>
-                <button onClick={() => onSelect(project.rawId)}>{project.name}</button>
-              </li>
-          ))}
-        </ul>
-      </div>
-  );
+    return (
+        <div>
+            <h3>Projects</h3>
+            <ul>
+                {data.getProjects.map((project) => (
+                    <li key={project.id}>
+                        <button onClick={() => onSelect(project.rawId)}>
+                            {project.name}
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
-function TasksList({ projectId }) {
-  const { loading, error, data } = useQuery(GET_TASKS, {
-    variables: { projectId },
-  });
 
-  if (loading) return <p>Loading tasks...</p>;
-  if (error) return <p>Error loading tasks</p>;
+function TasksList({projectId}) {
+    const {loading, error, data} = useQuery(GET_TASKS, {
+        variables: {projectId},
+    });
 
-  return (
-      <div>
-        <h3>Tasks for Project {projectId}</h3>
-        <ul>
-          {data.getTasks.map((task) => (
-              <li key={task.id}>{task.name}</li>
-          ))}
-        </ul>
-      </div>
-  );
+    if (loading) return <p>Loading tasks...</p>;
+    if (error) return <p>Error loading tasks</p>;
+
+    return (
+        <div>
+            <h3>Tasks for Project {projectId}</h3>
+            <ul>
+                {data.getTasks.map((task) => (
+                    <li key={task.id}>{task.name}</li>
+                ))}
+            </ul>
+        </div>
+    );
 }
 
 function App() {
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
+    // Separate useState hooks for client and selectedProjectId
+    const [client, setClient] = useState(null);
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
 
-  return (
-      <ApolloProvider client={client}>
-        <Router>
-          <div className="App">
-            <ProjectsList onSelect={setSelectedProjectId} />
-            {selectedProjectId && <TasksList projectId={selectedProjectId} />}
-          </div>
-        </Router>
-      </ApolloProvider>
-  );
+    // Initialize Apollo Client after config is loaded
+    useEffect(() => {
+        const initApolloClient = async () => {
+            const apolloClient = await getApolloClient();
+            setClient(apolloClient);
+        };
+        initApolloClient();
+    }, [setClient]);
+
+    if (!client) {
+        return <p>Loading...</p>; // Or a loading spinner
+    }
+
+    return (
+        <ApolloProvider client={client}>
+            <Router>
+                <div className="App">
+                    {/* Pass setSelectedProjectId as onSelect */}
+                    <ProjectsList onSelect={setSelectedProjectId}/>
+                    {selectedProjectId && <TasksList projectId={selectedProjectId}/>}
+                </div>
+            </Router>
+        </ApolloProvider>
+    );
 }
+
 
 export default App;

@@ -13,7 +13,7 @@ echo "Using ZOO_PHP_LARAVEL_PORT: $ZOO_PHP_LARAVEL_PORT"
 envsubst '$ZOO_PHP_LARAVEL_PORT $NGINX_PORT' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
 # Debugging substitution
-cat /etc/nginx/conf.d/default.conf
+# cat /etc/nginx/conf.d/default.conf
 
 # Start NGINX
 nginx -g 'daemon off;'

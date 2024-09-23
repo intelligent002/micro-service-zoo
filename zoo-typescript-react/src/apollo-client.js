@@ -1,9 +1,17 @@
 // src/apollo-client.js
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import {ApolloClient, InMemoryCache} from '@apollo/client';
+import {getConfig} from './config/config.ts';
 
-const client = new ApolloClient({
-    uri: 'http://localhost:82/graphql/graphql', // Replace with your GraphQL server URL
-    cache: new InMemoryCache(),
-});
+let client = null;
 
-export default client;
+export const getApolloClient = async () => {
+    if (!client) {
+        // Wait for the config to be loaded asynchronously
+        const config = await getConfig();
+        client = new ApolloClient({
+            uri: config.apiUrl,
+            cache: new InMemoryCache(),
+        });
+    }
+    return client;
+};

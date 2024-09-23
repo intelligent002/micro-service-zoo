@@ -69,6 +69,7 @@ services:
         environment:
             - LOG_LEVEL=DEBUG
             - NGINX_PORT=8102
+            - REACT_APP_ROUTER_PORT=8120
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8102/liveness | jq -r '.status'); \

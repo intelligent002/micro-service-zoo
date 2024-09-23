@@ -1,5 +1,5 @@
 # Stage 1: Build the React application
-FROM node:18-alpine3.20 AS build
+FROM docker.artifactory.intel.r7g.org/node:18-alpine3.20 AS build
 
 # Set working directory in the container
 WORKDIR /app
