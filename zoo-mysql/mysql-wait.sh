@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
 # Function to check MySQL connectivity using process substitution for credentials
