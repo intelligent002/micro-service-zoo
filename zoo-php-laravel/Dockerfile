@@ -2,7 +2,7 @@
 FROM docker.artifactory.intel.r7g.org/php:8.2-fpm
 
 # Install System packages
-RUN apt update && apt install -y curl jq fcgiwrap nano default-mysql-client
+RUN apt update && apt install -y curl jq fcgiwrap git nano default-mysql-client zip
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
