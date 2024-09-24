@@ -2,7 +2,7 @@
 FROM docker.artifactory.intel.r7g.org/php:8.2-fpm
 
 # Install System packages
-RUN apt update && apt install -y curl jq fcgiwrap git nano default-mysql-client zip
+RUN apt update && apt install -y bash curl jq fcgiwrap git nano default-mysql-client zip
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql
@@ -17,8 +17,6 @@ COPY ./php-fpm/docker.conf /usr/local/etc/php-fpm.d/docker.conf
 
 # Copy custom PHP configurations
 COPY ./php-fpm/php.ini /usr/local/etc/php/php.ini
-COPY --chown=www-data:www-data ./php-fpm/mysql-wait.sh /var/www/html/mysql-wait.sh
-RUN chmod +x /var/www/html/mysql-wait.sh
 
 # Set working directory
 WORKDIR /var/www/html
