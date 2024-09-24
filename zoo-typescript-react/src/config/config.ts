@@ -1,12 +1,10 @@
 export interface Config {
     apiUrl: string;
-    apiKey: string;
     featureFlagX: boolean;
 }
 
 let config: Config = {
     apiUrl: '',
-    apiKey: '',
     featureFlagX: false,
 };
 
@@ -34,7 +32,6 @@ export const loadConfig = async (): Promise<void> => {
             // Assign the loaded config
             config = {
                 apiUrl: jsonConfig.apiUrl,
-                apiKey: jsonConfig.apiKey,
                 featureFlagX: jsonConfig.featureFlagX,
             };
 

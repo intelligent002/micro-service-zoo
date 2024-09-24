@@ -1,5 +1,4 @@
 {
-  "apiUrl": "http://localhost:8120/graphql/graphql",
-  "apiKey": "bla",
+  "apiUrl": "/graphql/graphql",
   "featureFlagX": false
 }
