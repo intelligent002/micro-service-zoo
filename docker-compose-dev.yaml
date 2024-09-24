@@ -103,7 +103,7 @@ services:
             - DB_PORT=3307
             - APP_PORT=8103
         volumes:
-            - ./zoo-mysql/mysql-wait.sh:/tmp/mysql-wait.sh
+            - ./zoo-mysql/mysql-wait.sh:/usr/local/bin/mysql-wait.sh
         healthcheck:
             # Test availabiltiy of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
             test: ["CMD-SHELL", "response=$$(REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
@@ -117,7 +117,7 @@ services:
         depends_on:
             - zoo-mysql
         # dont start the migrations before mysql is really ready to serve requests
-        command: ["/bin/sh", "-c", "chmod +x /tmp/mysql-wait.sh && /tmp/mysql-wait.sh && php artisan migrate --force && php-fpm"]
+        command: ["/bin/sh", "-c", "chmod +x /usr/local/bin/mysql-wait.sh && /usr/local/bin/mysql-wait.sh && php artisan migrate --force && php-fpm"]
         networks:
             - zoo
 
