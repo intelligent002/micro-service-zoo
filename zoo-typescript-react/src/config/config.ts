@@ -1,5 +1,3 @@
-// src/config/config.ts
-
 export interface Config {
     apiUrl: string;
     apiKey: string;
