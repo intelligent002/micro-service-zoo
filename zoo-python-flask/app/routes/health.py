@@ -5,7 +5,7 @@ from app.config import db
 
 routes_health = Blueprint('routes_health', __name__)
 
-@routes_health.route('/liveness')
+@routes_health.route('/liveness', methods=['GET'])
 def liveness():
     """
     Health check liveness - app local scope only
@@ -14,7 +14,7 @@ def liveness():
     return jsonify(status="OK"), 200
 
 
-@routes_health.route('/readiness')
+@routes_health.route('/readiness', methods=['GET'])
 def readiness():
     """
     Health check readiness - app subsidiary services too

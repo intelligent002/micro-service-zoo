@@ -23,5 +23,8 @@ class Config:
     APP_PORT = os.getenv('APP_PORT', 8001)
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG').upper()
 
+    # Directory to store schema files
+    SCHEMA_DIR = os.path.join(os.getcwd(), 'schemas')
+    os.makedirs(SCHEMA_DIR, exist_ok=True)
 
 db = SQLAlchemy()

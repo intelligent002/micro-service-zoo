@@ -4,11 +4,13 @@ from app.config import Config
 from app.routes.graphql import routes_graphql
 from app.routes.health import routes_health
 from app.routes.index import routes_index
+from app.routes.shema_generator import routes_schema
 
 routes = Blueprint('routes', __name__)
 routes.register_blueprint(routes_health)
 routes.register_blueprint(routes_index)
 routes.register_blueprint(routes_graphql)
+routes.register_blueprint(routes_schema)
 
 
 @routes.before_request
