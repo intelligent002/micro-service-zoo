@@ -4,7 +4,7 @@ from app.routes.graphql import route_graphql
 from app.routes.index import route_index
 
 routes = Blueprint('routes', __name__)
-routes.register_blueprint(route_index)
+#routes.register_blueprint(route_index)
 routes.register_blueprint(route_graphql)
 
 

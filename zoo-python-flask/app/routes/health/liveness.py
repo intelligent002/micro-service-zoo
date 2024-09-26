@@ -4,7 +4,7 @@ from flask_restx import Resource, fields
 from app.routes.health.namespace import ns_health
 
 # Define the LIVENESS response for serialization and validation
-response_liveness = ns_health.model('Liveness', {
+response_liveness = ns_health.model('ResponseLiveness', {
     'status': fields.String(required=True, description='Liveness status', example='OK')
 })
 

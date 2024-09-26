@@ -16,7 +16,7 @@ def generate_schema(version):
 
 
 # Define the EndpointSchemaGenerate response model for serialization and validation
-response_generate = ns_schema.model('Generator', {
+response_generate = ns_schema.model('ResponseSchemaGenerator', {
     'status': fields.String(required=True, description='Generation status', example='OK'),
     'data': fields.String(required=True, description='Status of schema generation',
                           example='Schema generated with version [2024-09-26---10-42-00] and saved as [schema_2024-09-26---10-42-00.graphql].')

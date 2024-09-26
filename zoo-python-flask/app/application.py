@@ -35,7 +35,7 @@ def create_app():
     app.config.from_object(Config)
 
     # Register all namespaces
-    api = Api(app, version='1.0', title='zoo-python-flask microservice',
+    api = Api(app, doc='/graphql/swagger', version='1.0', title='zoo-python-flask microservice',
               description='API features: GraphQL, REST, liveness, readiness, GQL schema generation')
 
 

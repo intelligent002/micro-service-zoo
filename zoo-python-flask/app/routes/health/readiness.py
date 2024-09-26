@@ -6,12 +6,12 @@ from app.config import db
 from app.routes.health.namespace import ns_health
 
 # Define the READINESS response for serialization and validation
-response_subsidiary = ns_health.model('services', {
+response_subsidiary = ns_health.model('ResponseReadinessServices', {
     'MySQL': fields.String(required=True, description='Status of subsidiary service - MySQL', example='OK'),
     'Redis': fields.String(required=True, description='Status of subsidiary service - Redis', example='OK')
 })
 
-response_readiness = ns_health.model('Readiness', {
+response_readiness = ns_health.model('ResponseReadiness', {
     'status': fields.String(required=True, description='Readiness status', example='OK'),
     'data': fields.Nested(response_subsidiary, required=True,
                           description='Data object containing subsidiary service statuses')
