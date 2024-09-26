@@ -1,0 +1,52 @@
+# GraphQL Schema Version: 2024-09-26---12-27-04 (UTC)
+schema {
+  query: Query
+}
+
+scalar DateTime
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Project implements Node {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  tasks(before: String, after: String, first: Int, last: Int): TaskConnection
+  rawId: Int
+}
+
+type Query {
+  node(id: ID!): Node
+  getProjects: [Project]
+  getTasks(name: String, projectId: Int): [Task]
+}
+
+type Task implements Node {
+  id: ID!
+  projectId: Int
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  project: Project
+  rawId: Int
+}
+
+type TaskConnection {
+  pageInfo: PageInfo!
+  edges: [TaskEdge]!
+}
+
+type TaskEdge {
+  node: Task
+  cursor: String!
+}

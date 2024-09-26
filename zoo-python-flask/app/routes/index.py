@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify
 
-routes_index = Blueprint('routes_index', __name__)
+route_index = Blueprint('routes_index', __name__)
 
 
-@routes_index.route('/', methods=['GET'])
+@route_index.route('/', methods=['GET'])
 def index():
     """
     Root endpoint that returns a welcome message.

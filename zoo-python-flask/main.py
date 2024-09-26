@@ -1,6 +1,3 @@
-import os
-
-# run.py
 from app.application import create_app
 from app.config import Config  # Import the db instance
 

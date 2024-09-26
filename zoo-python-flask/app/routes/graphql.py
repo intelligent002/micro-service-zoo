@@ -3,7 +3,7 @@ from flask_graphql import GraphQLView
 
 from app.graphql.schema import schema
 
-routes_graphql = Blueprint('routes_graphql', __name__)
+route_graphql = Blueprint('routes_graphql', __name__)
 
 # Custom error formatter
 def custom_format_error(error):
@@ -23,7 +23,7 @@ def custom_format_error(error):
     return formatted_error
 
 # Create the GraphQL view with GraphiQL disabled
-routes_graphql.add_url_rule(
+route_graphql.add_url_rule(
     '/graphql',
     view_func=GraphQLView.as_view(
         'graphql',
