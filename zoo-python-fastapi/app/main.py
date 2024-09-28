@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes import index, health, graphql
-from metrics import init_metrics
+from app.metrics import init_metrics
 
 app = FastAPI(
     title="My FastAPI Project",
