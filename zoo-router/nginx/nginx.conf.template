@@ -1,7 +1,7 @@
 # Define upstream backends for User GUI, User API, Admin GUI, and Admin API
 
 upstream zoo-python-flask {
-    server zoo-python-flask:${ZOO_PYTHON_FLASK_PORT};
+    server zoo-python-fastapi:${ZOO_PYTHON_FASTAPI_PORT};
 }
 
 upstream zoo-php-laravel-http2fpm {

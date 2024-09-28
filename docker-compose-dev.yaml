@@ -186,7 +186,7 @@ services:
         restart: unless-stopped
         environment:
             - NGINX_PORT=8120
-            - ZOO_PYTHON_FLASK_PORT=8101
+            - ZOO_PYTHON_FASTAPI_PORT=8101
             - ZOO_TYPESCRIPT_REACT_PORT=8102
             - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
         ports:
