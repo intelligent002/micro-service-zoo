@@ -1,8 +1,11 @@
 from typing import Dict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.db import get_db
 from app.health.liveness import liveness
 from app.health.readiness import readiness
 
@@ -43,6 +46,9 @@ class ResponseReadiness(BaseModel):
             responses={
                 200: {"model": ResponseReadiness}
             })
-async def readiness_check():
-    # You can add any readiness logic here (e.g., checking database connection)
-    return readiness()
+async def readiness_check(db: AsyncSession = Depends(get_db)):
+    status = await readiness(db)
+    if "ERROR" in status.values():
+        return JSONResponse(status_code=503,
+                            content={"status": "ERROR", "data": status})
+    return {"status": "OK", "data": status}
