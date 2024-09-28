@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.routes import index, health, graphql
+from metrics import init_metrics
 
 app = FastAPI(
     title="My FastAPI Project",
@@ -26,12 +26,12 @@ CORSMiddleware(
 )
 
 # Include routers for REST, health checks, and GraphQL
-app.include_router(index.router)
-app.include_router(health.router)
-app.include_router(graphql.router)
+app.include_router(index.router, prefix="/graphql")
+app.include_router(health.router, prefix="/graphql")
+app.include_router(graphql.router, prefix="/graphql")
 
 # Prometheus metrics
-Instrumentator().instrument(app).expose(app)
+init_metrics(app)
 
 if __name__ == "__main__":
     import uvicorn
