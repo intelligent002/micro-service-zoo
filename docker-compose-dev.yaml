@@ -53,6 +53,35 @@ services:
             retries: 3
             start_period: 5s
             timeout: 10s
+        depends_on:
+            - zoo-mysql
+        networks:
+            - zoo
+
+    # Backend written in Python/Flask (python:3.12.5-alpine3.20)
+    zoo-python-fastapi:
+        build:
+            context: ./zoo-python-fastapi # Set build context to the respective folder
+            dockerfile: Dockerfile
+        container_name: zoo-python-fastapi
+        restart: unless-stopped
+        environment:
+            - DB_HOSTNAME=zoo-mysql
+            - DB_USERNAME=zoo-user
+            - DB_PASSWORD=zoo-password
+            - DB_DATABASE=zoo-db
+            - DB_PORT=3307
+            - DEBUG_MODE=False
+            - LOG_LEVEL=DEBUG
+            - APP_PORT=8101
+        healthcheck:
+            # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/graphql/liveness | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            interval: 60s
+            retries: 3
+            start_period: 5s
+            timeout: 10s
         ports:
             - "8101:8101"
         depends_on:
