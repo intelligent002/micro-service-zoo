@@ -1,1 +1,1 @@
-from dbsession import DBSessionDep
+from app.dependencies.dbsession import DBSessionDep
