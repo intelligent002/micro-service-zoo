@@ -14,10 +14,10 @@ USER www-data
 ENV PATH="/home/www-data/.local/bin:$PATH"
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /fastapi
 
 # Set the PYTHONPATH to ensure `app` is recognized as a package
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/fastapi
 
 # Copy the requirements.txt
 COPY requirements.txt .
@@ -25,11 +25,12 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the project into app
-# Copy the project into app
-COPY app /app/app
-COPY alembic /app/
-COPY alembic.ini /app/
+# Copy over the alembic
+COPY alembic /fastapi/alembic
+COPY alembic.ini /fastapi/
+
+# Copy over the project
+COPY app /fastapi/app
 
 # Expose the Flask port (8001)
 EXPOSE 8001/tcp
