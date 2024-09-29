@@ -1,54 +1,54 @@
-# Define upstream backends for User GUI, User API, Admin GUI, and Admin API
+user  nginx;
+worker_processes  auto;
 
-upstream zoo-python-flask {
-    server zoo-python-fastapi:${ZOO_PYTHON_FASTAPI_PORT};
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
 }
 
-upstream zoo-php-laravel-http2fpm {
-    server zoo-php-laravel-http2fpm:${ZOO_PHP_LARAVEL_HTTP2FPM_PORT};
-}
 
-upstream zoo-typescript-react {
-    server zoo-typescript-react:${ZOO_TYPESCRIPT_REACT_PORT};
-}
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
 
-server {
-    listen ${NGINX_PORT} default_server;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
-    server_name localhost;
+    # access_log  /var/log/nginx/access.log  main;
 
-    # Serve the static files from /var/www/html when accessing /router/ prefix
-    location ^~ /router/ {
-        root /var/www/html;
-    }
-    
-    # Zone per User API service
-    location ^~ /graphql/ {
-        # which is a Python-Flask GraphQL app
-        proxy_pass http://zoo-python-flask;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+    sendfile        on;
+    #tcp_nopush     on;
 
-    # Zone per Admin API service
-    location ^~ /rest/ {
-     	# which is PHP-Laravel REST app, behind another Nginx which behaves as a translator from HTTP2FPM
-        proxy_pass http://zoo-php-laravel-http2fpm;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+    keepalive_timeout  65;
 
-    # Zone per User GUI service
-    location ^~ / {
-     	# which is TypeScript-React app
-        proxy_pass http://zoo-typescript-react;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+    gzip  on;
+
+    log_format json_combined escape=json '{'
+            '"timestamp":"$time_iso8601",'
+            '"host":"$hostname",'
+            '"environment":"${ENVIRONMENT}",'
+            '"service_name":"${SERVICE_NAME}",'
+            '"request_id":"$request_id",'
+            '"trace_id":"$request_id",'
+			'"remote_user":"$remote_user",'
+			'"body_bytes_sent":"$body_bytes_sent",'
+			'"http_user_agent":"$http_user_agent",'
+			'"referer":"$http_referer",'
+            '"extra":{'
+                '"ip_address":"$remote_addr",'
+				'"http_x_forwarded_for":"$http_x_forwarded_for",'
+                '"http_method":"$request_method",'
+                '"request":"$request",'
+                '"status_code":"$status",'
+                '"response_time_ms":"$request_time"'
+            '}'
+        '}';
+	    
+    access_log /var/log/nginx/access.log json_combined;
+
+    include /etc/nginx/conf.d/*.conf;
 }
