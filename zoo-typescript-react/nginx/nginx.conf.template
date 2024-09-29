@@ -1,15 +1,54 @@
-server {
-    listen ${NGINX_PORT};
+user  nginx;
+worker_processes  auto;
 
-    server_name localhost;
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
 
-    root /usr/share/nginx/html;
 
-    index index.html;
+events {
+    worker_connections  1024;
+}
 
-    location / {
-        try_files $uri /index.html;
-    }
 
-    error_page 404 /index.html;
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    # access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    gzip  on;
+
+    log_format json_combined escape=json '{'
+            '"timestamp":"$time_iso8601",'
+            '"host":"$hostname",'
+            '"environment":"${ENVIRONMENT}",'
+            '"service_name":"${SERVICE_NAME}",'
+            '"request_id":"$request_id",'
+            '"trace_id":"$request_id",'
+			'"remote_user":"$remote_user",'
+			'"body_bytes_sent":"$body_bytes_sent",'
+			'"http_user_agent":"$http_user_agent",'
+			'"referer":"$http_referer",'
+            '"extra":{'
+                '"ip_address":"$remote_addr",'
+				'"http_x_forwarded_for":"$http_x_forwarded_for",'
+                '"http_method":"$request_method",'
+                '"request":"$request",'
+                '"status_code":"$status",'
+                '"response_time_ms":"$request_time"'
+            '}'
+        '}';
+	    
+    access_log /var/log/nginx/access.log json_combined;
+
+    include /etc/nginx/conf.d/*.conf;
 }

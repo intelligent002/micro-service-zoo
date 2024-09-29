@@ -1,63 +1,54 @@
-server {
-    
-    # The server listens on port 8004 and is set as the default server.
-    listen ${NGINX_PORT} default_server;
-    
-    # The server responds to requests directed to 'localhost'.
-    server_name localhost;
+user  nginx;
+worker_processes  auto;
 
-    # Specifies the default files to serve when a directory is requested.
-    index index.php index.html index.htm;
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
 
-    # Serve the static files from /var/www/html when accessing /router/ prefix
-    location ^~ /http2fpm/ {
-        root /var/www/html;
-    }
-    
-    location / {
-        # Forwards all incoming requests to PHP-FPM through FastCGI, 
-        # with fallback to 'index.php' if the file does not exist.
-        try_files $uri /index.php?$query_string;
-    }
 
-    location ~ \.php$ {
-        
-        # Forwards the request to PHP-FPM running on port 8003 in the 'zoo-php-laravel' container.
-        fastcgi_pass zoo-php-laravel:${ZOO_PHP_LARAVEL_PORT};
+events {
+    worker_connections  1024;
+}
 
-        # Includes standard FastCGI parameters needed for NGINX to communicate with PHP-FPM.
-        include fastcgi_params;
 
-        # Defines the PHP file path to execute by combining the document root with the requested PHP file.
-        fastcgi_param SCRIPT_FILENAME /var/www/html/public$fastcgi_script_name;
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
 
-        # Passes any extra path information after the PHP file, which is useful for frameworks like Laravel.
-        fastcgi_param PATH_INFO $fastcgi_path_info;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
-        # Specifies 'index.php' as the default file to use when a directory is requested.
-        fastcgi_index index.php;
+    # access_log  /var/log/nginx/access.log  main;
 
-        # Passes the query string (the part after '?' in the URL) to PHP-FPM for further processing.
-        fastcgi_param QUERY_STRING $query_string;
+    sendfile        on;
+    #tcp_nopush     on;
 
-        # Passes the HTTP request method (e.g., GET, POST, PUT) to PHP-FPM so it can handle it accordingly.
-        fastcgi_param REQUEST_METHOD $request_method;
+    keepalive_timeout  65;
 
-        # Passes the MIME type of the request body (e.g., form data, JSON) to PHP-FPM for processing.
-        fastcgi_param CONTENT_TYPE $content_type;
+    gzip  on;
 
-        # Passes the length of the request body in bytes to PHP-FPM, useful for POST requests or file uploads.
-        fastcgi_param CONTENT_LENGTH $content_length;
-    }
+    log_format json_combined escape=json '{'
+            '"timestamp":"$time_iso8601",'
+            '"host":"$hostname",'
+            '"environment":"${ENVIRONMENT}",'
+            '"service_name":"${SERVICE_NAME}",'
+            '"request_id":"$request_id",'
+            '"trace_id":"$request_id",'
+			'"remote_user":"$remote_user",'
+			'"body_bytes_sent":"$body_bytes_sent",'
+			'"http_user_agent":"$http_user_agent",'
+			'"referer":"$http_referer",'
+            '"extra":{'
+                '"ip_address":"$remote_addr",'
+				'"http_x_forwarded_for":"$http_x_forwarded_for",'
+                '"http_method":"$request_method",'
+                '"request":"$request",'
+                '"status_code":"$status",'
+                '"response_time_ms":"$request_time"'
+            '}'
+        '}';
+	    
+    access_log /var/log/nginx/access.log json_combined;
 
-    # Denies access to hidden files (files beginning with a dot, e.g., .env).
-    location ~ /\. {
-        deny all;
-    }
-
-    # Denies access to the 'storage' and 'vendor' directories for security purposes.
-    location ~* /(storage|vendor) {
-        deny all;
-    }
-
+    include /etc/nginx/conf.d/*.conf;
 }
