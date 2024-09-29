@@ -17,6 +17,11 @@ server {
 
     server_name localhost;
 
+    # Serve the static files from /var/www/html when accessing /router/ prefix
+    location ^~ /router/ {
+        root /var/www/html;
+    }
+    
     # Zone per User API service
     location ^~ /graphql/ {
         # which is a Python-Flask GraphQL app
