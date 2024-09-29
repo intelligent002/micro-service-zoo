@@ -1,16 +1,32 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import index, health, graphql
+from app.database import sessionmanager
 from app.metrics import init_metrics
+from app.routes import index, health, graphql
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Function that handles startup and shutdown events.
+    To understand more, read https://fastapi.tiangolo.com/advanced/events/
+    """
+    yield
+    if sessionmanager._engine is not None:
+        # Close the DB connection
+        await sessionmanager.close()
 
 app = FastAPI(
+    lifespan=lifespan,
     title="My FastAPI Project",
     description="A project demonstrating REST, GraphQL, CORS, and prometheus metrics",
     version="1.0.0",
-    docs_url="/docs",  # URL for Swagger UI
-    redoc_url="/redoc",  # URL for ReDoc UI
-    openapi_url="/openapi.json"  # URL for OpenAPI schema
+    docs_url="/graphql/docs",  # URL for Swagger UI
+    redoc_url="/graphql/redoc",  # URL for ReDoc UI
+    openapi_url="/graphql/openapi.json"  # URL for OpenAPI schema
 )
 
 # CORS settings

@@ -26,7 +26,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy over the alembic
-COPY alembic /fastapi/alembic
+COPY app/alembic /fastapi/alembic
 COPY alembic.ini /fastapi/
 
 # Copy over the project
