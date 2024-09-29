@@ -132,6 +132,8 @@ services:
             - DB_USERNAME=zoo-user
             - DB_PORT=3307
             - APP_PORT=8103
+            - SERVICE_NAME=zoo-php-laravel
+            - LOG_LEVEL=debug
         healthcheck:
             # Test availabiltiy of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
             test: ["CMD-SHELL", "response=$$(REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \

@@ -13,7 +13,7 @@ class CustomJsonFormatter extends JsonFormatter
             'level'       => $record['level_name'],
             'logger_name' => $record['channel'],
             'message'     => $record['message'],
-            'host'        => env('HOST_NAME', 'default-host'),
+            'host'        => env('HOSTNAME', ''),
             'environment' => env('APP_ENV', 'production'),
             'service_name'=> env('SERVICE_NAME', 'zoo-php-laravel'),
             'request_id'  => request()->header('X-Request-ID') ?? '',
