@@ -6,13 +6,14 @@ server {
     # The server responds to requests directed to 'localhost'.
     server_name localhost;
 
-    # Root directory for the website files. NGINX won't serve files directly,
-    # used to store the liveness probe for the http2fpm container
-    root /var/www/html; 
-
     # Specifies the default files to serve when a directory is requested.
     index index.php index.html index.htm;
 
+    # Serve the static files from /var/www/html when accessing /router/ prefix
+    location ^~ /http2fpm/ {
+        root /var/www/html;
+    }
+    
     location / {
         # Forwards all incoming requests to PHP-FPM through FastCGI, 
         # with fallback to 'index.php' if the file does not exist.

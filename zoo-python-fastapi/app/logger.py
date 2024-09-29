@@ -11,7 +11,7 @@ def configure_logging():
 
     # Create a handler that logs to stderr
     json_handler = logging.StreamHandler(sys.stderr)
-    formatter = jsonlogger.JsonFormatter("(timestamp) (level) (name) (message)")
+    formatter = jsonlogger.JsonFormatter("(timestamp) (level) (logger_name) (message) (host) (environment) (service_name) (request_id) (trace_id)")
 
     # Set the formatter to JSON
     json_handler.setFormatter(formatter)

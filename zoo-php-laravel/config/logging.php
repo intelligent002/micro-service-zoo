@@ -1,6 +1,6 @@
 <?php
 
-use Monolog\Formatter\JsonFormatter;
+use App\Logging\CustomJsonFormatter;
 use Monolog\Handler\StreamHandler;
 
 return [
@@ -52,17 +52,18 @@ return [
 
         // Local environment (Apache, logs to a file)
         'file'   => [
-            'driver' => 'daily',
-            'path'   => storage_path('logs/laravel.log'),
-            'level'  => env('LOG_LEVEL', 'debug'),
-            'days'   => 14,
+            'driver'    => 'daily',
+            'path'      => storage_path('logs/laravel.log'),
+            'formatter' => CustomJsonFormatter::class,
+            'level'     => env('LOG_LEVEL', 'debug'),
+            'days'      => 14,
         ],
 
         // Docker environment (logs to stderr)
         'stderr' => [
             'driver'    => 'monolog',
             'handler'   => StreamHandler::class,
-            'formatter' => JsonFormatter::class,
+            'formatter' => CustomJsonFormatter::class,
             'with'      => [
                 'stream' => 'php://stderr',
             ],
