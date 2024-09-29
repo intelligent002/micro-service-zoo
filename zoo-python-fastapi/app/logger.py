@@ -6,15 +6,15 @@ from pythonjsonlogger import jsonlogger
 
 # Configure logging to use JSON format
 def configure_logging():
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    log = logging.getLogger()
+    log.setLevel(logging.INFO)
 
     # Create a handler that logs to stderr
-    handler = logging.StreamHandler(sys.stderr)
+    json_handler = logging.StreamHandler(sys.stderr)
+    formatter = jsonlogger.JsonFormatter("(timestamp) (level) (name) (message)")
 
     # Set the formatter to JSON
-    formatter = jsonlogger.JsonFormatter('(timestamp) (level) (name) (message)')
-    handler.setFormatter(formatter)
+    json_handler.setFormatter(formatter)
 
-    # Add the handler to the root logger
-    logger.addHandler(handler)
+    # Add the handler to the root log
+    log.addHandler(json_handler)
