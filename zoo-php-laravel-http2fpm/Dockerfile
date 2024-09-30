@@ -1,9 +1,14 @@
 FROM docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
-RUN apk update && apk add curl jq
+RUN apk update && apk add --no-cache \
+    curl \
+    jq \
+    nano \
+    wget \
+    && rm -rf /var/cache/apk/* /tmp/*
 
 # Copy configuration and starter files
-COPY nginx/default.conf.template /etc/nginx/conf.d/default.conf.template
-COPY nginx/nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nginx/default.conf.template /etc/nginx/conf.d/
+COPY nginx/nginx.conf.template /etc/nginx/
 COPY nginx/start.sh /start.sh
 RUN chmod +x /start.sh && rm -f /etc/nginx/conf.d/default.conf
 

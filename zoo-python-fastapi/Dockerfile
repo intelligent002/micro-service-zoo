@@ -2,7 +2,12 @@
 FROM docker.artifactory.intel.r7g.org/python:3.12.5-alpine3.20
 
 # Install system requirements
-RUN apk update && apk add --no-cache curl jq nano
+RUN apk update && apk add --no-cache \
+    curl \
+    jq \
+    nano \
+    wget \
+    && rm -rf /var/cache/apk/* /tmp/*
 
 # Create the www-data user and group if they don't already exist
 RUN adduser -u 82 -D -S -G www-data www-data
@@ -23,7 +28,8 @@ ENV PYTHONPATH=/fastapi
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && rm -rf /tmp/* /var/tmp/*
 
 # Copy over the alembic
 COPY app/alembic /fastapi/alembic

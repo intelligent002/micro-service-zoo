@@ -16,6 +16,12 @@ server {
     listen ${NGINX_PORT} default_server;
 
     server_name localhost;
+    
+    # Generate a trace_id manually
+    set_by_lua_block $trace_id {
+        local uuid = require 'resty.uuid';
+        return uuid.generate();
+    }
 
     # Serve the static files from /var/www/html when accessing /router/ prefix
     location ^~ /router/ {
@@ -30,6 +36,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        # Pass both request_id and trace_id to the upstream
+        proxy_set_header X-Request-ID $request_id;
+        proxy_set_header X-Trace-ID $trace_id;
     }
 
     # Zone per Admin API service
@@ -40,6 +49,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        # Pass both request_id and trace_id to the upstream
+        proxy_set_header X-Request-ID $request_id;
+        proxy_set_header X-Trace-ID $trace_id;
     }
 
     # Zone per User GUI service
@@ -50,5 +62,8 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        # Pass both request_id and trace_id to the upstream
+        proxy_set_header X-Request-ID $request_id;
+        proxy_set_header X-Trace-ID $trace_id;
     }
 }

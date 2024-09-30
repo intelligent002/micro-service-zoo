@@ -2,10 +2,21 @@
 FROM docker.artifactory.intel.r7g.org/php:8.2-fpm
 
 # Install System packages
-RUN apt update && apt install -y bash curl jq fcgiwrap git nano default-mysql-client zip
+RUN apt update && apt install -y \
+    bash \
+    curl \
+    default-mysql-client \
+    fcgiwrap \
+    git \
+    jq \
+    nano \
+    zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql \
+    && docker-php-source delete \
+    && rm -rf /tmp/* /var/tmp/*
 
 # Install Composer
 COPY --from=docker.artifactory.intel.r7g.org/composer:latest /usr/bin/composer /usr/bin/composer
