@@ -1,18 +1,16 @@
-import logging
-
 from fastapi import Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import DBSessionDep
-
-logger = logging.getLogger("health")
+from app.health import get_health_logger
 
 
 async def readiness(db_session: AsyncSession = Depends(DBSessionDep)):
     """
     Health check readiness - app subsidiary services
     """
+    logger = get_health_logger()
     subsidiary_status = {"MySQL": "OK", "Redis": "OK"}
 
     # Check MySQL Database asynchronously

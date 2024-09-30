@@ -3,6 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.logger import setup_logging
+
+
+
 from app.database import sessionmanager
 from app.metrics import init_metrics
 from app.routes import index, health, graphql
@@ -19,6 +23,10 @@ async def lifespan(app: FastAPI):
         # Close the DB connection
         await sessionmanager.close()
 
+# Setup Logging
+setup_logging()
+
+# Setup FastAPI
 app = FastAPI(
     lifespan=lifespan,
     title="My FastAPI Project",

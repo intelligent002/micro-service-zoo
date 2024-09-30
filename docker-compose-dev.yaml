@@ -8,12 +8,12 @@ services:
         ports:
             - "3307:3307"
         environment:
-            MYSQL_DATABASE: zoo-db
-            MYSQL_HOSTNAME: localhost
-            MYSQL_PASSWORD: zoo-password
-            MYSQL_ROOT_PASSWORD: root-password
-            MYSQL_TCP_PORT: 3307
-            MYSQL_USER: zoo-user
+            - MYSQL_DATABASE=zoo-db
+            - MYSQL_HOSTNAME=localhost
+            - MYSQL_PASSWORD=zoo-password
+            - MYSQL_ROOT_PASSWORD=root-password
+            - MYSQL_TCP_PORT=3307
+            - MYSQL_USER=zoo-user
         volumes:
             - mysql-data:/var/lib/mysql
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
@@ -60,7 +60,7 @@ services:
         networks:
             - zoo
 
-    # Backend written in Python/Flask (python:3.12.5-alpine3.20)
+    # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
     zoo-python-fastapi:
         build:
             context: ./zoo-python-fastapi # Set build context to the respective folder

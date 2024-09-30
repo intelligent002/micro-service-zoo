@@ -42,5 +42,5 @@ COPY app /fastapi/app
 EXPOSE 8001/tcp
 
 # Command to run the Flask application
-CMD ["sh","-c","uvicorn --workers ${APP_WORKERS:-1} --host 0.0.0.0 --port ${APP_PORT:-8001} app.main:app"]
+CMD ["sh","-c","uvicorn --workers ${APP_WORKERS:-1} --host 0.0.0.0 --port ${APP_PORT:-8001} app.main:app --no-access-log"]
 

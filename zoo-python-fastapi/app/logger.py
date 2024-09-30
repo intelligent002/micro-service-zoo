@@ -1,20 +1,52 @@
 import logging
+import os
 import sys
+import time
 
 from pythonjsonlogger import jsonlogger
 
+from app.config import Config
 
-# Configure logging to use JSON format
-def configure_logging():
-    log = logging.getLogger()
-    log.setLevel(logging.INFO)
 
-    # Create a handler that logs to stderr
-    json_handler = logging.StreamHandler(sys.stderr)
-    formatter = jsonlogger.JsonFormatter("(timestamp) (level) (logger_name) (message) (host) (environment) (service_name) (request_id) (trace_id)")
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
 
-    # Set the formatter to JSON
-    json_handler.setFormatter(formatter)
+        # Add custom fields to the log record
+        log_record['timestamp'] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        log_record['level'] = record.levelname
+        log_record['message'] = record.getMessage()
+        log_record['logger_name'] = record.name
 
-    # Add the handler to the root log
-    log.addHandler(json_handler)
+        # Docker and environment-related info
+        log_record['host'] = os.getenv("HOSTNAME", "unknown")
+        log_record['environment'] = os.getenv("ENVIRONMENT", "")
+        log_record['service_name'] = os.getenv("SERVICE_NAME", "")
+
+        # Request and trace fields (you can extend this later with request_id, trace_id, etc.)
+        log_record['request_id'] = ""
+        log_record['trace_id'] = ""
+        log_record['extra'] = {}
+
+
+def setup_logging():
+    """
+    Set up the global logging configuration.
+    """
+
+    # Create a stream handler (for output to console)
+    handler = logging.StreamHandler(sys.stdout)
+
+    # Use the custom JSON formatter
+    formatter = CustomJsonFormatter()
+    handler.setFormatter(formatter)
+
+    # Get the root logger
+    root_logger = logging.getLogger()
+    root_logger.handlers.clear()
+
+    # set the log level
+    root_logger.setLevel(Config.LOG_LEVEL)
+
+    # Attach the handler to the root logger
+    root_logger.addHandler(handler)
