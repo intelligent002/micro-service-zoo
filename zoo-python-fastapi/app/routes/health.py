@@ -1,53 +1,33 @@
-from typing import Dict
-
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 
 from app.dependencies import DBSessionDep
-from app.health.liveness import liveness
-from app.health.readiness import readiness
+from app.schemas.common import RespOkDict, RespErrDict, BaseOkResp
+from app.services.health import liveness, readiness
 
 router = APIRouter()
 
-
-# Define the LIVENESS response for serialization and validation
-class ResponseLiveness(BaseModel):
-    status: str = Field(...,
-                        title="Service Status",
-                        description="Status of the app, local service scope only",
-                        examples=["OK"])
-
-
 @router.get("/liveness",
-            response_model=ResponseLiveness,
+            response_model=BaseOkResp,
             responses={
-                200: {"model": ResponseLiveness}
+                200: {"model": BaseOkResp}
             })
-async def liveness_check():
-    return await liveness()
-
-
-# Define the READINESS response for serialization and validation
-class ResponseReadiness(BaseModel):
-    status: str = Field(...,
-                        title="Service Status",
-                        description="Status of the subsidiary services scope",
-                        examples=["OK"])
-    data: Dict[str, str] = Field(...,
-                                 title="Subsidiary services Status",
-                                 description="Health of the subsidiary services",
-                                 examples=[{"MySQL": "OK"}])
+async def route_liveness():
+    """Liveness checkup - application scope only"""
+    response = await liveness()
+    return JSONResponse(status_code=200, content=response)
 
 
 @router.get("/readiness",
-            response_model=ResponseReadiness,
+            response_model=RespOkDict,
             responses={
-                200: {"model": ResponseReadiness}
+                200: {"model": RespOkDict},
+                503: {"model": RespErrDict}
             })
-async def readiness_check(db_session: DBSessionDep):
-    status = await readiness(db_session)
-    if "ERROR" in status.values():
-        return JSONResponse(status_code=503,
-                            content={"status": "ERROR", "data": status})
-    return {"status": "OK", "data": status}
+async def route_readiness(db_session: DBSessionDep):
+    """Readiness checkup - subsidiary services included"""
+    subsidiary = await readiness(db_session)
+    if "ERROR" in subsidiary.values():
+        return JSONResponse(status_code=503, content={"status": "ERROR", "error": subsidiary})
+
+    return JSONResponse(status_code=200, content={"status": "OK", "result": subsidiary})

@@ -9,7 +9,7 @@ db_port = os.getenv('DB_PORT', '3306')
 
 if not all([db_username, db_password, db_hostname, db_database]):
     error = "One or more environment variables are missing: DB_USERNAME, DB_PASSWORD, DB_HOSTNAME, DB_DATABASE"
-    # current_app.logger.error(error)
+    # current_app.get_logger.py.error(error)
     raise ValueError(error)
 
 

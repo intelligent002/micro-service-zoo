@@ -9,7 +9,7 @@ from app.logger import setup_logging
 
 from app.database import sessionmanager
 from app.metrics import init_metrics
-from app.routes import index, health, graphql
+from app.routes import index, health, graphql, schema
 
 
 @asynccontextmanager
@@ -53,6 +53,7 @@ CORSMiddleware(
 app.include_router(index.router, prefix="/graphql")
 app.include_router(health.router, prefix="/graphql")
 app.include_router(graphql.router, prefix="/graphql")
+app.include_router(schema.router, prefix="/graphql")
 
 # Prometheus metrics
 init_metrics(app)
@@ -60,4 +61,4 @@ init_metrics(app)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)

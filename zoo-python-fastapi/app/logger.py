@@ -41,12 +41,12 @@ def setup_logging():
     formatter = CustomJsonFormatter()
     handler.setFormatter(formatter)
 
-    # Get the root logger
+    # Get the root get_logger.py
     root_logger = logging.getLogger()
     root_logger.handlers.clear()
 
     # set the log level
     root_logger.setLevel(Config.LOG_LEVEL)
 
-    # Attach the handler to the root logger
+    # Attach the handler to the root get_logger.py
     root_logger.addHandler(handler)

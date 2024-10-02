@@ -3,14 +3,14 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import DBSessionDep
-from app.health import get_health_logger
+from app.services.health.get_logger import get_logger
 
 
 async def readiness(db_session: AsyncSession = Depends(DBSessionDep)):
     """
     Health check readiness - app subsidiary services
     """
-    logger = get_health_logger()
+    logger = get_logger()
     subsidiary_status = {"MySQL": "OK", "Redis": "OK"}
 
     # Check MySQL Database asynchronously
