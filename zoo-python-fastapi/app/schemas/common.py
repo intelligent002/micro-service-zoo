@@ -23,8 +23,8 @@ class RespOkGeneric(BaseOkResp):
                                                           title="Execution results",
                                                           description="Execution results of varying types",
                                                           examples=[
-                                                              {"example_type": "string", "value": "OK"},
-                                                              {"example_type": "list", "value": ["item1", "item2"]},
+                                                              {"example_type": "string", "value": "value"},
+                                                              {"example_type": "list", "value": ["value1", "value2"]},
                                                               {"example_type": "dict", "value": {"MySQL": "OK"}}
                                                           ])
 
@@ -47,7 +47,7 @@ class RespOkString(RespOkGeneric):
     result: str = Field(...,
                         title="Execution results",
                         description="Execution results in string format",
-                        examples=["OK"])
+                        examples=["value"])
 
 
 # Specific error response with a string error message
@@ -63,7 +63,7 @@ class RespOkList(RespOkGeneric):
     result: List[str] = Field(...,
                               title="Execution results",
                               description="Execution results in list format",
-                              examples=["item1", "item2"])
+                              examples=["value1", "value2"])
 
 
 # Specific error response with a list of error messages

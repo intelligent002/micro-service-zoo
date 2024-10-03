@@ -3,11 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.logger import setup_logging
-
-
-
 from app.database import sessionmanager
+from app.logger import setup_logging
 from app.metrics import init_metrics
 from app.routes import index, health, graphql, schema
 
@@ -19,7 +16,7 @@ async def lifespan(app: FastAPI):
     To understand more, read https://fastapi.tiangolo.com/advanced/events/
     """
     yield
-    if sessionmanager._engine is not None:
+    if sessionmanager.engine is not None:
         # Close the DB connection
         await sessionmanager.close()
 
