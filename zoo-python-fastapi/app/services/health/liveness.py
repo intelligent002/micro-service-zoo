@@ -1,5 +1,6 @@
 from app.services.health.get_logger import get_logger
 
+
 async def liveness():
     """
     Health check liveness - app local service scope only

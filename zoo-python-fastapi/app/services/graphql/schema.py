@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.models import Project as ProjectModel, Task as TaskModel
+from app.services.graphql.get_logger import get_logger
 
 
 # Strawberry Types for Project and Task
@@ -14,10 +15,6 @@ class Project:
     id: int
     name: str
 
-    @strawberry.field
-    def raw_id(self) -> int:
-        return self.id
-
 
 @strawberry.type
 class Task:
@@ -25,32 +22,39 @@ class Task:
     name: str
     project_id: int
 
-    @strawberry.field
-    def raw_id(self) -> int:
-        return self.id
-
 
 # Queries using Strawberry
 @strawberry.type
 class Query:
 
     @strawberry.field
-    async def get_projects(self, info, name: Optional[str] = None) -> List[Project]:
-        # Use the FastAPI dependency injection to get the session
-        session: AsyncSession = info.context["session"]
-
+    async def get_projects(
+            self,
+            info,
+            id: Optional[int] = None,
+            name: Optional[str] = None
+    ) -> List[Project]:
+        # get the logger
+        logger = get_logger()
         try:
+            # Use the FastAPI dependency injection to get the session
+            session: AsyncSession = info.context["session"]
+
             query = select(ProjectModel)
+
+            if id:
+                query = query.where(ProjectModel.id == id)
 
             if name:
                 query = query.where(ProjectModel.name.ilike(f"%{name}%"))
 
             result = await session.execute(query)
             projects = result.scalars().all()
+            logger.info(f"Processed get_projects(id={id},name={name})")
             return [Project(id=p.id, name=p.name) for p in projects]
 
         except Exception as e:
-            print(f"Error fetching projects: {str(e)}")
+            logger.warning(f"Failed to process the get_projects(id={id},name={name}): [{str(e)}]")
             return []
 
     @strawberry.field
@@ -60,10 +64,11 @@ class Query:
             name: Optional[str] = None,
             project_id: Optional[int] = None
     ) -> List[Task]:
-        # Use the FastAPI dependency injection to get the session
-        session: AsyncSession = info.context["session"]
-
+        logger = get_logger()
         try:
+            # Use the FastAPI dependency injection to get the session
+            session: AsyncSession = info.context["session"]
+
             query = select(TaskModel)
 
             if name:
@@ -74,10 +79,11 @@ class Query:
 
             result = await session.execute(query)
             tasks = result.scalars().all()
+            logger.info(f"Processed get_tasks(name={name},project_id={project_id})")
             return [Task(id=t.id, name=t.name, project_id=t.project_id) for t in tasks]
 
         except Exception as e:
-            print(f"Error fetching tasks: {str(e)}")
+            logger.warning(f"Failed to process the get_tasks(name={name},project_id={project_id}): [{str(e)}]")
             return []
 
 
