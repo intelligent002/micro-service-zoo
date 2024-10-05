@@ -51,7 +51,7 @@ class Query:
                 query = query.where(ProjectModel.name.ilike(f"%{name}%"))  # Filter by project name (case-insensitive)
 
             # Log the SQL query for debugging purposes
-            logger.info(f"Executing query: {str(query)}")
+            logger.debug(f"Executing query: {str(query)}")
 
             # Execute the query asynchronously
             result = await session.execute(query)
@@ -95,7 +95,7 @@ class Query:
                 query = query.where(TaskModel.project_id == project_id)  # Filter by project ID
 
             # Log the SQL query for debugging purposes
-            logger.info(f"Executing query: {str(query)}")
+            logger.debug(f"Executing query: {str(query)}")
 
             # Execute the query asynchronously
             result = await session.execute(query)
