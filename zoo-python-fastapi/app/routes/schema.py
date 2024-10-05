@@ -1,8 +1,16 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse, FileResponse
 
-from app.schemas.common import RespOkString, RespErrString, RespOkList, RespOkGeneric
-from app.services.schema import schema_list, schema_generate, schema_download
+from app.schemas.common import (
+    RespOkString,
+    RespOkList,
+    RespErrString
+)
+from app.services.schema import (
+    schema_list,
+    schema_generate,
+    schema_download
+)
 
 router = APIRouter()
 
