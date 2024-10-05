@@ -24,9 +24,6 @@ $SERVICE_NAME \
 $ENVIRONMENT \
 ' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
-rm /etc/nginx/conf.d/default.conf.template
-rm /etc/nginx/nginx.conf.template
-
 # Debugging substitutions
 # cat /etc/nginx/conf.d/default.conf
 # cat /etc/nginx/nginx.conf
