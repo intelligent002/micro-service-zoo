@@ -11,7 +11,7 @@ services:
             - MYSQL_DATABASE=zoo-db
             - MYSQL_HOSTNAME=localhost
             - MYSQL_PASSWORD=zoo-password
-            - MYSQL_ROOT_PASSWORD=root-password
+            - MYSQL_ROOT_PASSWORD=007
             - MYSQL_TCP_PORT=3307
             - MYSQL_USER=zoo-user
         volumes:
