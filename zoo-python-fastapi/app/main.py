@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import sessionmanager
 from app.logger import setup_logging
 from app.metrics import init_metrics
-from app.routes import index, health, graphql, schema
+from app.routes import router_index, router_graphql,router_health,router_schema
 
 
 @asynccontextmanager
@@ -47,10 +47,10 @@ CORSMiddleware(
 )
 
 # Include routers for REST, health checks, and GraphQL
-app.include_router(index.router, prefix="/graphql")
-app.include_router(health.router, prefix="/graphql")
-app.include_router(graphql.router, prefix="/graphql")
-app.include_router(schema.router, prefix="/graphql")
+app.include_router(router_index, prefix="/graphql")
+app.include_router(router_health, prefix="/graphql")
+app.include_router(router_graphql, prefix="/graphql")
+app.include_router(router_schema, prefix="/graphql")
 
 # Prometheus metrics
 init_metrics(app)
