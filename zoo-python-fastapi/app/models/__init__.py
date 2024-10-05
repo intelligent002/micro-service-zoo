@@ -1,4 +1,2 @@
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base() # model base class
-
+from app.models.project import Project
+from app.models.task import Task
