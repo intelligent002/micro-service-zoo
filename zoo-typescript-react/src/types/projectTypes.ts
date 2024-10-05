@@ -1,8 +1,7 @@
 // Define the shape of a Project entity
 export interface Project {
-    id: string;
+    id: number;
     name: string;
-    rawId: number;
     __typename: string;
 }
 

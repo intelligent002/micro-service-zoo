@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.schemas.common import RespOkString
+from app.models.pydantic.common import RespOkString
 
 router = APIRouter()
 

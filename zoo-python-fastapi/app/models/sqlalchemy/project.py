@@ -8,6 +8,7 @@ Base = declarative_base()
 
 
 class Project(Base):
+    """SQLAlchemy Model - interact with SQL"""
     __tablename__ = "projects"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     name: Mapped[str] = mapped_column(String(255), index=True, unique=True, )

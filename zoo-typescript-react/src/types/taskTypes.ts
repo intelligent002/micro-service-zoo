@@ -2,7 +2,6 @@
 export interface Task {
     id: number;
     name: string;
-    rawId: number;
 }
 
 // Define the structure of the GraphQL query response

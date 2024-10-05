@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from app.dependencies import DBSessionDep
-from app.schemas.common import RespOkDict, RespErrDict, BaseOkResp
+from app.models.pydantic.common import RespOkDict, RespErrDict, BaseOkResp
 from app.services.health import liveness, readiness
 
 router = APIRouter()

@@ -8,6 +8,7 @@ Base = declarative_base()
 
 
 class Task(Base):
+    """SQLAlchemy Model - interact with SQL"""
     __tablename__ = "tasks"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, index=True)
     project_id: Mapped[int] = mapped_column(ForeignKey('projects.id'))

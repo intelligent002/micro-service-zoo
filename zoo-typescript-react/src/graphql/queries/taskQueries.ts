@@ -5,7 +5,6 @@ export const GET_TASKS = gql`
         getTasks(projectId: $projectId) {
             id
             name
-            rawId
             projectId
         }
     }

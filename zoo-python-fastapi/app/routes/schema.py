@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse, FileResponse
 
-from app.schemas.common import (
+from app.models.pydantic.common import (
     RespOkString,
     RespOkList,
     RespErrString
