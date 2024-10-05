@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
     To understand more, read https://fastapi.tiangolo.com/advanced/events/
     """
     yield
-    if sessionmanager.engine is not None:
+    if await sessionmanager.engine is not None:
         # Close the DB connection
         await sessionmanager.close()
 
