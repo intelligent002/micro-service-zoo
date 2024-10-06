@@ -4,6 +4,7 @@ import {getApolloClient} from './apollo-client';
 import {BrowserRouter as Router} from 'react-router-dom';
 import ProjectsList from './components/Project/ProjectsList'
 import TasksList from "./components/Task/TasksList";
+import './App.css';
 
 function App() {
     // Separate useState hooks for client and selectedProjectId

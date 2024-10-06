@@ -22,9 +22,9 @@ function ProjectsList({onSelect}) {
     }
 
     return (
-        <div>
+        <div className="app-container">
             <h3>Projects</h3>
-            <ul>
+            <ul className="project-list">
                 {data.getProjects.map(project => (
                     <ProjectItem key={project.id} project={project} onSelect={onSelect}/>
                 ))}
