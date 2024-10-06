@@ -2,7 +2,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { APP_INITIALIZER } from '@angular/core';
 import { AppComponent } from './app/app.component';
-import { ConfigService } from './app/config.service';
+import { ConfigService } from './app/services/config.service';
 
 // Function to initialize configuration before app start
 export function initializeApp(configService: ConfigService) {
