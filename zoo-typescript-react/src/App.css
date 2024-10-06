@@ -1,38 +1,76 @@
-.App {
+/* Global styles */
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  background-color: #f5f7fa;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #323a45;
+  color: white;
+  padding: 20px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1, h2, h3 {
+  font-weight: 600;
+  color: #323a45;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Centering the app with 80% width and 10% offset from top */
+.App {
+  width: 80%;
+  margin: 10% auto 0 auto; /* 10% offset from top and centered horizontally */
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Project List */
+.project-list {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  justify-content: flex-start; /* Align buttons to the left */
+  flex-wrap: wrap; /* Wrap buttons if they exceed the width */
+  list-style-type: none; /* Removes bullets */
+  padding-left: 0; /* Removes any default padding */
+  margin-bottom: 20px;
+}
+
+button {
+  margin: 10px; /* Adjust spacing between buttons */
+  background-color: #00aaff;
+  border: 1px solid #0077cc;
   color: white;
+  padding: 10px 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  background-color: #0077cc;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Task Panel */
+.task-panel {
+  margin-top: 20px;
+}
+
+.task-list {
+  padding-left: 20px; /* Standard padding for ordered lists */
+  list-style-type: decimal; /* Ordered list uses numbers */
+}
+
+.task-list li {
+  margin-bottom: 10px; /* Space between tasks */
+}
+
+/* Footer Styles (if needed) */
+footer {
+  background-color: #f5f7fa;
+  padding: 20px;
+  text-align: center;
+  color: #888;
 }
