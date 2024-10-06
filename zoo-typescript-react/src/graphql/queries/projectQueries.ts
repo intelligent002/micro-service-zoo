@@ -5,6 +5,8 @@ export const GET_PROJECTS = gql`
         getProjects {
             id
             name
+            createdAt
+            updatedAt
             __typename
         }
     }
