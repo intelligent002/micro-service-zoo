@@ -3,10 +3,10 @@ import TaskItem from './TaskItem';
 import {useQuery} from "@apollo/client";
 import {GET_TASKS} from "../../graphql/queries/taskQueries";
 
-function TasksList({projectId}) {
-    const {loading, error, data} = useQuery(GET_TASKS,{
-        variables: {projectId},
-        skip: !projectId, // Skip the query if projectId is not provided
+function TasksList({project}) {
+    const {loading, error, data} = useQuery(GET_TASKS, {
+        variables: {projectId: project.id},
+        skip: !project.id, // Skip the query if projectId is not provided
     });
 
     if (loading) return <p>Loading tasks...</p>;
@@ -14,7 +14,7 @@ function TasksList({projectId}) {
 
     return (
         <div>
-            <h3>Tasks for Project {projectId}</h3>
+            <h3>Tasks for {project.name}</h3>
             <ul>
                 {data.getTasks.map((task) => (
                     <TaskItem key={task.id} task={task}/>

@@ -26,7 +26,7 @@ function ProjectsList({onSelect}) {
             <h3>Projects</h3>
             <ul className="project-list">
                 {data.getProjects.map(project => (
-                    <ProjectItem key={project.id} project={project} onSelect={onSelect}/>
+                    <ProjectItem key={project.id} project={project} onSelect={() => onSelect(project)}/>
                 ))}
             </ul>
         </div>

@@ -21,7 +21,7 @@ h1, h2, h3 {
 /* Centering the app with 80% width and 10% offset from top */
 .App {
   width: 80%;
-  margin: 10% auto 0 auto; /* 10% offset from top and centered horizontally */
+  margin: 2% auto 0 auto; /* 10% offset from top and centered horizontally */
   padding: 20px;
   background-color: white;
   border-radius: 5px;

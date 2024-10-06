@@ -9,7 +9,7 @@ import './App.css';
 function App() {
     // Separate useState hooks for client and selectedProjectId
     const [client, setClient] = useState(null);
-    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [selectedProject, setSelectedProject] = useState(null);
 
     // Initialize Apollo Client after config is loaded
     useEffect(() => {
@@ -29,8 +29,8 @@ function App() {
             <Router>
                 <div className="App">
                     {/* Pass setSelectedProjectId as onSelect */}
-                    <ProjectsList onSelect={setSelectedProjectId}/>
-                    {selectedProjectId && <TasksList projectId={selectedProjectId}/>}
+                    <ProjectsList onSelect={setSelectedProject}/>
+                    {selectedProject && <TasksList project={selectedProject}/>}
                 </div>
             </Router>
         </ApolloProvider>
