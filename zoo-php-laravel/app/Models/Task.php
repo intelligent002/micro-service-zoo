@@ -9,23 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @method static where(string $string, mixed $id)
  * @method static find(mixed $taskId)
+ * @property mixed $name
+ * @property mixed $project_id
+ * @property int $priority
  */
 class Task extends Model
 {
     use HasFactory;
-
-    /**
-     * @var mixed $project_id
-     */
-    public int $project_id;
-    /**
-     * @var int $priority
-     */
-    public int $priority;
-    /**
-     * @var string $name
-     */
-    public string $name;
 
     protected $fillable = ['name', 'priority', 'project_id'];
 

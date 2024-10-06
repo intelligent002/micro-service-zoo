@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
+ * @property mixed $id
+ * @method static create(array $validatedData)
  * @OA\Schema(
  *     @OA\Xml(name="Project")
  * )
@@ -14,15 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Project extends Model
 {
     use HasFactory;
-
-    /**
-     * @var int $id
-     */
-    public int $id;
-    /**
-     * @var string $name
-     */
-    public string $name;
 
     protected $fillable = ['name'];
 
