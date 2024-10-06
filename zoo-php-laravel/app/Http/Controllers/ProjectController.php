@@ -19,7 +19,7 @@ class ProjectController extends Controller
         $projects = Project::all();
         return response()->json([
             'status' => 'OK',
-            'data'   => $projects
+            'result' => $projects
         ], Response::HTTP_OK);
     }
 
@@ -40,7 +40,7 @@ class ProjectController extends Controller
 
         return response()->json([
             'status' => 'OK',
-            'data'   => $project
+            'result' => $project
         ], Response::HTTP_CREATED);
     }
 
@@ -94,6 +94,6 @@ class ProjectController extends Controller
         return response()->json([
             'status'  => 'OK',
             'message' => 'Task deleted successfully'
-        ]);
+        ], Response::HTTP_OK);
     }
 }

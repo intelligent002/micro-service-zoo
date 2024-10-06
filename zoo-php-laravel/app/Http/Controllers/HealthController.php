@@ -17,7 +17,9 @@ class HealthController extends Controller
     public function liveness(): JsonResponse
     {
         Log::info("Liveness check passed.");
-        return response()->json(['status' => 'OK'], Response::HTTP_OK);
+        return response()->json([
+            'status' => 'OK'
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -40,19 +42,19 @@ class HealthController extends Controller
             $readiness_status["MySQL"] = "ERROR";
         }
 
-        if (!in_array("ERROR", $readiness_status)) {
-            // not found - return "status: OK"
-            Log::info("Readiness check passed.");
-            return response()->json([
-                'status' => 'OK',
-                'data'   => $readiness_status
-            ], Response::HTTP_OK); // 200 is the default status
-        } else {
-            // found - return "status: ERROR"
+        if (in_array("ERROR", $readiness_status)) {
+            // found errors - return "status: ERROR"
             return response()->json([
                 'status' => 'ERROR',
-                'data'   => $readiness_status
+                'result' => $readiness_status
             ], Response::HTTP_SERVICE_UNAVAILABLE); // 503
         }
+
+        // not found - return "status: OK"
+        Log::info("Readiness check passed.");
+        return response()->json([
+            'status' => 'OK',
+            'result' => $readiness_status
+        ], Response::HTTP_OK); // 200 is the default status
     }
 }

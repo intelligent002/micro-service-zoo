@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class TaskController extends Controller
 {
     /**
+     * Return all tasks in project by project_id
      * @param Project $project
      * @return JsonResponse
      */
@@ -19,13 +20,13 @@ class TaskController extends Controller
         $tasks = Task::where('project_id', $project->id)->orderBy('priority', 'asc')->get();
         return response()->json([
             'status' => 'OK',
-            'data'   => $tasks
+            'result' => $tasks
         ], Response::HTTP_OK);
 
     }
 
     /**
-     * Created resource in storage and return it
+     * Created new task and return it
      * @param Project $project
      * @param Request $request
      * @return JsonResponse
@@ -58,11 +59,18 @@ class TaskController extends Controller
 
         return response()->json([
             'status' => 'OK',
-            'data'   => $task
+            'result' => $task
         ], Response::HTTP_CREATED);
     }
 
-    public function update(Project $project, Task $task, Request $request)
+    /**
+     * Update the name of task by ID
+     * @param Project $project
+     * @param Task $task
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Project $project, Task $task, Request $request): JsonResponse
     {
         // Validate request data
         $validatedData = $request->validate([
@@ -76,12 +84,13 @@ class TaskController extends Controller
 
         return response()->json([
             'status' => 'OK',
-            'data'   => $task
-        ], Response::HTTP_CREATED);
+            'result' => $task
+        ], Response::HTTP_OK);
     }
 
     /**
-     * Return the specified resource by ID.
+     * Return the specified task by ID.
+     * @param Project $project
      * @param Task $task
      * @return JsonResponse
      */
@@ -89,12 +98,13 @@ class TaskController extends Controller
     {
         return response()->json([
             'status' => 'OK',
-            'data'   => $task
+            'result' => $task
         ], Response::HTTP_OK);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified task
+     * @param Project $project
      * @param Task $task
      * @return JsonResponse
      */
@@ -104,16 +114,17 @@ class TaskController extends Controller
         $task->delete();
 
         return response()->json([
-            'status'  => 'OK',
-            'message' => 'Task deleted successfully'
-        ]);
+            'status' => 'OK',
+            'result' => 'Task deleted successfully'
+        ], Response::HTTP_OK);
     }
 
     /**
+     * Reorder the tasks in project
      * @param Request $request
      * @return JsonResponse
      */
-    public function reorder(Request $request)
+    public function reorder(Request $request): JsonResponse
     {
         foreach ($request->tasks as $index => $taskId) {
             $task = Task::find($taskId);
@@ -121,6 +132,8 @@ class TaskController extends Controller
             $task->save();
         }
 
-        return response()->json(['status' => 'success']);
+        return response()->json([
+            'status' => 'success'
+        ], Response::HTTP_OK);
     }
 }
