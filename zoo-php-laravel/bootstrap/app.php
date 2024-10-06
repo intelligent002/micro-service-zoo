@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: '/rest/',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->use([
+            HandleCors::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
 
