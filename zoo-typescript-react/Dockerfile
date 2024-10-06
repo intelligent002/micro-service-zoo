@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --loglevel=error
 
 # Copy the rest of the app files into the container
 COPY . .
