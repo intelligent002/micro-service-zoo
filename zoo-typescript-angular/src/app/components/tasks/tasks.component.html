@@ -1,0 +1,13 @@
+<div class="tasks-container">
+  <h3>Tasks</h3>
+
+  <div *ngIf="tasks.length === 0">No tasks available for this project.</div>
+
+  <div *ngIf="tasks.length > 0">
+    <div *ngFor="let task of tasks" class="task-card">
+      <h4>{{ task.name }}</h4>
+      <small>Created: {{ task.created_at }}</small>
+      <small>Priority: {{ task.priority }}</small>
+    </div>
+  </div>
+</div>

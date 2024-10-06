@@ -6,7 +6,8 @@
   <div *ngIf="projects.length > 0">
     <div *ngFor="let project of projects" class="project-card">
       <h3>{{ project.name }}</h3>
-      <small>Status: {{ project.created_at }}</small>
+      <small>created: {{ project.created_at }}</small>
+      <app-tasks [projectId]="project.id"></app-tasks>
     </div>
   </div>
 </div>
