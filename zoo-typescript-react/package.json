@@ -14,15 +14,27 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
-    "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@babel/plugin-transform-class-properties": "^7.25.7",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.25.7",
+    "@babel/plugin-transform-optional-chaining": "^7.25.7",
+    "@babel/plugin-transform-private-methods": "^7.25.7",
+    "@rollup/plugin-terser": "^0.4.4",
+    "eslint": "^9.12.0",
+    "glob": "^11.0.0",
+    "rimraf": "^6.0.1",
+    "vite": "^4.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "typescript": "^4.9.5"
+  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "jest"
   },
   "eslintConfig": {
     "extends": [
@@ -41,13 +53,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@babel/plugin-transform-class-properties": "^7.25.7",
-    "@babel/plugin-transform-nullish-coalescing-operator": "^7.25.7",
-    "@babel/plugin-transform-optional-chaining": "^7.25.7",
-    "@babel/plugin-transform-private-methods": "^7.25.7",
-    "@rollup/plugin-terser": "^0.4.4",
-    "glob": "^9.3.5"
   }
 }
