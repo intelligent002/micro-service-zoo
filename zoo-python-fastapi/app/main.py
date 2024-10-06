@@ -34,16 +34,15 @@ app = FastAPI(
     openapi_url="/graphql/openapi.json"  # URL for OpenAPI schema
 )
 
-# CORS settings
-CORSMiddleware(
-    app,
-    allow_origins="*",
-    allow_methods="*",
-    allow_headers="*",
-    allow_credentials=True,
-    allow_origin_regex=None,
-    expose_headers="*",
-    max_age=600,
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this to specific domains
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+    allow_credentials=True,  # Allow credentials (e.g., cookies) - will not work with wildcard origins
+    expose_headers=["*"],  # Expose headers to frontend
+    max_age=600,  # How long the results of a preflight request can be cached
 )
 
 # Include routers for REST, health checks, and GraphQL
