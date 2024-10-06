@@ -1,0 +1,12 @@
+<div class="projects-container">
+  <h2>Projects List</h2>
+
+  <div *ngIf="projects.length === 0">No projects available.</div>
+
+  <div *ngIf="projects.length > 0">
+    <div *ngFor="let project of projects" class="project-card">
+      <h3>{{ project.name }}</h3>
+      <small>Status: {{ project.created_at }}</small>
+    </div>
+  </div>
+</div>

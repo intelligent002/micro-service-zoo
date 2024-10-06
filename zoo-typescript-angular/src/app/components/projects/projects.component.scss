@@ -1,0 +1,20 @@
+.projects-container {
+  .project-card {
+    padding: 15px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+
+    h3 {
+      margin-top: 0;
+    }
+
+    small {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.85em;
+      color: #666;
+    }
+  }
+}
