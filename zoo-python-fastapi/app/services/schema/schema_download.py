@@ -18,7 +18,7 @@ async def schema_download(version):
         logger.error(message)
         return JSONResponse(status_code=422,
                             content={"status": "ERROR",
-                                     "message": message})
+                                     "error": message})
 
     # Check if the requested schema file exists
     filename = f"schema_{version}.graphql"
@@ -28,7 +28,7 @@ async def schema_download(version):
         logger.error(message)
         return JSONResponse(status_code=404,
                             content={"status": "ERROR",
-                                     "message": message})
+                                     "error": message})
 
     # Serve the file for download
     return FileResponse(filepath, status_code=200)

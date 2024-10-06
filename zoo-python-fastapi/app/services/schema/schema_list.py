@@ -13,7 +13,7 @@ async def schema_list():
     except Exception as e:
         message = f"Failed to list the versions [{str(e)}]"
         logger.error(message)
-        return {"status": "ERROR", "message": message}
+        return {"status": "ERROR", "error": message}
 
     logger.info("Schemas was listed.")
     return {"status": "OK", "result": versions}
