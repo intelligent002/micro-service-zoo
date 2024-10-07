@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import sessionmanager
 from app.logger import setup_logging
 from app.metrics import init_metrics
-from app.routes import router_index, router_graphql,router_health,router_schema
+from app.routes import router_index, router_graphql, router_health, router_schema
 
 
 @asynccontextmanager
@@ -20,6 +20,7 @@ async def lifespan(app: FastAPI):
         # Close the DB connection
         await sessionmanager.close()
 
+
 # Setup Logging
 setup_logging()
 
@@ -29,9 +30,9 @@ app = FastAPI(
     title="My FastAPI Project",
     description="A project demonstrating REST, GraphQL, CORS, and prometheus metrics",
     version="1.0.0",
-    docs_url="/graphql/docs",  # URL for Swagger UI
-    redoc_url="/graphql/redoc",  # URL for ReDoc UI
-    openapi_url="/graphql/openapi.json"  # URL for OpenAPI schema
+    docs_url="/swagger",  # URL for Swagger UI
+    redoc_url="/redoc",  # URL for ReDoc UI
+    openapi_url="/openapi.json"  # URL for OpenAPI schema
 )
 
 # Add CORS middleware
@@ -46,10 +47,10 @@ app.add_middleware(
 )
 
 # Include routers for REST, health checks, and GraphQL
-app.include_router(router_index, prefix="/graphql")
-app.include_router(router_health, prefix="/graphql")
-app.include_router(router_graphql, prefix="/graphql")
-app.include_router(router_schema, prefix="/graphql")
+app.include_router(router_index)
+app.include_router(router_health)
+app.include_router(router_graphql)
+app.include_router(router_schema)
 
 # Prometheus metrics
 init_metrics(app)
