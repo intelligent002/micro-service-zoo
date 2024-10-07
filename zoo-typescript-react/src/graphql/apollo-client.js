@@ -1,6 +1,6 @@
 // src/apollo-client.js
 import {ApolloClient, InMemoryCache} from '@apollo/client';
-import {getConfig} from './config/config.ts';
+import {getConfig} from '../config/config.ts';
 
 let client = null;
 
