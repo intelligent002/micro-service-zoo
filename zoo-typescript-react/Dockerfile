@@ -28,7 +28,7 @@ RUN apk update && apk add --no-cache \
 # Copy the built React files from the previous stage to Nginx's html directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy configuration and starter files
+# Copy configuration and starter file
 COPY nginx/default.conf.template /etc/nginx/conf.d/
 COPY nginx/nginx.conf.template /etc/nginx/
 COPY nginx/start.sh /start.sh
