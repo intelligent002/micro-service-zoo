@@ -93,7 +93,7 @@ services:
         networks:
             - zoo
 
-    # Frontend written in TypeScript/React (node:18-alpine3.20)
+    # Frontend written in TypeScript/React (node:20.18.0-alpine3.20)
     zoo-typescript-react:
         build:
             context: ./zoo-typescript-react # Set build context to the respective folder
@@ -104,8 +104,8 @@ services:
             - ENVIRONMENT=docker-compose
             - LOG_LEVEL=debug
             - NGINX_PORT=8102
-            - REACT_APP_ROUTER_PORT=8120
             - SERVICE_NAME=zoo-typescript-react
+            - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8102/liveness | jq -r '.status'); \
@@ -189,6 +189,33 @@ services:
         networks:
             - zoo
 
+    # Frontend written in TypeScript/angular (node:20.18.0-alpine3.20)
+    zoo-typescript-angular:
+        build:
+            context: ./zoo-typescript-angular # Set build context to the respective folder
+            dockerfile: Dockerfile
+        container_name: zoo-typescript-angular
+        restart: unless-stopped
+        environment:
+            - ENVIRONMENT=docker-compose
+            - LOG_LEVEL=debug
+            - NGINX_PORT=8105
+            - SERVICE_NAME=zoo-typescript-angular
+        healthcheck:
+            # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8105/liveness | jq -r '.status'); \
+                    if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            interval: 60s
+            retries: 3
+            start_period: 5s
+            timeout: 10s
+        ports:
+            - "8105:8105"
+        depends_on:
+            - zoo-php-laravel-http2fpm
+        networks:
+            - zoo
+
     # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
     zoo-router:
         build:
@@ -202,6 +229,7 @@ services:
             - SERVICE_NAME=zoo-router
             - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
             - ZOO_PYTHON_FASTAPI_PORT=8101
+            - ZOO_TYPESCRIPT_ANGULAR_PORT=8105
             - ZOO_TYPESCRIPT_REACT_PORT=8102
         ports:
             - "8120:8120"
