@@ -1,0 +1,22 @@
+<div class="projects-container">
+  <h2>
+    Projects List
+    <button (click)="createProject()" class="create-button">Create</button>
+  </h2>
+
+  <div *ngIf="projects.length === 0">No projects available.</div>
+
+  <div *ngIf="projects.length > 0">
+    <div *ngFor="let project of projects" class="project-card">
+      <div class="project-header">
+        <h3>{{ project.name }}</h3>
+        <div class="actions">
+          <button (click)="viewTasks(project.id)" class="tasks-button">Tasks</button>
+          <button (click)="editProject(project.id)" class="edit-button">Edit</button>
+          <button (click)="deleteProject(project.id)" class="delete-button">Delete</button>
+        </div>
+      </div>
+      <small>created: {{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+    </div>
+  </div>
+</div>

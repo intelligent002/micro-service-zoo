@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ProjectItem({ project, onSelect }) {
+function ProjectItem({project, onSelect}) {
     return (
         <li>
             <button onClick={onSelect}>

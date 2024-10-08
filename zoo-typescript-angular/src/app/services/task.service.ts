@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators'; // Use map operator to transform the response
 import {Task} from '../models/task.model';
 import {ConfigService} from './config.service';
 import {RestApiResponse} from '../models/rest-api-response.model';

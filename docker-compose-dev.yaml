@@ -201,6 +201,7 @@ services:
             - LOG_LEVEL=debug
             - NGINX_PORT=8105
             - SERVICE_NAME=zoo-typescript-angular
+            - BACKEND_HOSTNAME=http://private-api.docker.r7g.org:8120
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8105/liveness | jq -r '.status'); \

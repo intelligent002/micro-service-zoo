@@ -15,11 +15,11 @@ function TasksList({project}) {
     return (
         <div>
             <h3>Tasks for {project.name}</h3>
-            <ul>
+            <ol>
                 {data.getTasks.map((task) => (
                     <TaskItem key={task.id} task={task}/>
                 ))}
-            </ul>
+            </ol>
         </div>
     );
 }
