@@ -17,7 +17,7 @@ export class ConfigService {
   async loadConfig(): Promise<void> {
     try {
       this.config = await firstValueFrom(
-        this.http.get<Config>('/assets/config.json').pipe(
+        this.http.get<Config>('/config.json').pipe(
           catchError(() => {
             console.error('Could not load config.json');
             return of({apiUrl: ""});  // Handle error gracefully

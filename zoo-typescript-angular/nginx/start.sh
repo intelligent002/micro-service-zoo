@@ -29,13 +29,13 @@ $ENVIRONMENT \
 # Replace placeholder with the environment variable or default value
 jq -r ' .apiUrl =       env.BACKEND_HOSTNAME
 |       .featureFlagX = false
-' /usr/share/nginx/html/assets/config.json > /usr/share/nginx/html/assets/config.json.tmp
-mv -f /usr/share/nginx/html/assets/config.json.tmp /usr/share/nginx/html/assets/config.json
+' /usr/share/nginx/html/config.json > /usr/share/nginx/html/config.json.tmp
+mv -f /usr/share/nginx/html/config.json.tmp /usr/share/nginx/html/config.json
 
 # Debugging substitutions
 # cat /etc/nginx/conf.d/default.conf
 # cat /etc/nginx/nginx.conf
-# cat /usr/share/nginx/html/assets/config.json
+# cat /usr/share/nginx/html/config.json
 
 # Start NGINX
 nginx -g 'daemon off;'

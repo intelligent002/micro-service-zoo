@@ -80,7 +80,7 @@ services:
             - SERVICE_NAME=zoo-python-fastapi
         healthcheck:
             # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/graphql/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
@@ -143,7 +143,7 @@ services:
             - SERVICE_NAME=zoo-php-laravel
         healthcheck:
             # Test availabiltiy of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/rest/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3

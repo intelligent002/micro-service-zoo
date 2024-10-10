@@ -12,17 +12,14 @@ import {Project} from '../../../models/project.model';
   imports: [CommonModule, ReactiveFormsModule],
   styleUrls: ['./project-create.component.scss']
 })
+
 export class ProjectCreateComponent implements OnInit {
   createForm: FormGroup;
 
   @Output() projectCreated = new EventEmitter<Project>();
   @ViewChild('projectNameInput') projectNameInput!: ElementRef;
 
-  constructor(
-    private fb: FormBuilder,
-    private projectService: ProjectService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private projectService: ProjectService, private router: Router) {
     this.createForm = this.fb.group({
       name: ['', Validators.required]
     });
@@ -43,10 +40,9 @@ export class ProjectCreateComponent implements OnInit {
       // and now handle the creation
       const projectData = this.createForm.value;
       this.projectService.createProject(projectData).subscribe({
-        next: (newProject) => {
+        next: () => {
           console.log('Project created successfully');
-        },
-        error: (error) => {
+        }, error: (error) => {
           console.error('Error creating project:', error);
         }
       });
