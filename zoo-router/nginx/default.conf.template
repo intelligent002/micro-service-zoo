@@ -20,6 +20,18 @@ upstream zoo-typescript-angular {
     server zoo-typescript-angular:${ZOO_TYPESCRIPT_ANGULAR_PORT};
 }
 
+# Server block for Health Probe
+server {
+    listen ${NGINX_PORT};
+    server_name localhost;
+    root /var/www/html;
+
+    # Generate a trace_id manually
+    set_by_lua_block $trace_id {
+        local uuid = require 'resty.uuid';
+        return uuid.generate();
+    }
+}
 
 # Server block for Public API service (Python-FastAPI GraphQL App)
 server {

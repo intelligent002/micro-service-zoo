@@ -173,10 +173,10 @@ services:
             - SERVICE_NAME=zoo-php-laravel-http2fpm
             - ZOO_PHP_LARAVEL_PORT=8103
         volumes:
-            - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/http2fpm/
+            - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8104/http2fpm/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8104/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
@@ -235,10 +235,10 @@ services:
         ports:
             - "8120:8120"
         volumes:
-            - ./zoo-router/probe/:/var/www/html/router/
+            - ./zoo-router/probe/:/var/www/html/
         healthcheck:
             # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8120/router/liveness | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8120/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
