@@ -1,12 +1,10 @@
-<h2>Create a New Project</h2>
-
 <form (ngSubmit)="createProject()" *ngIf="createForm" [formGroup]="createForm">
-  <div>
+  <div class="form-row">
     <label for="name">Project Name</label>
-    <input formControlName="name" id="name" type="text"/>
-    <div *ngIf="createForm.controls['name'].invalid && createForm.controls['name'].touched">
-      Project name is required.
-    </div>
+    <input formControlName="name" id="name" #projectNameInput type="text" />
+    <button [disabled]="createForm.invalid" type="submit">Create Project</button>
   </div>
-  <button [disabled]="createForm.invalid" type="submit">Create Project</button>
+  <div *ngIf="createForm.get('name')?.invalid && createForm.get('name')?.touched" class="error">
+    Project name is required.
+  </div>
 </form>

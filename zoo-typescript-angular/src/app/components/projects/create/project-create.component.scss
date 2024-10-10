@@ -1,0 +1,31 @@
+.form-row {
+  display: flex;
+  align-items: center;    /* Aligns all items vertically in the center */
+  gap: 5px;              /* Adds space between the elements */
+  width: 100%;
+}
+
+label {
+  min-width: 100px;       /* Ensures the label has a fixed width to align well with the input */
+}
+
+input {
+  flex: 1;                /* Makes the input take up the remaining available space */
+  padding: 10px;          /* Adds padding for height consistency */
+  margin-right: 10px;     /* Space between the input and button */
+}
+
+button {
+  padding: 10px 20px;     /* Consistent padding with the input field */
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 40px;           /* Explicit height to align well with the input */
+}
+
+button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}

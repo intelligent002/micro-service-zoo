@@ -1,24 +1,28 @@
 .projects-container {
   padding: 20px;
+  .projects-header {
 
-
-  h2 {
+    height: 120px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    .create-button {
-      background-color: #28a745; /* Green for Create */
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 14px;
+    h2 {
+      color: red;
+    }
+  }
 
-      &:hover {
-        background-color: #218838; /* Darker green on hover */
-      }
+  .create-button {
+    background-color: #28a745; /* Green for Create */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+
+    &:hover {
+      background-color: #218838; /* Darker green on hover */
     }
   }
 

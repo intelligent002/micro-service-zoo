@@ -1,10 +1,11 @@
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
-import { APP_INITIALIZER } from '@angular/core';
-import { AppComponent } from './app/app.component';
-import { ConfigService } from './app/services/config.service';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideHttpClient} from '@angular/common/http';
+import {APP_INITIALIZER} from '@angular/core';
+import {AppComponent} from './app/app.component';
+import {ConfigService} from './app/services/config.service';
 import {routes} from './app/app.routes';
-import {provideRouter} from '@angular/router';
+import {provideRouter, RouteReuseStrategy} from '@angular/router';
+import {CustomRouteReuseStrategy} from './app/components/CustomRouteReuseStrategy';
 
 // Function to initialize configuration before app start
 export function initializeApp(configService: ConfigService) {
@@ -21,6 +22,7 @@ bootstrapApplication(AppComponent, {
       multi: true                // Ensure this is run before app startup
     },
     provideHttpClient(), // Ensure HttpClient is available
-    provideRouter(routes)// Provide the routes
+    provideRouter(routes), // Provide the routes
+    {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy}
   ]
 }).catch(err => console.error(err));
