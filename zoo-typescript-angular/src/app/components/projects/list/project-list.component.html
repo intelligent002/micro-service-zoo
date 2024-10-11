@@ -11,14 +11,28 @@
   <div *ngIf="(projectService.getProjects() | async) as projects; else noProjects">
     <div *ngFor="let project of projects" class="project-card">
       <div class="project-header">
-        <h3>#{{ project.id }} : {{ project.name }}</h3>
+        <h3>#{{ project.id }}: <span *ngIf="!project.isEditing">{{ project.name }}</span>
+          <input *ngIf="project.isEditing" #projectNameInput [(ngModel)]="project.name"
+                 placeholder="Project Name" class="project-edit" id="project-{{project.id}}"/>
+        </h3>
         <div class="actions">
           <button (click)="viewTasks(project.id)" class="tasks-button">Tasks</button>
-          <button (click)="editProject(project.id)" class="edit-button">Edit</button>
+          <button (click)="toggleEditMode(project)" class="edit-button">
+            {{ project.isEditing ? 'Save' : 'Edit' }}
+          </button>
           <button (click)="deleteProject(project.id)" class="delete-button">Delete</button>
         </div>
       </div>
-      <small>created: {{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+      <div class="project-dates-container">
+        <div class="project-dates">
+          <small class="date-label">Created:</small>
+          <small class="date-value">{{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+        </div>
+        <div class="project-dates">
+          <small class="date-label">Updated:</small>
+          <small class="date-value">{{ project.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+        </div>
+      </div>
     </div>
   </div>
 
