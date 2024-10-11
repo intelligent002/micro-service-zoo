@@ -15,13 +15,24 @@ import {FormsModule} from '@angular/forms';
   imports: [CommonModule, TasksComponent, ProjectCreateComponent, FormsModule]
 })
 export class ProjectListComponent implements OnInit {
-  showCreateForm: boolean = false;  // Control form visibility
-  currentEditingProjectId: number | null = null;  // To track the current editing project
-  // Collect references to all input fields using ViewChildren
-  @ViewChildren('projectNameInput') projectNameInputs!: QueryList<ElementRef>;
 
   constructor(public projectService: ProjectService, private router: Router) {
   }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // project create related controls:
+  showCreateForm: boolean = false;  // Control form visibility
+
+  toggleCreateProject(): void {
+    this.showCreateForm = !this.showCreateForm;
+  }
+
+  handleProjectCreated(): void {
+    this.showCreateForm = false;  // Hide the form after submission
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // project list related controls:
 
   ngOnInit(): void {
     // Trigger projects loading, this shall happen once, since we use RouteReuseStrategy
@@ -29,6 +40,27 @@ export class ProjectListComponent implements OnInit {
     this.projectService.loadProjectsFromServer();
   }
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // project edit related controls:
+  currentEditingProjectId: number | null = null;  // To track the current editing project
+
+  // Collect references to all input fields using ViewChildren
+  @ViewChildren('projectNameInput') projectNameInputs!: QueryList<ElementRef>;
+
+  // Toggle editing and set the currentEditingProjectId
+  toggleEditMode(project: Project): void {
+    // save if was in edit mode
+    if (project.isEditing) {
+      this.updateProject(project);
+    }
+    // toggle the mode
+    project.isEditing = !project.isEditing;
+    if (project.isEditing) {
+      this.currentEditingProjectId = project.id;  // Track the last project being edited
+    }
+  }
+
+  // focus on edit field upon it's render is complete
   ngAfterViewChecked(): void {
     // Focus the input field of the last/current editing project, if applicable
     if (this.currentEditingProjectId !== null) {
@@ -40,6 +72,21 @@ export class ProjectListComponent implements OnInit {
     }
   }
 
+  // update the project
+  updateProject(project: Project): void {
+    this.projectService.updateProject(project).subscribe({
+      error: (err) => {
+        console.error('Error updating project:', err);
+      }, complete: () => {
+        console.log('Project updated successfully');
+      }
+    });
+  }
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // project delete related controls:
+
+  // delete the project
   deleteProject(projectId: number): void {
     if (confirm('Are you sure you want to delete this project and its tasks?')) {
       // Dispatch REST method for deletion from server side
@@ -55,15 +102,8 @@ export class ProjectListComponent implements OnInit {
     }
   }
 
-  updateProject(project: Project): void {
-    this.projectService.updateProject(project).subscribe({
-      error: (err) => {
-        console.error('Error updating project:', err);
-      }, complete: () => {
-        console.log('Project updated successfully');
-      }
-    });
-  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // project tasks view related controls:
 
   async viewTasks(projectId: number): Promise<void> {
     try {
@@ -74,25 +114,7 @@ export class ProjectListComponent implements OnInit {
     }
   }
 
-  toggleCreateProject(): void {
-    this.showCreateForm = !this.showCreateForm;
-  }
 
-  handleProjectCreated(): void {
-    this.showCreateForm = false;  // Hide the form after submission
-  }
 
-  // Toggle editing and set the currentEditingProjectId
-  toggleEditMode(project: Project): void {
-    // save if was in edit mode
-    if (project.isEditing) {
-      // Save the project if it's in editing mode
-      this.updateProject(project);
-    }
-    // toggle the mode
-    project.isEditing = !project.isEditing;
-    if (project.isEditing) {
-      this.currentEditingProjectId = project.id;  // Track the current project being edited
-    }
-  }
+
 }
