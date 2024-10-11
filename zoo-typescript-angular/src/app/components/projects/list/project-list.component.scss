@@ -1,7 +1,7 @@
 .projects-container {
   padding: 20px;
-  .projects-header {
 
+  .projects-header {
     height: 120px;
     display: flex;
     justify-content: space-between;
@@ -44,11 +44,16 @@
       h3 {
         margin: 0;
         font-size: 18px;
+        width: 100%;
+      }
+
+      .project-edit {
+        width: 80%;
       }
 
       .actions {
         display: flex;
-        gap: 10px; /* Spacing between buttons */
+        gap: 5px; /* Spacing between buttons */
 
         button {
           padding: 5px 10px;
@@ -90,12 +95,27 @@
           }
         }
       }
+
     }
 
-    small {
-      display: block;
-      font-size: 12px;
-      color: #666;
+    .project-dates-container {
+      max-width: 220px;
+    }
+
+    .project-dates {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .date-label {
+      text-align: left;
+    }
+
+    .date-value {
+      text-align: right;
+      white-space: nowrap;
     }
   }
 }
+
+
