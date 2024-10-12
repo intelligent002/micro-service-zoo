@@ -1,17 +1,8 @@
 html, body {
   width: 100%;
   margin: 0;
-  background-color: #f5f7fa;  /* Global background color */
+  background-color: #f5f7fa; /* Global background color */
   font-family: Tahoma, serif;
-}
-
-/* Global form styles */
-form {
-  margin: 20px;
-  padding: 15px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 label {
@@ -20,19 +11,26 @@ label {
   display: block;
 }
 
-input {
+input, button {
   padding: 4px;
-  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size:14px;
+}
+
+input {
+  border: 1px solid #ccc;
 }
 
 button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
+  padding: 5px 10px;
   border: none;
-  border-radius: 5px;
+  color: white;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  opacity: 0.9;
 }
 
 button:disabled {
@@ -43,4 +41,56 @@ button:disabled {
 .error {
   color: red;
   font-size: 0.9em;
+}
+
+.create-button, .update-button {
+  background-color: #28a745; /* Green for Create */
+}
+
+.create-button:hover, .update-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+.tasks-button {
+  background-color: #007bff; /* Blue for Tasks */
+}
+
+.tasks-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.edit-button {
+  background-color: #ffc107; /* Yellow for Edit */
+  color: black;
+}
+
+.edit-button:hover {
+  background-color: #e0a800; /* Darker yellow on hover */
+}
+
+.delete-button {
+  background-color: #dc3545; /* Red for Delete */
+}
+
+.delete-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.update-button {
+  background-color: #28a745;
+}
+
+.update-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.create-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  gap: 5px;
 }

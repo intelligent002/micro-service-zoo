@@ -4,40 +4,45 @@
     <div *ngIf="showCreateForm">
       <app-project-create (projectCreated)="handleProjectCreated()"></app-project-create>
     </div>
-    <button (click)="toggleCreateProject()" class="create-button">Create</button>
+    <button (click)="toggleCreateProject()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
   </div>
 
   <!-- Directly bind projects$ observable using async pipe -->
   <div *ngIf="(projectService.getProjects() | async) as projects; else noProjects">
     <div *ngFor="let project of projects" class="project-card">
       <div class="project-header">
-        <h3>#{{ project.id }}: <span *ngIf="!project.isEditing">{{ project.name }}</span>
-          <input *ngIf="project.isEditing" #projectNameInput [(ngModel)]="project.name"
-                 placeholder="Project Name" class="project-edit" id="project-{{project.id}}"/>
+        <h3>#{{ project.id }}:&nbsp;
+          <ng-container *ngIf="!project.isEditing">
+            <span>{{ project.name }}</span>
+          </ng-container>
+          <ng-container *ngIf="project.isEditing">
+            <app-project-edit *ngIf="project.isEditing" [project]="project"
+                              (projectUpdated)="handleProjectUpdated(project)"></app-project-edit>
+          </ng-container>
         </h3>
         <div class="actions">
           <button (click)="viewTasks(project.id)" class="tasks-button">Tasks</button>
-          <button (click)="toggleEditMode(project)" class="edit-button">
-            {{ project.isEditing ? 'Save' : 'Edit' }}
+          <button (click)="toggleUpdateProject(project)" class="edit-button">
+            {{ project.isEditing ? 'Cancel' : 'Edit' }}
           </button>
           <button (click)="deleteProject(project.id)" class="delete-button">Delete</button>
         </div>
+    </div>
+    <div class="project-dates-container">
+      <div class="project-dates">
+        <small class="date-label">Created:</small>
+        <small class="date-value">{{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
       </div>
-      <div class="project-dates-container">
-        <div class="project-dates">
-          <small class="date-label">Created:</small>
-          <small class="date-value">{{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
-        </div>
-        <div class="project-dates">
-          <small class="date-label">Updated:</small>
-          <small class="date-value">{{ project.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
-        </div>
+      <div class="project-dates">
+        <small class="date-label">Updated:</small>
+        <small class="date-value">{{ project.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Fallback when there are no projects -->
-  <ng-template #noProjects>
-    <div>No projects available.</div>
-  </ng-template>
+<!-- Fallback when there are no projects -->
+<ng-template #noProjects>
+  <div>No projects available.</div>
+</ng-template>
 </div>

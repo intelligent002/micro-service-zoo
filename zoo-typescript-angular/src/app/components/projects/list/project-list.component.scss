@@ -1,121 +1,64 @@
 .projects-container {
   padding: 20px;
-
-  .projects-header {
-    height: 120px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    h2 {
-      color: red;
-    }
-  }
-
-  .create-button {
-    background-color: #28a745; /* Green for Create */
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-
-    &:hover {
-      background-color: #218838; /* Darker green on hover */
-    }
-  }
-
-  .project-card {
-    padding: 15px;
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative;
-
-    .project-header {
-      display: flex;
-      justify-content: space-between; /* Align title to the left and buttons to the right */
-      align-items: flex-start; /* Ensure buttons are aligned at the top */
-      margin-bottom: 10px; /* Add space below the header */
-
-      h3 {
-        margin: 0;
-        font-size: 18px;
-        width: 100%;
-      }
-
-      .project-edit {
-        width: 80%;
-      }
-
-      .actions {
-        display: flex;
-        gap: 5px; /* Spacing between buttons */
-
-        button {
-          padding: 5px 10px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          transition: background-color 0.3s ease;
-
-          &:hover {
-            opacity: 0.9;
-          }
-        }
-
-        .tasks-button {
-          background-color: #007bff; /* Blue for Tasks */
-          color: white;
-
-          &:hover {
-            background-color: #0056b3; /* Darker blue on hover */
-          }
-        }
-
-        .edit-button {
-          background-color: #ffc107; /* Yellow for Edit */
-          color: black;
-
-          &:hover {
-            background-color: #e0a800; /* Darker yellow on hover */
-          }
-        }
-
-        .delete-button {
-          background-color: #dc3545; /* Red for Delete */
-          color: white;
-
-          &:hover {
-            background-color: #c82333; /* Darker red on hover */
-          }
-        }
-      }
-
-    }
-
-    .project-dates-container {
-      max-width: 220px;
-    }
-
-    .project-dates {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .date-label {
-      text-align: left;
-    }
-
-    .date-value {
-      text-align: right;
-      white-space: nowrap;
-    }
-  }
 }
 
+.projects-header {
+  height: 120px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.projects-header h2 {
+  color: red;
+}
+
+.project-card {
+  padding: 15px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.project-header h3 {
+  margin: 0;
+  font-size: 20px;
+  align-items: center;
+  width: 100%;
+}
+
+.project-header .project-edit {
+  width: 80%;
+}
+
+.project-dates-container {
+  max-width: 220px;
+}
+
+.project-dates {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-label {
+  text-align: left;
+}
+
+.date-value {
+  text-align: right;
+  white-space: nowrap;
+}
+
+span, app-project-edit {
+  display: inline-block; /* Ensure span and app-project-edit behave inline */
+}

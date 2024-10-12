@@ -2,7 +2,7 @@
   <div class="form-row">
     <label for="name">Project Name</label>
     <input formControlName="name" id="name" #projectNameInput type="text" />
-    <button [disabled]="createForm.invalid" type="submit">Create Project</button>
+    <button [disabled]="createForm.invalid" type="submit" class="create-button">Create</button>
   </div>
   <div *ngIf="createForm.get('name')?.invalid && createForm.get('name')?.touched" class="error">
     Project name is required.
