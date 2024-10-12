@@ -52,14 +52,14 @@ export class ProjectEditComponent implements OnChanges {
 
   async updateProject(): Promise<void> {
     if (this.updateForm.valid) {
+      // quickly switch to view mode
       const updatedProject = {...this.project, ...this.updateForm.value};
       this.projectUpdated.emit(updatedProject);
-
+      // update project in the background and trigger its modifications via observable object
       this.projectService.updateProject(updatedProject).subscribe({
         next: () => {
           console.log('Project updated successfully');
-        },
-        error: (error) => {
+        }, error: (error) => {
           console.error('Error updating project:', error);
         }
       });

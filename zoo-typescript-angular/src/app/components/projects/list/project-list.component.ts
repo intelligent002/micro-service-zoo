@@ -60,12 +60,12 @@ export class ProjectListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this project and its tasks?')) {
       // Dispatch REST method for deletion from server side
       this.projectService.deleteProject(projectId).subscribe({
-        error: () => {
+        next: () => {
+          console.log('Project deleted successfully');
+        }, error: () => {
           // Reload the projects list from server after a failed deletion
           console.error('Error deleting project, issued full load of projects');
           this.projectService.loadProjectsFromServer();
-        }, complete: () => {
-          console.log('Project deleted successfully');
         }
       });
     }
