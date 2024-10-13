@@ -27,6 +27,8 @@ Route::apiResources([
 
 // Routes for Tasks
 Route::controller(TaskController::class)->group(function () {
+    // tasks reorder
+    Route::post('projects/{project}/tasks/prioritize', 'prioritize')->name("tasks.prioritize");
     // tasks create
     Route::post('projects/{project}/tasks', 'store')->name("tasks.create");
     // tasks get all
@@ -37,8 +39,6 @@ Route::controller(TaskController::class)->group(function () {
     Route::post('projects/{project}/tasks/{task}', 'update')->name("tasks.update");
     // tasks delete
     Route::delete('projects/{project}/tasks/{task}', 'destroy')->name("tasks.destroy");
-    // tasks reorder
-    Route::post('projects/{project}/tasks/reorder', 'reorder')->name("tasks.reorder");
 });
 
 

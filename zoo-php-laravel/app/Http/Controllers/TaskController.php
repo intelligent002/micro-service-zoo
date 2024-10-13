@@ -124,16 +124,16 @@ class TaskController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function reorder(Request $request): JsonResponse
+    public function prioritize(Request $request): JsonResponse
     {
-        foreach ($request->tasks as $index => $taskId) {
-            $task = Task::find($taskId);
+        foreach ($request->task_ids as $index => $task_id) {
+            $task = Task::find($task_id);
             $task->priority = $index + 1;
             $task->save();
         }
 
         return response()->json([
-            'status' => 'success'
+            'status' => 'success', 'origin' => $request->tasks
         ], Response::HTTP_OK);
     }
 }
