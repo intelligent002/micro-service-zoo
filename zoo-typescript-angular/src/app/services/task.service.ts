@@ -25,7 +25,7 @@ export class TaskService {
   // Load tasks for a specific project from the server
   loadTasksFromServer(projectId: number): void {
     this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Task[]>>(`${this.apiUrl}/projects/${projectId}/tasks/`)
+      this.http.get<RestApiResponse<Task[]>>(`${this.apiUrl}/projects/${projectId}/tasks`)
     ).pipe(
       tap((tasks) => {
         if (!this.tasksSubject[projectId]) {
@@ -55,7 +55,7 @@ export class TaskService {
       taskData: Task
     }): Observable<Task> {
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/`, taskData)
+      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks`, taskData)
     ).pipe(
       tap((newTask) => {
         if (this.tasksSubject[projectId]) {
@@ -98,17 +98,17 @@ export class TaskService {
     );
   }
 
-  prioritizeTasks(projectId: number): Observable<Task> {
-    // perform the actual job
+  prioritizeTasks(projectId: number, taskIds: number[]): Observable<Task> {
     return this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/`)
+      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/prioritize`, {task_ids: taskIds})
+    ).pipe(
     );
   }
 
   migrateTasks(projectId: number): Observable<Task> {
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/`)
+      this.http.get<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks`)
     );
   }
 }

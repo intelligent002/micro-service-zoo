@@ -26,7 +26,7 @@ export class ProjectService {
   // Load projects from the server
   loadProjectsFromServer(): void {
     this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/projects/`)
+      this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/projects`)
     ).pipe(
       tap((projects) => this.projectsSubject.next(projects))  // Update BehaviorSubject with new data
     ).subscribe();
@@ -40,7 +40,7 @@ export class ProjectService {
   // Create a new project
   createProject(projectData: Project): Observable<Project> {
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Project>>(`${this.apiUrl}/projects/`, projectData)
+      this.http.post<RestApiResponse<Project>>(`${this.apiUrl}/projects`, projectData)
     ).pipe(
       tap((newProject) => {
         // we cannot render anything quick, until we actually get the data to render.

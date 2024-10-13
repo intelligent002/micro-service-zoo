@@ -9,8 +9,8 @@
 
   <ng-container *ngIf="(tasks$ | async) as tasks; else noTasks">
     <ng-container *ngIf="tasks.length > 0; else noTasks">
-      <ol>
-        <li *ngFor="let task of tasks$ | async">
+      <ol cdkDropList (cdkDropListDropped)="drop($event)">
+        <li *ngFor="let task of tasks" cdkDrag>
           <span>
           <ng-container *ngIf="!task.isEditing"><b>{{ task.name }}</b></ng-container>
           <ng-container *ngIf="task.isEditing">

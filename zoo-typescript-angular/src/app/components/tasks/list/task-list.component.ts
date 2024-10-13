@@ -8,13 +8,14 @@ import {TaskEditComponent} from '../edit/task-edit.component';
 import {Project} from '../../../models/project.model';
 import {FormsModule} from '@angular/forms';
 import {ProjectCreateComponent} from '../../projects/create/project-create.component';
+import {CdkDragDrop, CdkDropList, DragDropModule, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-task-list',
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, TaskCreateComponent, TaskEditComponent, ProjectCreateComponent]
+  imports: [CommonModule, FormsModule, TaskCreateComponent, TaskEditComponent, ProjectCreateComponent, CdkDropList, DragDropModule]
 })
 export class TaskListComponent implements OnInit {
   @Input() project!: Project;
@@ -26,7 +27,6 @@ export class TaskListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.taskService.loadTasksFromServer(this.project.id);
     this.tasks$ = this.taskService.getTasks(this.project.id);
     this.loadTasks();
   }
@@ -35,27 +35,41 @@ export class TaskListComponent implements OnInit {
     this.taskService.loadTasksFromServer(this.project.id);
   }
 
-  // project create related
+  // task create related
   toggleCreateTask(): void {
     this.showCreateForm = !this.showCreateForm;
   }
 
+  // task create related
   handleTaskCreated(): void {
     this.showCreateForm = false;  // Hide the form after submission
   }
 
-
-  // project edit related controls:
+  // task edit related
   toggleUpdateTask(task: Task): void {
     task.isEditing = !task.isEditing;
   }
 
+  // task edit related
   handleTaskUpdated(task: Task): void {
     task.isEditing = false;  // Hide the form after submission
   }
 
+  drop(event: CdkDragDrop<Task[]>): void {
+    // Subscribe to the tasks$ observable to access the current task list
+    this.tasks$.subscribe(tasks => {
+      moveItemInArray(tasks, event.previousIndex, event.currentIndex);
+      const taskIds = tasks.map(task => task.id);
+
+      // Optionally, update the task order on the server
+      this.taskService.prioritizeTasks(this.project.id, taskIds).subscribe(() => {
+        console.log('Task order updated successfully');
+      });
+    });
+  }
+
   reorderTask(taskId: number, direction: 'up' | 'down'): void {
-    this.taskService.prioritizeTasks(this.project.id);
+    this.taskService.prioritizeTasks(this.project.id, []);
   }
 
   moveTask(taskId: number, anotherProjectId: number): void {
