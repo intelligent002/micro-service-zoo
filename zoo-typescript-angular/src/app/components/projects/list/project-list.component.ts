@@ -1,39 +1,32 @@
 import {Component, OnInit} from '@angular/core';
 import {ProjectService} from '../../../services/project.service';
-import {Router} from '@angular/router';
+import {TaskService} from '../../../services/task.service';
 import {CommonModule} from '@angular/common';
-import {TasksComponent} from '../../tasks/tasks.component';
 import {ProjectCreateComponent} from '../create/project-create.component';
 import {Project} from '../../../models/project.model';
 import {FormsModule} from '@angular/forms';
 import {ProjectEditComponent} from '../edit/project-edit.component';
+import {TaskListComponent} from '../../tasks/list/task-list.component';
 
 @Component({
   selector: 'app-projects',
   templateUrl: './project-list.component.html',
   standalone: true,
   styleUrls: ['./project-list.component.scss'],
-  imports: [CommonModule, TasksComponent, ProjectCreateComponent, FormsModule, ProjectEditComponent]
+  imports: [CommonModule, FormsModule, ProjectCreateComponent, ProjectEditComponent, TaskListComponent]
 })
 export class ProjectListComponent implements OnInit {
 
-  // project create related controls:
-  showCreateForm: boolean = false;  // Control create form visibility
+  // Control create form visibility
+  showCreateForm: boolean = false;
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // project list related controls:
+  // Control task visibility per each project
+  tasksListVisible: { [projectId: number]: boolean } = {};
 
-  constructor(public projectService: ProjectService, private router: Router) {
+  constructor(public projectService: ProjectService, public taskService: TaskService) {
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ngOnInit(): void {
-    // Trigger projects loading, this shall happen once, since we use RouteReuseStrategy
-    console.debug('issued full load of projects');
-    this.projectService.loadProjectsFromServer();
-  }
-
+  // project create related
   toggleCreateProject(): void {
     this.showCreateForm = !this.showCreateForm;
   }
@@ -42,20 +35,22 @@ export class ProjectListComponent implements OnInit {
     this.showCreateForm = false;  // Hide the form after submission
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // project edit related controls:
+  ngOnInit(): void {
+    // Trigger projects loading, this shall happen once, since we use RouteReuseStrategy
+    console.debug('issued full load of projects');
+    this.projectService.loadProjectsFromServer();
+  }
 
+  // project edit related controls:
   toggleUpdateProject(project: Project): void {
     project.isEditing = !project.isEditing;
   }
 
   handleProjectUpdated(project: Project): void {
-    project.isEditing = false;  // Hide the form after submission
+    project.isEditing = false;
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // project delete related controls:
-
   deleteProject(projectId: number): void {
     if (confirm('Are you sure you want to delete this project and its tasks?')) {
       // Dispatch REST method for deletion from server side
@@ -71,15 +66,12 @@ export class ProjectListComponent implements OnInit {
     }
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // project tasks view related controls:
-
-  async viewTasks(projectId: number): Promise<void> {
-    try {
-      const result = await this.router.navigate([`/project/${projectId}/tasks`]); // Navigate to project tasks
-      if (!result) console.error('failed to navigate towards /project/${projectId}/tasks');
-    } catch (err) {
-      console.error('Navigation towards /project/${projectId}/tasks error:', err);
+  // task view related
+  toggleTasksListView(projectId: number): void {
+    this.tasksListVisible[projectId] = !this.tasksListVisible[projectId];
+    if (this.tasksListVisible[projectId]) {
+      // Load tasks when expanding
+      this.taskService.loadTasksFromServer(projectId);
     }
   }
 }

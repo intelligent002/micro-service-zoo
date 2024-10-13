@@ -1,0 +1,44 @@
+<div class="task-list">
+  <div class="task-header">
+    <h4>Tasks list</h4>
+    <ng-container *ngIf="showCreateForm">
+      <app-task-create [project]="project" (taskCreated)="handleTaskCreated()"></app-task-create>
+    </ng-container>
+    <button (click)="toggleCreateTask()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
+  </div>
+
+  <ng-container *ngIf="(tasks$ | async) as tasks; else noTasks">
+    <ng-container *ngIf="tasks.length > 0; else noTasks">
+      <ol>
+        <li *ngFor="let task of tasks$ | async">
+          <span>
+          <ng-container *ngIf="!task.isEditing"><b>{{ task.name }}</b></ng-container>
+          <ng-container *ngIf="task.isEditing">
+            <app-task-edit [task]="task" (taskUpdated)="handleTaskUpdated(task)"></app-task-edit>
+          </ng-container>
+          <div class="actions">
+            <button (click)="toggleUpdateTask(task)"
+                    class="edit-button">{{ task.isEditing ? 'Cancel' : 'Edit' }}</button>
+            <button (click)="deleteTask(task.id)" class="delete-button">Delete</button>
+          </div>
+          </span>
+          <div class="dates-container">
+            <div class="date-container">
+              <small class="date-label">Created:</small>
+              <small class="date-value">{{ task.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+            </div>
+            <div class="date-container">
+              <small class="date-label">Updated:</small>
+              <small class="date-value">{{ task.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </ng-container>
+  </ng-container>
+
+  <!-- Fallback when there are no projects -->
+  <ng-template #noTasks>
+    <div>No tasks available for project, create one ...</div>
+  </ng-template>
+</div>

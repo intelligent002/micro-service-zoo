@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { Project } from '../models/project.model';
-import { ConfigService } from './config.service';
-import { RestApiResponse } from '../models/rest-api-response.model';
-import { RestApiResponseHandlerService } from './rest-api-response-handler.service';
+import {tap} from 'rxjs/operators';
+import {Project} from '../models/project.model';
+import {ConfigService} from './config.service';
+import {RestApiResponse} from '../models/rest-api-response.model';
+import {RestApiResponseHandlerService} from './rest-api-response-handler.service';
 
 @Injectable({
   providedIn: 'root'

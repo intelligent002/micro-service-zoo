@@ -3,14 +3,10 @@
 }
 
 .projects-header {
-  height: 120px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.projects-header h2 {
-  color: red;
 }
 
 .project-card {
@@ -41,24 +37,8 @@
   width: 80%;
 }
 
-.project-dates-container {
-  max-width: 220px;
-}
 
-.project-dates {
-  display: flex;
-  justify-content: space-between;
-}
 
-.date-label {
-  text-align: left;
-}
-
-.date-value {
-  text-align: right;
-  white-space: nowrap;
-}
-
-span, app-project-edit {
+span, app-project-edit, app-project-create {
   display: inline-block; /* Ensure span and app-project-edit behave inline */
 }

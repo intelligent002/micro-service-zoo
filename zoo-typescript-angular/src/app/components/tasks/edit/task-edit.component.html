@@ -1,0 +1,6 @@
+<form (ngSubmit)="updateTask()" *ngIf="updateForm" [formGroup]="updateForm">
+  <div class="form-row">
+    <input #taskNameInput formControlName="name" placeholder="Task Name" class="task-edit"/>
+    <button [disabled]="updateForm.invalid" type="submit" class="update-button">Save</button>
+  </div>
+</form>

@@ -55,7 +55,7 @@ export class ProjectEditComponent implements OnChanges {
       // quickly switch to view mode
       const updatedProject = {...this.project, ...this.updateForm.value};
       this.projectUpdated.emit(updatedProject);
-      // update project in the background and trigger its modifications via observable object
+      // update project in the background and trigger its view update via the observable object
       this.projectService.updateProject(updatedProject).subscribe({
         next: () => {
           console.log('Project updated successfully');

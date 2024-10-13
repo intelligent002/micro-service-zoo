@@ -1,0 +1,25 @@
+span, app-task-edit, app-task-create {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ol li:nth-child(odd) {
+  background-color: transparent; /* Darker background */
+}
+
+/* Lighter color for even rows */
+ol li:nth-child(even) {
+  background-color: #f5f5f5; /* Lighter background */
+}
+
+ol li {
+  padding: 4px 15px 4px 4px;
+  border-top: 1px solid #ccc; /* Optional: Add a subtle border between items */
+}

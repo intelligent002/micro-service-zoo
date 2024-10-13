@@ -1,48 +1,55 @@
 <div class="projects-container">
   <div class="projects-header">
     <h2>Projects List</h2>
-    <div *ngIf="showCreateForm">
+    <ng-container *ngIf="showCreateForm">
       <app-project-create (projectCreated)="handleProjectCreated()"></app-project-create>
-    </div>
+    </ng-container>
     <button (click)="toggleCreateProject()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
   </div>
 
   <!-- Directly bind projects$ observable using async pipe -->
   <div *ngIf="(projectService.getProjects() | async) as projects; else noProjects">
-    <div *ngFor="let project of projects" class="project-card">
-      <div class="project-header">
-        <h3>#{{ project.id }}:&nbsp;
-          <ng-container *ngIf="!project.isEditing">
-            <span>{{ project.name }}</span>
-          </ng-container>
-          <ng-container *ngIf="project.isEditing">
-            <app-project-edit *ngIf="project.isEditing" [project]="project"
-                              (projectUpdated)="handleProjectUpdated(project)"></app-project-edit>
-          </ng-container>
-        </h3>
-        <div class="actions">
-          <button (click)="viewTasks(project.id)" class="tasks-button">Tasks</button>
-          <button (click)="toggleUpdateProject(project)" class="edit-button">
-            {{ project.isEditing ? 'Cancel' : 'Edit' }}
-          </button>
-          <button (click)="deleteProject(project.id)" class="delete-button">Delete</button>
+    <div *ngIf="projects.length > 0; else noProjects">
+      <div *ngFor="let project of projects" class="project-card">
+        <div class="project-header">
+          <h3>#{{ project.id }}:&nbsp;
+            <ng-container *ngIf="!project.isEditing">
+              <span>{{ project.name }}</span>
+            </ng-container>
+            <ng-container *ngIf="project.isEditing">
+              <app-project-edit *ngIf="project.isEditing" [project]="project"
+                                (projectUpdated)="handleProjectUpdated(project)"></app-project-edit>
+            </ng-container>
+          </h3>
+          <div class="actions">
+            <button (click)="toggleTasksListView(project.id)" class="tasks-button">
+              {{ tasksListVisible[project.id] ? 'Hide&nbsp;Tasks' : 'Show&nbsp;Tasks' }}
+            </button>
+            <button (click)="toggleUpdateProject(project)" class="edit-button">
+              {{ project.isEditing ? 'Cancel' : 'Edit' }}
+            </button>
+            <button (click)="deleteProject(project.id)" class="delete-button">Delete</button>
+          </div>
         </div>
-    </div>
-    <div class="project-dates-container">
-      <div class="project-dates">
-        <small class="date-label">Created:</small>
-        <small class="date-value">{{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
-      </div>
-      <div class="project-dates">
-        <small class="date-label">Updated:</small>
-        <small class="date-value">{{ project.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+        <div class="dates-container">
+          <div class="date-container">
+            <small class="date-label">Created:</small>
+            <small class="date-value">{{ project.created_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+          </div>
+          <div class="date-container">
+            <small class="date-label">Updated:</small>
+            <small class="date-value">{{ project.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
+          </div>
+        </div>
+        <div *ngIf="tasksListVisible[project.id]">
+          <app-task-list [project]="project"></app-task-list>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Fallback when there are no projects -->
-<ng-template #noProjects>
-  <div>No projects available.</div>
-</ng-template>
+  <!-- Fallback when there are no projects -->
+  <ng-template #noProjects>
+    <div>No projects available, create one ...</div>
+  </ng-template>
 </div>

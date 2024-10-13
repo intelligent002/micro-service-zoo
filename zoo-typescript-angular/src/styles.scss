@@ -14,7 +14,7 @@ label {
 input, button {
   padding: 4px;
   border-radius: 4px;
-  font-size:14px;
+  font-size: 14px;
 }
 
 input {
@@ -31,11 +31,11 @@ button {
 
 button:hover {
   opacity: 0.9;
-}
 
-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
+  &:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+  }
 }
 
 .error {
@@ -45,52 +45,67 @@ button:disabled {
 
 .create-button, .update-button {
   background-color: #28a745; /* Green for Create */
-}
 
-.create-button:hover, .update-button:hover {
-  background-color: #218838; /* Darker green on hover */
+  &:hover {
+    background-color: #218838; /* Darker green on hover */
+  }
+
+  &:disabled {
+    background-color: #ddd;
+  }
 }
 
 .tasks-button {
   background-color: #007bff; /* Blue for Tasks */
-}
 
-.tasks-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  &:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
 }
 
 .edit-button {
   background-color: #ffc107; /* Yellow for Edit */
   color: black;
-}
 
-.edit-button:hover {
-  background-color: #e0a800; /* Darker yellow on hover */
+  &:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+  }
 }
 
 .delete-button {
   background-color: #dc3545; /* Red for Delete */
-}
 
-.delete-button:hover {
-  background-color: #c82333; /* Darker red on hover */
-}
-
-.update-button {
-  background-color: #28a745;
-}
-
-.update-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
-.create-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
+  &:hover {
+    background-color: #c82333; /* Darker red on hover */
+  }
 }
 
 .actions {
   display: flex;
   gap: 5px;
+}
+
+.dates-container {
+  max-width: 220px;
+}
+
+.date-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-label {
+  text-align: left;
+}
+
+.date-value {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
 }
