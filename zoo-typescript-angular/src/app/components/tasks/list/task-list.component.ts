@@ -1,3 +1,4 @@
+// Your existing imports
 import {Component, Input, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TaskService} from '../../../services/task.service';
@@ -8,7 +9,7 @@ import {TaskEditComponent} from '../edit/task-edit.component';
 import {Project} from '../../../models/project.model';
 import {FormsModule} from '@angular/forms';
 import {ProjectCreateComponent} from '../../projects/create/project-create.component';
-import {CdkDragDrop, CdkDropList, DragDropModule, moveItemInArray} from '@angular/cdk/drag-drop';
+import {CdkDragDrop, CdkDropList, DragDropModule, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop'; // Ensure all CDK imports are correct
 
 @Component({
   selector: 'app-task-list',
@@ -19,7 +20,9 @@ import {CdkDragDrop, CdkDropList, DragDropModule, moveItemInArray} from '@angula
 })
 export class TaskListComponent implements OnInit {
   @Input() project!: Project;
+  @Input() connectedDropLists: string[] | null = [];
   tasks$: Observable<Task[]> = of([]);
+
   // Control create form visibility
   showCreateForm: boolean = false;
 
@@ -28,55 +31,78 @@ export class TaskListComponent implements OnInit {
 
   ngOnInit(): void {
     this.tasks$ = this.taskService.getTasks(this.project.id);
-    this.loadTasks();
+    this.loadTasks();  // Load tasks from server
   }
 
   loadTasks(): void {
     this.taskService.loadTasksFromServer(this.project.id);
   }
 
-  // task create related
+  // Task create related
   toggleCreateTask(): void {
     this.showCreateForm = !this.showCreateForm;
   }
 
-  // task create related
   handleTaskCreated(): void {
-    this.showCreateForm = false;  // Hide the form after submission
+    this.showCreateForm = false;
   }
 
-  // task edit related
+  // Task edit related
   toggleUpdateTask(task: Task): void {
     task.isEditing = !task.isEditing;
   }
 
-  // task edit related
   handleTaskUpdated(task: Task): void {
-    task.isEditing = false;  // Hide the form after submission
+    task.isEditing = false;
   }
 
-  drop(event: CdkDragDrop<Task[]>): void {
-    // Subscribe to the tasks$ observable to access the current task list
-    this.tasks$.subscribe(tasks => {
-      moveItemInArray(tasks, event.previousIndex, event.currentIndex);
-      const taskIds = tasks.map(task => task.id);
+  drop(event: CdkDragDrop<Task[], any>, targetProject: Project): void {
+    if (event.previousContainer === event.container) {
+      // Reordering within the same project
+      console.log('same container');
 
-      // Optionally, update the task order on the server
-      this.taskService.prioritizeTasks(this.project.id, taskIds).subscribe(() => {
-        console.log('Task order updated successfully');
+      // Reorder the tasks directly from event.container.data
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      const taskIds = event.container.data.map(task => task.id);  // Get task IDs for reordering
+
+      // Send updated task order to server
+      this.taskService.prioritizeTasks({
+        projectId: targetProject.id,
+        taskIds: taskIds
+      }).subscribe(() => {
+        console.log('Task order updated successfully within the same project');
       });
-    });
+    } else {
+      // Moving task to a different project
+      console.log('other container');
+
+      // Ensure data is transferred between project task arrays
+      const previousTasks = event.previousContainer.data as Task[]; // Get tasks from the previous project
+      const targetTasks = event.container.data as Task[];  // Get tasks from the target project
+
+      // Transfer task from the previous project to the new project
+      transferArrayItem(previousTasks, targetTasks, event.previousIndex, event.currentIndex);
+
+      // The task that was moved
+      const movedTask = targetTasks[event.currentIndex];
+      movedTask.project_id = targetProject.id;  // Update project ID for the task
+
+      // Send updated task information to the server to persist changes
+      this.taskService.migrateTask({
+        taskId: movedTask.id,
+        projectId: targetProject.id,
+      }).subscribe(() => {
+        console.log(`Task ${movedTask.id} migrated to project ${targetProject.id} successfully`);
+      });
+    }
   }
 
-  reorderTask(taskId: number, direction: 'up' | 'down'): void {
-    this.taskService.prioritizeTasks(this.project.id, []);
-  }
 
-  moveTask(taskId: number, anotherProjectId: number): void {
-    this.taskService.migrateTasks(taskId);
-  }
-
+  // Delete task
   deleteTask(taskId: number): void {
-    this.taskService.deleteTask(this.project.id, taskId).subscribe();
+    this.taskService.deleteTask({
+      projectId: this.project.id,
+      taskId: taskId
+    }).subscribe();
   }
 }

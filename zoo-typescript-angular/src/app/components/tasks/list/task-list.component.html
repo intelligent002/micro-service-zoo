@@ -7,20 +7,25 @@
     <button (click)="toggleCreateTask()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
   </div>
 
+
   <ng-container *ngIf="(tasks$ | async) as tasks; else noTasks">
     <ng-container *ngIf="tasks.length > 0; else noTasks">
-      <ol cdkDropList (cdkDropListDropped)="drop($event)">
+      <ol cdkDropList
+          [id]="'cdk-drop-list-' + project.id"
+          [cdkDropListData]="tasks || []"
+          [cdkDropListConnectedTo]="connectedDropLists || []"
+          (cdkDropListDropped)="drop($event, project)">
         <li *ngFor="let task of tasks" cdkDrag>
           <span>
-          <ng-container *ngIf="!task.isEditing"><b>{{ task.name }}</b></ng-container>
-          <ng-container *ngIf="task.isEditing">
-            <app-task-edit [task]="task" (taskUpdated)="handleTaskUpdated(task)"></app-task-edit>
-          </ng-container>
-          <div class="actions">
-            <button (click)="toggleUpdateTask(task)"
-                    class="edit-button">{{ task.isEditing ? 'Cancel' : 'Edit' }}</button>
-            <button (click)="deleteTask(task.id)" class="delete-button">Delete</button>
-          </div>
+            <ng-container *ngIf="!task.isEditing"><b>{{ task.name }}</b></ng-container>
+            <ng-container *ngIf="task.isEditing">
+              <app-task-edit [task]="task" (taskUpdated)="handleTaskUpdated(task)"></app-task-edit>
+            </ng-container>
+            <div class="actions">
+              <button (click)="toggleUpdateTask(task)"
+                      class="edit-button">{{ task.isEditing ? 'Cancel' : 'Edit' }}</button>
+              <button (click)="deleteTask(task.id)" class="delete-button">Delete</button>
+            </div>
           </span>
           <div class="dates-container">
             <div class="date-container">
@@ -37,8 +42,7 @@
     </ng-container>
   </ng-container>
 
-  <!-- Fallback when there are no projects -->
   <ng-template #noTasks>
-    <div>No tasks available for project, create one ...</div>
+    <div>No tasks available for project, create one...</div>
   </ng-template>
 </div>

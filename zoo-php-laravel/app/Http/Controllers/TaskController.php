@@ -120,7 +120,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Reorder the tasks in project
+     * Prioritize the order of tasks in project
      * @param Request $request
      * @return JsonResponse
      */
@@ -133,7 +133,24 @@ class TaskController extends Controller
         }
 
         return response()->json([
-            'status' => 'success', 'origin' => $request->tasks
+            'status' => 'OK'
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Migrate task between projects
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function migrate(Project $project, Task $task): JsonResponse
+    {
+        // modify relation
+        $task->project_id = $project->id;
+        // store and done
+        $task->save();
+
+        return response()->json([
+            'status' => 'OK'
         ], Response::HTTP_OK);
     }
 }

@@ -12,29 +12,63 @@ import {RestApiResponseHandlerService} from './rest-api-response-handler.service
 })
 export class ProjectService {
   private readonly apiUrl: string;
-  private projectsSubject = new BehaviorSubject<Project[]>([]);
-  private projects$ = this.projectsSubject.asObservable();
+
+  // BehaviourStates
+  private projectsSubject: BehaviorSubject<Project[]> = new BehaviorSubject<Project[]>([]);
+  private connectedDropListsSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+
+  // read-only observable for components to subscribe
+  private projects$: Observable<Project[]> = this.projectsSubject.asObservable();
+  private connectedDropLists$: Observable<string[]> = this.connectedDropListsSubject.asObservable();
+
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
     private responseHandler: RestApiResponseHandlerService
   ) {
-    this.apiUrl = this.configService.getConfig().apiUrl;  // Get API URL from config.json
+    // Get API URL from config.json
+    this.apiUrl = this.configService.getConfig().apiUrl;
+    this.bindSubjectsConnectedDropListsToProjects();
   }
 
-  // Load projects from the server
+  // Load projects from the server and manage BehaviorSubjects
   loadProjectsFromServer(): void {
     this.responseHandler.handleResponse(
       this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/projects`)
     ).pipe(
-      tap((projects) => this.projectsSubject.next(projects))  // Update BehaviorSubject with new data
+      tap((projects) => {
+        if (!this.projectsSubject) {
+          // Initialize the BehaviorSubject for the projects if it doesn't exist
+          this.projectsSubject = new BehaviorSubject<Project[]>([]);
+        }
+        // Emit the list of projects
+        this.projectsSubject.next(projects);
+      })
     ).subscribe();
   }
 
-  // Get the observable projects list
+  bindSubjectsConnectedDropListsToProjects() {
+    // Subscribe to projectsSubject and update connectedDropListsSubject whenever projects change
+    this.projects$.subscribe((projects) => {
+      if (!this.connectedDropListsSubject) {
+        // Initialize the BehaviorSubject for the connectedDropLists if it doesn't exist
+        this.connectedDropListsSubject = new BehaviorSubject<string[]>([]);
+      }
+      const dropListIds = projects.map(project => `cdk-drop-list-${project.id}`);
+      // Emit the list of connectedDropListsSubject
+      this.connectedDropListsSubject.next(dropListIds);
+    });
+  }
+
+  // Get the observable list of projects
   getProjects(): Observable<Project[]> {
     return this.projects$;
+  }
+
+  // Get the observable list of connected drop lists
+  getConnectedDropLists(): Observable<string[]> {
+    return this.connectedDropLists$;
   }
 
   // Create a new project

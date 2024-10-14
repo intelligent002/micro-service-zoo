@@ -19,19 +19,22 @@ export class TaskService {
     private configService: ConfigService,
     private responseHandler: RestApiResponseHandlerService
   ) {
-    this.apiUrl = this.configService.getConfig().apiUrl;  // Get API URL from config.json
+    // Get API URL from config.json
+    this.apiUrl = this.configService.getConfig().apiUrl;
   }
 
-  // Load tasks for a specific project from the server
+  // Load tasks for a specific project from server
   loadTasksFromServer(projectId: number): void {
     this.responseHandler.handleResponse(
       this.http.get<RestApiResponse<Task[]>>(`${this.apiUrl}/projects/${projectId}/tasks`)
     ).pipe(
       tap((tasks) => {
         if (!this.tasksSubject[projectId]) {
+          // Initialize the BehaviorSubject for the project if it doesn't exist
           this.tasksSubject[projectId] = new BehaviorSubject<Task[]>([]);
         }
-        this.tasksSubject[projectId].next(tasks);  // Update the tasks BehaviorSubject with new data
+        // Update the tasks BehaviorSubject with new data
+        this.tasksSubject[projectId].next(tasks);
       })
     ).subscribe();
   }
@@ -45,7 +48,7 @@ export class TaskService {
     return this.tasksSubject[projectId].asObservable();
   }
 
-  // Create a new task for a specific project
+  // Create a new task in a specific project
   createTask(
     {
       projectId,
@@ -57,11 +60,10 @@ export class TaskService {
     return this.responseHandler.handleResponse(
       this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks`, taskData)
     ).pipe(
+      // post-factum emit the updated list
       tap((newTask) => {
         if (this.tasksSubject[projectId]) {
-          // Get the current task list for the project
           const currentTasks = this.tasksSubject[projectId].getValue();
-          // Add the new task to the task list for the specific project
           this.tasksSubject[projectId].next([...currentTasks, newTask]);
         }
       })
@@ -69,16 +71,22 @@ export class TaskService {
   }
 
   // Update a task for a specific project
-  updateTask(taskData: Task): Observable<Task> {
+  updateTask(
+    taskData: Task
+  ): Observable<Task> {
+    // no speedups, perform the actual job
     return this.responseHandler.handleResponse(
       this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${taskData.project_id}/tasks/${taskData.id}`, taskData)
     ).pipe(
+      // post-factum emit the updated list
       tap((updatedTask) => {
-        const currentTasks = this.tasksSubject[taskData.project_id].getValue();
-        const index = currentTasks.findIndex(task => task.id === updatedTask.id);
-        if (index !== -1) {
-          currentTasks[index] = updatedTask;
-          this.tasksSubject[taskData.project_id].next(currentTasks);  // Emit the updated list (create a new array reference)
+        if (this.tasksSubject[taskData.project_id]) {
+          const currentTasks = this.tasksSubject[taskData.project_id].getValue();
+          const index = currentTasks.findIndex(task => task.id === updatedTask.id);
+          if (index !== -1) {
+            currentTasks[index] = updatedTask;
+            this.tasksSubject[taskData.project_id].next(currentTasks);
+          }
         }
       })
     );
@@ -86,29 +94,55 @@ export class TaskService {
 
 
   // Delete a task
-  deleteTask(projectId: number, taskId: number): Observable<Task> {
+  deleteTask(
+    {
+      projectId,
+      taskId
+    }: {
+      projectId: number,
+      taskId: number
+    }): Observable<Task> {
     // speed up the visual part
-    const currentTasks = this.tasksSubject[projectId].getValue();
-    const updatedTasks = currentTasks.filter(p => p.id !== taskId);
-    this.tasksSubject[projectId].next(updatedTasks);  // Emit the updated list
-
+    if (this.tasksSubject[projectId]) {
+      const currentTasks = this.tasksSubject[projectId].getValue();
+      const updatedTasks = currentTasks.filter(p => p.id !== taskId);
+      this.tasksSubject[projectId].next(updatedTasks);
+    }
     // perform the actual job
     return this.responseHandler.handleResponse(
       this.http.delete<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/${taskId}`)
     );
   }
 
-  prioritizeTasks(projectId: number, taskIds: number[]): Observable<Task> {
+  // modify priority of the tasks
+  prioritizeTasks(
+    {
+      projectId,
+      taskIds
+    }: {
+      projectId: number,
+      taskIds: number[]
+    }): Observable<Task> {
+    // nothing to speedup, already drag-n-dropped
+    // perform the actual job
     return this.responseHandler.handleResponse(
       this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/prioritize`, {task_ids: taskIds})
-    ).pipe(
     );
   }
 
-  migrateTasks(projectId: number): Observable<Task> {
+  // migrate a task to another project
+  migrateTask(
+    {
+      projectId,
+      taskId
+    }: {
+      projectId: number,
+      taskId: number
+    }): Observable<Task> {
+    // nothing to speedup, already drag-n-dropped
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks`)
+      this.http.patch<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/${taskId}/migrate`, {})
     );
   }
 }

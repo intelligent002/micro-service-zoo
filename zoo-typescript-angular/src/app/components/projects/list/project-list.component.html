@@ -7,18 +7,18 @@
     <button (click)="toggleCreateProject()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
   </div>
 
-  <!-- Directly bind projects$ observable using async pipe -->
-  <div *ngIf="(projectService.getProjects() | async) as projects; else noProjects">
-    <div *ngIf="projects.length > 0; else noProjects">
+  <ng-container *ngIf="(projects$ | async) as projects; else noProjects">
+    <ng-container *ngIf="projects.length > 0; else noProjects">
       <div *ngFor="let project of projects" class="project-card">
         <div class="project-header">
-          <h3>#{{ project.id }}:&nbsp;
+          <h3>#{{ project.id }}:
             <ng-container *ngIf="!project.isEditing">
               <span>{{ project.name }}</span>
             </ng-container>
             <ng-container *ngIf="project.isEditing">
               <app-project-edit *ngIf="project.isEditing" [project]="project"
-                                (projectUpdated)="handleProjectUpdated(project)"></app-project-edit>
+                                (projectUpdated)="handleProjectUpdated(project)">
+              </app-project-edit>
             </ng-container>
           </h3>
           <div class="actions">
@@ -42,14 +42,17 @@
           </div>
         </div>
         <div *ngIf="tasksListVisible[project.id]">
-          <app-task-list [project]="project"></app-task-list>
+          <app-task-list
+            [project]="project"
+            [connectedDropLists]="connectedDropLists$ | async">
+          </app-task-list>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Fallback when there are no projects -->
-  <ng-template #noProjects>
-    <div>No projects available, create one ...</div>
-  </ng-template>
+    </ng-container>
+  </ng-container>
 </div>
+
+<!-- Fallback when there are no projects -->
+<ng-template #noProjects>
+  <div>No projects available, create one ...</div>
+</ng-template>

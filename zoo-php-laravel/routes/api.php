@@ -27,8 +27,10 @@ Route::apiResources([
 
 // Routes for Tasks
 Route::controller(TaskController::class)->group(function () {
-    // tasks reorder
+    // tasks prioritize
     Route::post('projects/{project}/tasks/prioritize', 'prioritize')->name("tasks.prioritize");
+    // tasks migrate
+    Route::patch('projects/{project}/tasks/{task}/migrate', 'migrate')->name("tasks.migrate");
     // tasks create
     Route::post('projects/{project}/tasks', 'store')->name("tasks.create");
     // tasks get all
