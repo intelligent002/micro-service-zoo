@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @method static where(string $string, mixed $id)
- * @method static find(mixed $taskId)
+ * @method static find(mixed $id)
  * @property mixed $name
  * @property mixed $project_id
  * @property int $priority
