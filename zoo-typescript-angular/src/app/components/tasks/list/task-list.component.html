@@ -4,18 +4,21 @@
     <ng-container *ngIf="showCreateForm">
       <app-task-create [project]="project" (taskCreated)="handleTaskCreated()"></app-task-create>
     </ng-container>
-    <button (click)="toggleCreateTask()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
+    <button (click)="toggleCreateTask()" class="create-button">{{ showCreateForm ? 'Cancel&nbsp;Create' : 'Create&nbsp;Task' }}</button>
   </div>
 
 
   <ng-container *ngIf="(tasks$ | async) as tasks; else noTasks">
     <ng-container *ngIf="tasks.length > 0; else noTasks">
-      <ol cdkDropList
-          [id]="'cdk-drop-list-' + project.id"
-          [cdkDropListData]="tasks || []"
-          [cdkDropListConnectedTo]="connectedDropLists || []"
-          (cdkDropListDropped)="drop($event, project)">
-        <li *ngFor="let task of tasks" cdkDrag>
+      <ol
+        cdkDropList
+        [id]="'i-' + project.id"
+        [cdkDropListData]="tasks || []"
+        [cdkDropListConnectedTo]="allConnectedDropLists || []"
+        (cdkDropListDropped)="onListDrop({$event, project})">
+        <li *ngFor="let task of tasks" cdkDrag
+            (cdkDragStarted)="onDragStart()"
+            (cdkDragEnded)="onDragEnd()">
           <span>
             <ng-container *ngIf="!task.isEditing"><b>{{ task.name }}</b></ng-container>
             <ng-container *ngIf="task.isEditing">
@@ -23,8 +26,8 @@
             </ng-container>
             <div class="actions">
               <button (click)="toggleUpdateTask(task)"
-                      class="edit-button">{{ task.isEditing ? 'Cancel' : 'Edit' }}</button>
-              <button (click)="deleteTask(task.id)" class="delete-button">Delete</button>
+                      class="edit-button">{{ task.isEditing ? 'Cancel&nbsp;Edit' : 'Edit&nbsp;Task' }}</button>
+              <button (click)="deleteTask(task.id)" class="delete-button">Delete&nbsp;Task</button>
             </div>
           </span>
           <div class="dates-container">

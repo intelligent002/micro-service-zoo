@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
+import {catchError, tap} from 'rxjs/operators';
 import {Task} from '../models/task.model';
 import {ConfigService} from './config.service';
 import {RestApiResponse} from '../models/rest-api-response.model';
 import {RestApiResponseHandlerService} from './rest-api-response-handler.service';
+import {Project} from '../models/project.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,29 +24,35 @@ export class TaskService {
     this.apiUrl = this.configService.getConfig().apiUrl;
   }
 
+  // Get the observable tasks list
+  getTasks(project: Project): Observable<Task[]> {
+    // Initialize the BehaviorSubject for the project if it doesn't exist
+    if (!this.tasksSubject[project.id]) {
+      this.tasksSubject[project.id] = new BehaviorSubject<Task[]>([]);
+      this.loadTasksFromServer(project.id).subscribe();
+    }
+    return this.tasksSubject[project.id].asObservable();
+  }
+
   // Load tasks for a specific project from server
-  loadTasksFromServer(projectId: number): void {
-    this.responseHandler.handleResponse(
+  loadTasksFromServer(projectId: number): Observable<Task[]> {
+    return this.responseHandler.handleResponse(
       this.http.get<RestApiResponse<Task[]>>(`${this.apiUrl}/projects/${projectId}/tasks`)
     ).pipe(
       tap((tasks) => {
+        // Initialize the BehaviorSubject for the project if it doesn't exist
         if (!this.tasksSubject[projectId]) {
-          // Initialize the BehaviorSubject for the project if it doesn't exist
           this.tasksSubject[projectId] = new BehaviorSubject<Task[]>([]);
         }
         // Update the tasks BehaviorSubject with new data
         this.tasksSubject[projectId].next(tasks);
+        console.debug(`Project #${projectId} had its tasks loaded successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error listing tasks per project #${projectId}:`, error);
+        return EMPTY;
       })
-    ).subscribe();
-  }
-
-  // Get the observable tasks list
-  getTasks(projectId: number): Observable<Task[]> {
-    // Initialize the BehaviorSubject for the project if it doesn't exist
-    if (!this.tasksSubject[projectId]) {
-      this.tasksSubject[projectId] = new BehaviorSubject<Task[]>([]);
-    }
-    return this.tasksSubject[projectId].asObservable();
+    );
   }
 
   // Create a new task in a specific project
@@ -66,32 +73,41 @@ export class TaskService {
           const currentTasks = this.tasksSubject[projectId].getValue();
           this.tasksSubject[projectId].next([...currentTasks, newTask]);
         }
+        console.debug(`Task #${newTask.id} was created successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error creating task per project #${projectId}:`, error);
+        return EMPTY;
       })
     );
   }
 
   // Update a task for a specific project
   updateTask(
-    taskData: Task
+    task: Task
   ): Observable<Task> {
     // no speedups, perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${taskData.project_id}/tasks/${taskData.id}`, taskData)
+      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${task.project_id}/tasks/${task.id}`, task)
     ).pipe(
       // post-factum emit the updated list
       tap((updatedTask) => {
-        if (this.tasksSubject[taskData.project_id]) {
-          const currentTasks = this.tasksSubject[taskData.project_id].getValue();
-          const index = currentTasks.findIndex(task => task.id === updatedTask.id);
+        if (this.tasksSubject[task.project_id]) {
+          const currentTasks = this.tasksSubject[task.project_id].getValue();
+          const index = currentTasks.findIndex(t => t.id === task.id);
           if (index !== -1) {
             currentTasks[index] = updatedTask;
-            this.tasksSubject[taskData.project_id].next(currentTasks);
+            this.tasksSubject[task.project_id].next(currentTasks);
           }
         }
+        console.debug(`Task #${task.id} was updated successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error updating task #${task.id}`, error);
+        return EMPTY;
       })
     );
   }
-
 
   // Delete a task
   deleteTask(
@@ -111,6 +127,14 @@ export class TaskService {
     // perform the actual job
     return this.responseHandler.handleResponse(
       this.http.delete<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/${taskId}`)
+    ).pipe(
+      tap(() => {
+        console.debug(`Task #${taskId} was deleted successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error deleting task #${taskId}:`, error);
+        return EMPTY;
+      })
     );
   }
 
@@ -127,22 +151,46 @@ export class TaskService {
     // perform the actual job
     return this.responseHandler.handleResponse(
       this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/prioritize`, {task_ids: taskIds})
+    ).pipe(
+      tap(() => {
+        console.debug(`Project #${projectId} had its task prioritized successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error prioritizing tasks in project #${projectId}:`, error);
+        return EMPTY;
+      })
     );
+  }
+
+  // update tasks state BehaviourSubj
+  updateTasksState({projectId, tasks}: { projectId: number, tasks: Task[] }) {
+    if (this.tasksSubject[projectId]) {
+      this.tasksSubject[projectId].next(tasks);
+    }
   }
 
   // migrate a task to another project
   migrateTask(
     {
-      projectId,
-      taskId
+      project,
+      task
     }: {
-      projectId: number,
-      taskId: number
+      project: Project,
+      task: Task
     }): Observable<Task> {
-    // nothing to speedup, already drag-n-dropped
+    // speed up the visual part
+
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.patch<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/${taskId}/migrate`, {})
+      this.http.patch<RestApiResponse<Task>>(`${this.apiUrl}/projects/${project.id}/tasks/${task.id}/migrate`, {})
+    ).pipe(
+      tap(() => {
+        console.log(`Task #${task.id} migrated to project #${project.id} successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error migrating tasks #${task.id} tp project #${project.id}:`, error);
+        return EMPTY;
+      })
     );
   }
 }

@@ -4,7 +4,7 @@
     <ng-container *ngIf="showCreateForm">
       <app-project-create (projectCreated)="handleProjectCreated()"></app-project-create>
     </ng-container>
-    <button (click)="toggleCreateProject()" class="create-button">{{ showCreateForm ? 'Cancel' : 'Create' }}</button>
+    <button (click)="toggleCreateProject()" class="create-button">{{ showCreateForm ? 'Cancel Create' : 'Create Project' }}</button>
   </div>
 
   <ng-container *ngIf="(projects$ | async) as projects; else noProjects">
@@ -22,13 +22,13 @@
             </ng-container>
           </h3>
           <div class="actions">
-            <button (click)="toggleTasksListView(project.id)" class="tasks-button">
-              {{ tasksListVisible[project.id] ? 'Hide&nbsp;Tasks' : 'Show&nbsp;Tasks' }}
+            <button (click)="toggleTasksListView(project)" class="tasks-button">
+              {{ project.isExpanded ? 'Hide&nbsp;Tasks' : 'Show&nbsp;Tasks' }}
             </button>
             <button (click)="toggleUpdateProject(project)" class="edit-button">
-              {{ project.isEditing ? 'Cancel' : 'Edit' }}
+              {{ project.isEditing ? 'Cancel&nbsp;Edit' : 'Edit&nbsp;Project' }}
             </button>
-            <button (click)="deleteProject(project.id)" class="delete-button">Delete</button>
+            <button (click)="deleteProject(project.id)" class="delete-button">Delete&nbsp;Project</button>
           </div>
         </div>
         <div class="dates-container">
@@ -41,10 +41,20 @@
             <small class="date-value">{{ project.updated_at | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC</small>
           </div>
         </div>
-        <div *ngIf="tasksListVisible[project.id]">
+        <div [ngClass]="{ 'hidden': !isDragging || (project.isExpanded && project.gotTasks) }" class="placeholder-drop"
+             cdkDropList
+             [id]="'o-' + project.id"
+             [cdkDropListConnectedTo]="(connectedDropZones$ | async) || []"
+             (cdkDropListDropped)="onProjectDrop({$event, project})">
+          Drop tasks here to migrate to this project.
+        </div>
+        <div *ngIf="project.isExpanded">
           <app-task-list
+            #taskListComponent
             [project]="project"
-            [connectedDropLists]="connectedDropLists$ | async">
+            [allConnectedDropLists]="(connectedDropZones$ | async) || []"
+            (dragStartedEvent)="onDragStart()"
+            (dragEndedEvent)="onDragEnd()">
           </app-task-list>
         </div>
       </div>

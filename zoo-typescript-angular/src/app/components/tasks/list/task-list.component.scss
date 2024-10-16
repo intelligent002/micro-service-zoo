@@ -16,10 +16,14 @@ ol li:nth-child(odd) {
 
 /* Lighter color for even rows */
 ol li:nth-child(even) {
-  background-color: #f5f5f5; /* Lighter background */
+  background-color: #fafafa; /* Lighter background */
 }
 
-ol li {
-  padding: 4px 15px 4px 4px;
+li {
+  padding: 15px;
   border-top: 1px solid #ccc; /* Optional: Add a subtle border between items */
+}
+
+.innerDropZone {
+  border: 1px solid black;
 }

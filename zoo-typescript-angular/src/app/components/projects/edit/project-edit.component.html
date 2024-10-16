@@ -1,6 +1,6 @@
 <form (ngSubmit)="updateProject()" *ngIf="updateForm" [formGroup]="updateForm">
   <div class="form-row">
     <input #projectNameInput formControlName="name" placeholder="Project Name" class="project-edit"/>
-    <button [disabled]="updateForm.invalid" type="submit" class="update-button">Save</button>
+    <button [disabled]="updateForm.invalid" type="submit" class="update-button">Save&nbsp;Project</button>
   </div>
 </form>

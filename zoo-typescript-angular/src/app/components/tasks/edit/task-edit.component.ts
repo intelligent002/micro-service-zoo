@@ -50,19 +50,13 @@ export class TaskEditComponent implements OnChanges {
     });
   }
 
-  async updateTask(): Promise<void> {
+  updateTask(): void {
     if (this.updateForm.valid) {
       // quickly switch to view mode
       const updatedTask = {...this.task, ...this.updateForm.value};
       this.taskUpdated.emit(updatedTask);
       // update task in the background and trigger its modifications via observable object
-      this.taskService.updateTask(updatedTask).subscribe({
-        next: () => {
-          console.log('Task updated successfully');
-        }, error: (error) => {
-          console.error('Error updating task:', error);
-        }
-      });
+      this.taskService.updateTask(updatedTask).subscribe();
     }
   }
 }

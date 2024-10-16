@@ -1,6 +1,5 @@
-import {Component, ElementRef, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnInit, Output, Renderer2, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
 import {ProjectService} from '../../../services/project.service';
 import {CommonModule} from '@angular/common';
 import {Project} from '../../../models/project.model';
@@ -19,15 +18,19 @@ export class ProjectCreateComponent implements OnInit {
   @Output() projectCreated = new EventEmitter<Project>();
   @ViewChild('projectNameInput') projectNameInput!: ElementRef;
 
-  constructor(private fb: FormBuilder, private projectService: ProjectService, private router: Router) {
+  constructor(private fb: FormBuilder, private projectService: ProjectService, private renderer: Renderer2) {
     this.createForm = this.fb.group({
       name: ['', Validators.required]
     });
   }
 
+  // Focus the input field after the view is rendered
   ngAfterViewInit(): void {
-    // Automatically focus on the project name input field when the component is loaded
-    this.projectNameInput.nativeElement.focus();
+    setTimeout(() => {
+      if (this.projectNameInput) {
+        this.renderer.selectRootElement(this.projectNameInput.nativeElement).focus();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -39,13 +42,7 @@ export class ProjectCreateComponent implements OnInit {
       this.projectCreated.emit();
       // and now handle the creation
       const projectData = this.createForm.value;
-      this.projectService.createProject(projectData).subscribe({
-        next: () => {
-          console.log('Project created successfully');
-        }, error: (error) => {
-          console.error('Error creating project:', error);
-        }
-      });
+      this.projectService.createProject(projectData).subscribe();
     }
   }
 }
