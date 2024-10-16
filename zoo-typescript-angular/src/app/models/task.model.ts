@@ -5,4 +5,5 @@ export interface Task {
   name: string;
   created_at: Date;
   updated_at: Date;
+  isEditing: boolean;
 }

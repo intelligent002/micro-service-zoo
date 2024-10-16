@@ -1,0 +1,29 @@
+span, app-task-edit, app-task-create {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ol li:nth-child(odd) {
+  background-color: transparent; /* Darker background */
+}
+
+/* Lighter color for even rows */
+ol li:nth-child(even) {
+  background-color: #fafafa; /* Lighter background */
+}
+
+li {
+  padding: 15px;
+  border-top: 1px solid #ccc; /* Optional: Add a subtle border between items */
+}
+
+.innerDropZone {
+  border: 1px solid black;
+}

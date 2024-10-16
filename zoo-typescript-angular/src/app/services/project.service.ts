@@ -1,46 +1,81 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import {BehaviorSubject, Observable} from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { Project } from '../models/project.model';
-import { ConfigService } from './config.service';
-import { RestApiResponse } from '../models/rest-api-response.model';
-import { RestApiResponseHandlerService } from './rest-api-response-handler.service';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
+import {catchError, tap} from 'rxjs/operators';
+import {Project} from '../models/project.model';
+import {ConfigService} from './config.service';
+import {RestApiResponse} from '../models/rest-api-response.model';
+import {RestApiResponseHandlerService} from './rest-api-response-handler.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
   private readonly apiUrl: string;
-  private projectsSubject = new BehaviorSubject<Project[]>([]);
-  private projects$ = this.projectsSubject.asObservable();
+
+  // BehaviourStates
+  private projectsSubject: BehaviorSubject<Project[]> = new BehaviorSubject<Project[]>([]);
+  private connectedDropZonesSubject: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+
+  // read-only observable for components to subscribe
+  private projects$: Observable<Project[]> = this.projectsSubject.asObservable();
+  private connectedDropZones$: Observable<string[]> = this.connectedDropZonesSubject.asObservable();
+
+  bindSubjectsConnectedDropListsToProjects() {
+    // Subscribe to projectsSubject and update innerConnectedDropListsSubject & outerConnectedDropListsSubject whenever projects change
+    this.projects$.subscribe((projects) => {
+      const outerIds=projects.map(project => `o-${project.id}`);
+      const innerIds=projects.map(project => `i-${project.id}`);
+      const allIds = [...outerIds, ...innerIds]
+      this.connectedDropZonesSubject.next(allIds);
+    });
+  }
 
   constructor(
     private http: HttpClient,
     private configService: ConfigService,
     private responseHandler: RestApiResponseHandlerService
   ) {
-    this.apiUrl = this.configService.getConfig().apiUrl;  // Get API URL from config.json
+    // Get API URL from config.json
+    this.apiUrl = this.configService.getConfig().apiUrl;
+    this.bindSubjectsConnectedDropListsToProjects();
   }
 
-  // Load projects from the server
-  loadProjectsFromServer(): void {
-    this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/projects/`)
+  // Load projects from the server and manage BehaviorSubjects
+  loadProjectsFromServer(): Observable<Project[]> {
+    return this.responseHandler.handleResponse(
+      this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/projects`)
     ).pipe(
-      tap((projects) => this.projectsSubject.next(projects))  // Update BehaviorSubject with new data
-    ).subscribe();
+      tap((projects) => {
+        if (!this.projectsSubject) {
+          // Initialize the BehaviorSubject for the projects if it doesn't exist
+          this.projectsSubject = new BehaviorSubject<Project[]>([]);
+        }
+        // Emit the list of projects
+        this.projectsSubject.next(projects);
+        console.debug(`Projects was loaded successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error loading projects`, error);
+        return EMPTY;
+      })
+    );
   }
 
-  // Get the observable projects list
+  // Get the observable list of projects
   getProjects(): Observable<Project[]> {
     return this.projects$;
   }
 
+  // Get the observable list of connected drop lists
+  getConnectedDropZones(): Observable<string[]> {
+    return this.connectedDropZones$;
+  }
+
   // Create a new project
-  createProject(projectData: Project): Observable<Project> {
+  createProject(project: Project): Observable<Project> {
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Project>>(`${this.apiUrl}/projects/`, projectData)
+      this.http.post<RestApiResponse<Project>>(`${this.apiUrl}/projects`, project)
     ).pipe(
       tap((newProject) => {
         // we cannot render anything quick, until we actually get the data to render.
@@ -49,20 +84,30 @@ export class ProjectService {
         // which is a bit of an overkill, while 100% possible to achieve, for cash :)
         const currentProjects = this.projectsSubject.getValue();
         this.projectsSubject.next([...currentProjects, newProject]);  // Add the new project
+        console.debug(`Project #${newProject.id} was created successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error creating project`, error);
+        return EMPTY;
       })
     );
   }
 
   // Update a project
-  updateProject(projectData: Project): Observable<Project> {
+  updateProject(project: Project): Observable<Project> {
     return this.responseHandler.handleResponse(
-      this.http.put<RestApiResponse<Project>>(`${this.apiUrl}/projects/${projectData.id}`, projectData)
+      this.http.put<RestApiResponse<Project>>(`${this.apiUrl}/projects/${project.id}`, project)
     ).pipe(
       tap((updatedProject) => {
         const currentProjects = this.projectsSubject.getValue();
         const index = currentProjects.findIndex(p => p.id === updatedProject.id);
         currentProjects[index] = updatedProject;  // Update the project in the list
         this.projectsSubject.next(currentProjects);  // Emit the updated list
+        console.debug(`Project #${project.id} was updated successfully`);
+      }),
+      catchError((error) => {
+        console.error(`Error updating project #${project.id}`, error);
+        return EMPTY;
       })
     );
   }
@@ -77,6 +122,15 @@ export class ProjectService {
     // perform the actual job
     return this.responseHandler.handleResponse(
       this.http.delete<RestApiResponse<Project>>(`${this.apiUrl}/projects/${projectId}`)
+    ).pipe(
+      tap(() => {
+        console.debug(`Project #${projectId} was deleted successfully`)
+      }),
+      catchError((error) => {
+        console.error(`Error deleting project #${projectId}, reloading ...`, error);
+        this.loadProjectsFromServer().subscribe();
+        return EMPTY;
+      })
     );
   }
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property mixed $id
  * @method static create(array $validatedData)
+ * @method static find(mixed $id)
  * @OA\Schema(
  *     @OA\Xml(name="Project")
  * )

@@ -93,7 +93,7 @@ class ProjectController extends Controller
 
         return response()->json([
             'status' => 'OK',
-            'result' => 'Task deleted successfully'
+            'result' => 'Project deleted successfully'
         ], Response::HTTP_OK);
     }
 }

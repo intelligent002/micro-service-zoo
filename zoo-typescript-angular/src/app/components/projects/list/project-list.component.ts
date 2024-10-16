@@ -1,77 +1,40 @@
-import {Component, ElementRef, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ProjectService} from '../../../services/project.service';
-import {Router} from '@angular/router';
-import {CommonModule} from '@angular/common';
-import {TasksComponent} from '../../tasks/tasks.component';
-import {ProjectCreateComponent} from '../create/project-create.component';
+import {TaskService} from '../../../services/task.service';
+import {concatMap, Observable, of} from 'rxjs';
 import {Project} from '../../../models/project.model';
-import {FormsModule} from '@angular/forms';
+import {TaskListComponent} from '../../tasks/list/task-list.component';
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {ProjectCreateComponent} from '../create/project-create.component';
+import {ProjectEditComponent} from '../edit/project-edit.component';
+import {CdkDragDrop, CdkDropList} from '@angular/cdk/drag-drop';
+import {Task} from '../../../models/task.model';
 
 @Component({
   selector: 'app-projects',
   templateUrl: './project-list.component.html',
   standalone: true,
-  styleUrls: ['./project-list.component.scss'],
-  imports: [CommonModule, TasksComponent, ProjectCreateComponent, FormsModule]
+  imports: [TaskListComponent, AsyncPipe, DatePipe, ProjectCreateComponent, NgIf, NgForOf, ProjectEditComponent, CdkDropList, NgClass],
+  styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit {
-  showCreateForm: boolean = false;  // Control form visibility
-  currentEditingProjectId: number | null = null;  // To track the current editing project
-  // Collect references to all input fields using ViewChildren
-  @ViewChildren('projectNameInput') projectNameInputs!: QueryList<ElementRef>;
 
-  constructor(public projectService: ProjectService, private router: Router) {
+  showCreateForm: boolean = false;
+
+  // Use observables from the service
+  projects$: Observable<Project[]> = of([]);
+  connectedDropZones$: Observable<string[]> = of([]);
+  isDragging: boolean = false;
+
+  constructor(public projectService: ProjectService, public taskService: TaskService) {
   }
 
   ngOnInit(): void {
-    // Trigger projects loading, this shall happen once, since we use RouteReuseStrategy
-    console.debug('issued full load of projects');
-    this.projectService.loadProjectsFromServer();
-  }
 
-  ngAfterViewChecked(): void {
-    // Focus the input field of the last/current editing project, if applicable
-    if (this.currentEditingProjectId !== null) {
-      const inputElement = this.projectNameInputs.find((el) => el.nativeElement.id === `project-${this.currentEditingProjectId}`);
-      if (inputElement) {
-        inputElement.nativeElement.focus();
-        this.currentEditingProjectId = null;
-      }
-    }
-  }
-
-  deleteProject(projectId: number): void {
-    if (confirm('Are you sure you want to delete this project and its tasks?')) {
-      // Dispatch REST method for deletion from server side
-      this.projectService.deleteProject(projectId).subscribe({
-        error: () => {
-          // Reload the projects list from server after a failed deletion
-          console.error('Error deleting project, issued full load of projects');
-          this.projectService.loadProjectsFromServer();
-        }, complete: () => {
-          console.log('Project deleted successfully');
-        }
-      });
-    }
-  }
-
-  updateProject(project: Project): void {
-    this.projectService.updateProject(project).subscribe({
-      error: (err) => {
-        console.error('Error updating project:', err);
-      }, complete: () => {
-        console.log('Project updated successfully');
-      }
-    });
-  }
-
-  async viewTasks(projectId: number): Promise<void> {
-    try {
-      const result = await this.router.navigate([`/project/${projectId}/tasks`]); // Navigate to project tasks
-      if (!result) console.error('failed to navigate towards /project/${projectId}/tasks');
-    } catch (err) {
-      console.error('Navigation towards /project/${projectId}/tasks error:', err);
-    }
+    // Just load the projects from the server, reactivity handled by observables
+    this.projects$ = this.projectService.getProjects();
+    this.connectedDropZones$ = this.projectService.getConnectedDropZones();
+    this.projectService.loadProjectsFromServer().subscribe();
   }
 
   toggleCreateProject(): void {
@@ -79,20 +42,67 @@ export class ProjectListComponent implements OnInit {
   }
 
   handleProjectCreated(): void {
-    this.showCreateForm = false;  // Hide the form after submission
+    this.showCreateForm = false;
   }
 
-  // Toggle editing and set the currentEditingProjectId
-  toggleEditMode(project: Project): void {
-    // save if was in edit mode
-    if (project.isEditing) {
-      // Save the project if it's in editing mode
-      this.updateProject(project);
-    }
-    // toggle the mode
+  toggleUpdateProject(project: Project): void {
     project.isEditing = !project.isEditing;
-    if (project.isEditing) {
-      this.currentEditingProjectId = project.id;  // Track the current project being edited
+  }
+
+  handleProjectUpdated(project: Project): void {
+    project.isEditing = false;
+  }
+
+  deleteProject(projectId: number): void {
+    if (confirm('Are you sure you want to delete this project and its tasks?')) {
+      this.projectService.deleteProject(projectId).subscribe();
     }
+  }
+
+  toggleTasksListView(project: Project): void {
+    project.isExpanded = !project.isExpanded;
+  }
+
+  onDragStart() {
+    this.isDragging = true;
+    console.log('drag started');
+  }
+
+  onDragEnd() {
+    this.isDragging = false;
+  }
+
+  // Middleware that detects drop on project card level
+  onProjectDrop(
+    {
+      $event,
+      project
+    }: {
+      $event: CdkDragDrop<any>,
+      project: Project
+    }
+  ): void {
+    console.debug('migration without priority')
+    // Get tasks from the previous project
+    const sourceTasks = $event.previousContainer.data as Task[];
+    // The task that was moved
+    const movedTask = sourceTasks[$event.previousIndex];
+    // Send updated task information to the server to persist changes
+    this.taskService.migrateTask({
+      task: movedTask,
+      project: project,
+    }).pipe(
+      // Once migration is complete, load tasks for the source project
+      concatMap(() => this.taskService.loadTasksFromServer(movedTask.project_id)),
+      // Once the source project tasks are loaded, load tasks for the target project
+      concatMap(() => this.taskService.loadTasksFromServer(project.id)),
+    ).subscribe({
+      next: () => {
+        console.log('Migration and task reloading completed successfully.');
+      },
+      error: (error) => {
+        console.error('Error during task migration or loading:', error);
+      }
+    });
   }
 }

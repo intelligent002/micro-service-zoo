@@ -120,20 +120,37 @@ class TaskController extends Controller
     }
 
     /**
-     * Reorder the tasks in project
+     * Prioritize the order of tasks in project
      * @param Request $request
      * @return JsonResponse
      */
-    public function reorder(Request $request): JsonResponse
+    public function prioritize(Request $request): JsonResponse
     {
-        foreach ($request->tasks as $index => $taskId) {
-            $task = Task::find($taskId);
+        foreach ($request->task_ids as $index => $task_id) {
+            $task = Task::find($task_id);
             $task->priority = $index + 1;
             $task->save();
         }
 
         return response()->json([
-            'status' => 'success'
+            'status' => 'OK'
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Migrate task between projects
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function migrate(Project $project, Task $task): JsonResponse
+    {
+        // modify relation
+        $task->project_id = $project->id;
+        // store and done
+        $task->save();
+
+        return response()->json([
+            'status' => 'OK'
         ], Response::HTTP_OK);
     }
 }
