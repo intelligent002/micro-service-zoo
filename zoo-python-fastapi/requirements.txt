@@ -6,6 +6,6 @@ prometheus_client==0.21.0
 prometheus_fastapi_instrumentator==7.0.0
 pydantic==2.9.2
 python-json-logger==2.0.7
-SQLAlchemy==2.0.35
+SQLAlchemy==2.0.36
 strawberry-graphql==0.246.2
 uvicorn==0.31.1
