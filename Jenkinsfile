@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Initialize variables for container status checks
-                    def maxAttempts = 25  // This allows up to 2 minutes of waiting (24 attempts with 5s sleep)
+                    def maxAttempts = 24  // This allows up to 2 minutes of waiting (24 attempts with 5s sleep)
                     def delay = 5 // Sleep time in seconds
                     def allContainersStarted = false
                     def startingContainers = ''
