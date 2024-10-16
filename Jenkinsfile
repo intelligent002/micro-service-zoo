@@ -44,13 +44,13 @@ pipeline {
                 }
             }
         }
-        post {
-            always {
-                // Bring down the containers after the check
-                sh '''
-                    docker compose -f docker-compose-dev.yaml down
-                '''
-            }
+    }
+    post {
+        always {
+            // Bring down the containers after the check
+            sh '''
+                docker compose -f docker-compose-dev.yaml down
+            '''
         }
     }
 }
