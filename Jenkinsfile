@@ -15,46 +15,59 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
+        stage('Waiting for Start') {
             steps {
                 script {
-                    // Initialize a loop that checks the container health status every 10 seconds
-                    def maxAttempts = 12  // This allows up to 4 minutes of waiting (12 attempts with 20s sleep)
-                    def attempt = 0
-                    def healthy = false
-                    def delay = 20 // sleep time
+                    // Initialize variables for container status checks
+                    def maxAttempts = 24  // This allows up to 2 minutes of waiting (24 attempts with 5s sleep)
+                    def delay = 5 // Sleep time in seconds
+                    def allContainersStarted = false
 
-                    while (attempt < maxAttempts) {
-                        echo "Attempt ${attempt + 1}/${maxAttempts}: Checking container health..."
-                        def result = sh(script: '''
-                            unhealthy_containers=$(docker ps --filter 'health=unhealthy' --format '{{.Names}}' | wc -l)
-                            if [ "$unhealthy_containers" -eq 0 ]; then
-                                echo "All containers are healthy."
-                                exit 0
-                            else
-                                echo "Some containers are yet not healthy."
-                                exit 1
-                            fi
-                        ''', returnStatus: true)
+                    // Loop to wait for containers to exit "starting" state
+                    for (int attempt = 0; attempt < maxAttempts; attempt++) {
+                        echo "Attempt ${attempt + 1}/${maxAttempts}: Checking if containers are still starting..."
 
-                        if (result == 0) {
-                            healthy = true
+                        def startingContainers = sh(script: '''
+                            docker ps --filter 'health=starting' --format '{{.Names}}'
+                        ''', returnStdout: true).trim()
+
+                        if (startingContainers) {
+                            echo "Containers still starting: ${startingContainers}"
+                        } else {
+                            echo "All containers have exited the 'starting' state."
+                            allContainersStarted = true
                             break
                         }
 
-                        attempt++
                         echo "Sleeping for ${delay} seconds before the next check ..."
-                        sleep delay // Sleep for 20 seconds before the next check
+                        sleep delay
                     }
 
-                    // If containers are not healthy after the max attempts, fail the build
-                    if (!healthy) {
-                        def unhealthyCheck = sh(script: '''
-                            docker ps --filter 'health=unhealthy' --format '{{.Names}}'
+                    // Fail if containers are still in "starting" state after the maximum attempts
+                    if (!allContainersStarted) {
+                        def startingContainers = sh(script: '''
+                            docker ps --filter 'health=starting' --format '{{.Names}}'
                         ''', returnStdout: true).trim()
 
-                        error "Unhealthy containers detected: ${unhealthyCheck}"
+                        error "Some containers are still in the 'starting' state after ${maxAttempts * delay} seconds: ${startingContainers}"
                     }
+                }
+            }
+        }
+        stage('Validating Health') {
+            steps {
+                script {
+                    // Check if there are any unhealthy containers
+                    def unhealthyContainers = sh(script: '''
+                        docker ps --filter 'health=unhealthy' --format '{{.Names}}'
+                    ''', returnStdout: true).trim()
+
+                    if (unhealthyContainers) {
+                        error "Unhealthy containers detected: ${unhealthyContainers}"
+                    }
+
+                    // If no unhealthy containers, the test passes
+                    echo "All containers are healthy and running."
                 }
             }
         }
