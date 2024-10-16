@@ -40,7 +40,7 @@ pipeline {
                             break
                         }
 
-                        sleep delay // Sleep for 20 seconds before the next check
+                        sleep delay // Sleep for a few seconds before the next check
                     }
 
                     // Fail if containers are still in "starting" state after the maximum attempts
