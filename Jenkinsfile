@@ -5,7 +5,7 @@ pipeline {
         }
     }
     stages {
-        stage('Start') {
+        stage('Start Containers') {
             steps {
                 script {
                     // Start the containers
@@ -15,19 +15,20 @@ pipeline {
                 }
             }
         }
-        stage('Waiting for Start') {
+        stage('Wait for Containers to Become Ready') {
             steps {
                 script {
                     // Initialize variables for container status checks
-                    def maxAttempts = 24  // This allows up to 2 minutes of waiting (24 attempts with 5s sleep)
+                    def maxAttempts = 25  // This allows up to 2 minutes of waiting (24 attempts with 5s sleep)
                     def delay = 5 // Sleep time in seconds
                     def allContainersStarted = false
+                    def startingContainers = ''
 
                     // Loop to wait for containers to exit "starting" state
                     for (int attempt = 0; attempt < maxAttempts; attempt++) {
                         echo "Attempt ${attempt + 1}/${maxAttempts}: Checking if containers are still starting..."
 
-                        def startingContainers = sh(script: '''
+                        startingContainers = sh(script: '''
                             docker ps --filter 'health=starting' --format '{{.Names}}'
                         ''', returnStdout: true).trim()
 
@@ -39,22 +40,17 @@ pipeline {
                             break
                         }
 
-                        echo "Sleeping for ${delay} seconds before the next check ..."
-                        sleep delay
+                        sleep delay // Sleep for 20 seconds before the next check
                     }
 
                     // Fail if containers are still in "starting" state after the maximum attempts
                     if (!allContainersStarted) {
-                        def startingContainers = sh(script: '''
-                            docker ps --filter 'health=starting' --format '{{.Names}}'
-                        ''', returnStdout: true).trim()
-
                         error "Some containers are still in the 'starting' state after ${maxAttempts * delay} seconds: ${startingContainers}"
                     }
                 }
             }
         }
-        stage('Validating Health') {
+        stage('Validate Container Health') {
             steps {
                 script {
                     // Check if there are any unhealthy containers
