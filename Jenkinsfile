@@ -18,30 +18,41 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Wait for containers to become healthy
-                    timeout(time: 2, unit: 'MINUTES') {
-                        waitUntil {
-                            def healthy = sh(script: '''
-                                unhealthy_containers=$(docker ps --filter 'health=unhealthy' --format '{{.Names}}' | wc -l)
-                                if [ "$unhealthy_containers" -eq 0 ]; then
-                                    echo "All containers are healthy."
-                                    exit 0
-                                else
-                                    echo "Some containers are unhealthy."
-                                    exit 1
-                                fi
-                            ''', returnStatus: true)
+                    // Initialize a loop that checks the container health status every 10 seconds
+                    def maxAttempts = 12  // This allows up to 4 minutes of waiting (12 attempts with 20s sleep)
+                    def attempt = 0
+                    def healthy = false
+                    def delay = 20 // sleep time
 
-                            return (healthy == 0)
+                    while (attempt < maxAttempts) {
+                        echo "Attempt ${attempt + 1}/${maxAttempts}: Checking container health..."
+                        def result = sh(script: '''
+                            unhealthy_containers=$(docker ps --filter 'health=unhealthy' --format '{{.Names}}' | wc -l)
+                            if [ "$unhealthy_containers" -eq 0 ]; then
+                                echo "All containers are healthy."
+                                exit 0
+                            else
+                                echo "Some containers are yet not healthy."
+                                exit 1
+                            fi
+                        ''', returnStatus: true)
+
+                        if (result == 0) {
+                            healthy = true
+                            break
                         }
+
+                        attempt++
+                        echo "Sleeping for ${delay} seconds before the next check ..."
+                        sleep delay // Sleep for 20 seconds before the next check
                     }
 
-                    // Check if there are any unhealthy containers and fail the pipeline if necessary
-                    def unhealthyCheck = sh(script: '''
-                        docker ps --filter 'health=unhealthy' --format '{{.Names}}'
-                    ''', returnStdout: true).trim()
+                    // If containers are not healthy after the max attempts, fail the build
+                    if (!healthy) {
+                        def unhealthyCheck = sh(script: '''
+                            docker ps --filter 'health=unhealthy' --format '{{.Names}}'
+                        ''', returnStdout: true).trim()
 
-                    if (unhealthyCheck) {
                         error "Unhealthy containers detected: ${unhealthyCheck}"
                     }
                 }
