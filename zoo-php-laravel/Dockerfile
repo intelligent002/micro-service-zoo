@@ -1,5 +1,5 @@
 # Use the official PHP image
-FROM docker.artifactory.intel.r7g.org/php:8.2-fpm
+FROM php:8.2-fpm
 
 # Install System packages
 RUN apt update && apt install -y \
@@ -19,7 +19,7 @@ RUN docker-php-ext-install pdo pdo_mysql \
     && rm -rf /tmp/* /var/tmp/*
 
 # Install Composer
-COPY --from=docker.artifactory.intel.r7g.org/composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy custom PHP-FPM configurations
 COPY ./php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf

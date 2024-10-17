@@ -1,5 +1,5 @@
 # Stage 1: Build the React application
-FROM docker.artifactory.intel.r7g.org/node:20.18.0-alpine3.20 AS build
+FROM node:20.18.0-alpine3.20 AS build
 
 # Set working directory in the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve with Nginx
-FROM docker.artifactory.intel.r7g.org/nginx:1.27.1-alpine-slim
+FROM nginx:1.27.1-alpine-slim
 RUN apk update && apk add --no-cache \
     curl \
     jq \
