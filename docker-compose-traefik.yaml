@@ -24,7 +24,7 @@ services:
 
     # MySQL Service
     zoo-mysql:
-        image: docker.artifactory.intel.r7g.org/mysql:8.0
+        image: mysql:8.0
         container_name: zoo-mysql
         restart: unless-stopped
         ports:

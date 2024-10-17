@@ -1,4 +1,4 @@
-FROM docker.artifactory.intel.r7g.org/fabiocicerchia/nginx-lua:1.27.1-alpine3.20.3
+FROM fabiocicerchia/nginx-lua:1.27.1-alpine3.20.3
 
 # Install necessary dependencies
 RUN apk update && apk add --no-cache \
