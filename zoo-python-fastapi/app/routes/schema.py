@@ -39,7 +39,7 @@ async def route_generate():
 async def route_list():
     """List of GQL schema versions for download, returns array of versions as strings"""
     result = await schema_list()
-    if "ERROR" in result.values():
+    if result.get("status") == "ERROR":
         return JSONResponse(status_code=403, content=result)
 
     return JSONResponse(status_code=200, content=result)
