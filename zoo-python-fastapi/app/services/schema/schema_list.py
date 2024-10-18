@@ -11,8 +11,8 @@ async def schema_list():
         versions = [f.replace('schema_', '').replace('.graphql', '')
                     for f in os.listdir(Config.SCHEMA_DIR) if f.endswith('.graphql')]
     except Exception as e:
-        logger.error(f"Failed to list the versions [{str(e)}]")
-        return {"status": "ERROR", "error": "An internal error has occurred."}
+        logger.error(f"Failed to list the versions: [{str(e)}]")
+        return {"status": "ERROR", "error": "Failed to list the versions. Examine the logs."}
 
     logger.info("Schemas was listed.")
     return {"status": "OK", "result": versions}

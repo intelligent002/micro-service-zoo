@@ -25,10 +25,9 @@ async def schema_generate():
     try:
         await store_schema_file(version, contents)
     except Exception as e:
-        message = f"Failed to store the schema file: [{str(e)}]."
-        logger.error(message)
+        logger.error(f"Failed to store the schema file: [{str(e)}].")
         return {"status": "ERROR",
-                "error": message}
+                "error": "Failed to store the schema file, investigate the logs."}
 
     return {"status": "OK", "result": version}
 
