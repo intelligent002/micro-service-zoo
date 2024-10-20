@@ -1,6 +1,5 @@
 # Stage 1: Build the React application
 FROM node:20.18.0-alpine3.20 AS build
-#FROM node:20.18.0 AS build
 
 # Set working directory in the container
 WORKDIR /app
@@ -9,7 +8,7 @@ WORKDIR /app
 COPY package.json ./
 
 # Install dependencies
-RUN npm i
+RUN npm ci
 
 # Copy the rest of the app files into the container
 COPY . .
