@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm i
 
 # Copy the rest of the app files into the container
 COPY . .
@@ -27,6 +27,7 @@ RUN apk update && apk add --no-cache \
 
 # Copy the built React files from the previous stage to Nginx's html directory
 COPY --from=build /app/dist/browser/ /usr/share/nginx/html
+COPY --from=build /app/package*json /usr/share/nginx/html
 
 # Copy configuration and starter files
 COPY nginx/default.conf.template /etc/nginx/conf.d/
