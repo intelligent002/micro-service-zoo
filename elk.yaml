@@ -1,0 +1,63 @@
+services:
+
+    # Logstash Service
+    logstash:
+        image: docker.elastic.co/logstash/logstash:7.17.10
+        container_name: logstash
+        restart: unless-stopped
+        ports:
+            - "5044:5044"  # For Beats input
+            - "5000:5000/tcp" # For Logstash TCP input
+            - "5000:5000/udp" # For Logstash UDP input
+        environment:
+            LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://elasticsearch:9200 || exit 1"]
+            interval: 30s
+            retries: 3
+            start_period: 30s  # Increase the time Docker waits before checking the service's health
+            timeout: 10s
+        depends_on:
+            - elasticsearch
+        volumes:
+            - ./zoo-logstash/pipeline/:/usr/share/logstash/pipeline/
+        networks:
+            - zoo
+
+    # Elasticsearch Service
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+        container_name: elasticsearch
+        restart: unless-stopped
+        environment:
+            - discovery.type=single-node
+            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+        ports:
+            - "9200:9200"
+        volumes:
+            - es-data:/usr/share/elasticsearch/data
+        networks:
+            - zoo
+
+    # Kibana Service
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.17.10
+        container_name: kibana
+        restart: unless-stopped
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        depends_on:
+            - elasticsearch
+        ports:
+            - "5601:5601"
+        networks:
+            - zoo
+
+# Named volumes for persistent data storage
+volumes:
+    es-data:
+
+# Shared network between the containers
+networks:
+    zoo:
+        driver: bridge
