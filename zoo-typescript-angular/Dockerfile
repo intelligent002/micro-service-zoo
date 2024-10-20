@@ -2,11 +2,6 @@
 FROM node:20.18.0-alpine3.20 AS build
 #FROM node:20.18.0 AS build
 
-# Install Python and build tools
-#RUN apt-get update && \
-#    apt-get install -y python3 build-essential && \
-#    npm config set python /usr/bin/python3 \
-
 # Set working directory in the container
 WORKDIR /app
 
