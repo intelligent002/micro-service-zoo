@@ -23,8 +23,8 @@ services:
             # Test availabiltiy of mysql service, listening & actually serving - via mounted script
             test: [ "CMD", "/mysql-health.sh" ]
             interval: 60s
-            retries: 5
-            start_period: 20s
+            retries: 3
+            start_period: 3s
             timeout: 10s
         networks:
             - zoo
@@ -53,7 +53,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         depends_on:
             - zoo-mysql
@@ -84,7 +84,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         ports:
             - "8101:8101"
@@ -112,7 +112,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         ports:
             - "8102:8102"
@@ -147,7 +147,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         ports:
             - "8103:8103"
@@ -180,7 +180,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         depends_on:
             - zoo-php-laravel
@@ -208,7 +208,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         ports:
             - "8105:8105"
@@ -242,7 +242,7 @@ services:
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
-            start_period: 5s
+            start_period: 3s
             timeout: 10s
         depends_on:
             - zoo-typescript-react

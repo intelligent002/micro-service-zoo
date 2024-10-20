@@ -28,9 +28,9 @@ services:
             - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
         healthcheck:
             test: ["CMD-SHELL", "curl -f http://zoo-elk-es:9200 || exit 1"]
-            interval: 30s
-            retries: 5
-            start_period: 60s
+            interval: 60s
+            retries: 3
+            start_period: 3s
             timeout: 10s
         ports:
             - "9200:9200"
