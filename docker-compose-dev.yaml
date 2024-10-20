@@ -333,6 +333,7 @@ services:
 # Named volumes for persistent data storage
 volumes:
     mysql-data:
+    es-data:
 
 # Shared network between the containers
 networks:
