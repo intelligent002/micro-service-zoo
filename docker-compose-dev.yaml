@@ -1,5 +1,6 @@
 services:
 
+
     # MySQL Service
     zoo-mysql:
         image: mysql:8.0
@@ -15,7 +16,7 @@ services:
             - MYSQL_TCP_PORT=3307
             - MYSQL_USER=zoo-user
         volumes:
-            - mysql-data:/var/lib/mysql
+            - sql-data:/var/lib/mysql
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
         # we can set the execute flag as we are running as root
         entrypoint: ["/bin/bash", "-c", "chmod +x /mysql-health.sh && docker-entrypoint.sh mysqld"]
@@ -55,13 +56,8 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
-        logging:
-            driver: "gelf"
-            options:
-                gelf-address: "udp://127.0.0.1:5000"
         depends_on:
             - zoo-mysql
-            - zoo-elk-ls
         networks:
             - zoo
 
@@ -91,15 +87,10 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
-        logging:
-            driver: "gelf"
-            options:
-                gelf-address: "udp://127.0.0.1:5000"
         ports:
             - "8101:8101"
         depends_on:
             - zoo-mysql
-            - zoo-elk-ls
         networks:
             - zoo
 
@@ -159,15 +150,10 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
-        logging:
-            driver: "gelf"
-            options:
-                gelf-address: "udp://127.0.0.1:5000"
         ports:
             - "8103:8103"
         depends_on:
             - zoo-mysql
-            - zoo-elk-ls
         # we cannot change the execute flag because we are running as www-data, so we add this file and it's permissions in Dockerfile.
         # dont start the migrations before mysql is really ready to serve requests
         command: ["/bin/sh", "-c", "/mysql-wait.sh && php artisan migrate --force && php-fpm"]
@@ -197,13 +183,8 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
-        logging:
-            driver: "gelf"
-            options:
-                gelf-address: "udp://127.0.0.1:5000"
         depends_on:
             - zoo-php-laravel
-            - zoo-elk-ls
         ports:
             - "8104:8104"
         networks:
@@ -264,76 +245,16 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
-        logging:
-            driver: "gelf"
-            options:
-                gelf-address: "udp://127.0.0.1:5000"
         depends_on:
             - zoo-typescript-react
             - zoo-python-flask
             - zoo-php-laravel-http2fpm
-            - zoo-elk-ls
         networks:
             - zoo
-
-    # Logstash Service
-    zoo-elk-ls:
-        image: docker.elastic.co/logstash/logstash:7.17.10
-        container_name: zoo-elk-ls
-        restart: unless-stopped
-        ports:
-            - "5044:5044"  # For Beats input
-            - "5000:5000/tcp" # For Logstash TCP input
-            - "5000:5000/udp" # For Logstash UDP input
-        environment:
-            LS_JAVA_OPTS: "-Xmx512m -Xms512m"
-        depends_on:
-            - zoo-elk-es
-        volumes:
-            - ./zoo-elk-ls/pipeline/:/usr/share/logstash/pipeline/
-        networks:
-            - zoo
-
-    # Elasticsearch Service
-    zoo-elk-es:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
-        container_name: zoo-elk-es
-        restart: unless-stopped
-        environment:
-            - discovery.type=single-node
-            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-        healthcheck:
-            test: ["CMD-SHELL", "curl -f http://zoo-elk-es:9200 || exit 1"]
-            interval: 60s
-            retries: 3
-            start_period: 3s
-            timeout: 10s
-        ports:
-            - "9200:9200"
-        volumes:
-            - es-data:/usr/share/elasticsearch/data
-        networks:
-            - zoo
-
-    # Kibana Service
-    zoo-elk-kb:
-        image: docker.elastic.co/kibana/kibana:7.17.10
-        container_name: zoo-elk-kb
-        restart: unless-stopped
-        environment:
-            - ELASTICSEARCH_HOSTS=http://zoo-elk-es:9200
-        depends_on:
-            - zoo-elk-es
-        ports:
-            - "5601:5601"
-        networks:
-            - zoo
-
 
 # Named volumes for persistent data storage
 volumes:
-    mysql-data:
-    es-data:
+    sql-data:
 
 # Shared network between the containers
 networks:
