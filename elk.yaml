@@ -1,9 +1,9 @@
 services:
 
     # Logstash Service
-    logstash:
+    zoo-elk-ls:
         image: docker.elastic.co/logstash/logstash:7.17.10
-        container_name: logstash
+        container_name: zoo-elk-ls
         restart: unless-stopped
         ports:
             - "5044:5044"  # For Beats input
@@ -11,23 +11,17 @@ services:
             - "5000:5000/udp" # For Logstash UDP input
         environment:
             LS_JAVA_OPTS: "-Xmx512m -Xms512m"
-        healthcheck:
-            test: ["CMD-SHELL", "curl -f http://elasticsearch:9200 || exit 1"]
-            interval: 30s
-            retries: 3
-            start_period: 30s  # Increase the time Docker waits before checking the service's health
-            timeout: 10s
         depends_on:
-            - elasticsearch
+            - zoo-elk-es
         volumes:
-            - ./zoo-logstash/pipeline/:/usr/share/logstash/pipeline/
+            - ./zoo-elk-ls/pipeline/:/usr/share/logstash/pipeline/
         networks:
             - zoo
 
     # Elasticsearch Service
-    elasticsearch:
+    zoo-elk-es:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
-        container_name: elasticsearch
+        container_name: zoo-elk-es
         restart: unless-stopped
         environment:
             - discovery.type=single-node
@@ -40,14 +34,14 @@ services:
             - zoo
 
     # Kibana Service
-    kibana:
+    zoo-elk-kb:
         image: docker.elastic.co/kibana/kibana:7.17.10
-        container_name: kibana
+        container_name: zoo-elk-kb
         restart: unless-stopped
         environment:
-            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+            - ELASTICSEARCH_HOSTS=http://zoo-elk-es:9200
         depends_on:
-            - elasticsearch
+            - zoo-elk-es
         ports:
             - "5601:5601"
         networks:
