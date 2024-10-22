@@ -10,7 +10,7 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
-                        docker compose -f docker-compose-dev.yaml up --build -d
+                        docker compose up --build -d
                     '''
                 }
             }
@@ -72,7 +72,7 @@ pipeline {
         always {
             // Bring down the containers after the check
             sh '''
-                docker compose -f docker-compose-dev.yaml down
+                docker compose down
             '''
         }
     }
