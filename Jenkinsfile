@@ -10,6 +10,7 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
+                        chmod +x zoo.sh
                         ./zoo.sh
                     '''
                 }
