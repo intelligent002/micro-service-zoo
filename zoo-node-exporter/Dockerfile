@@ -1,4 +1,4 @@
-FROM prom/prometheus:v2.54.1
+FROM quay.io/prometheus/node-exporter:v1.8.2
 
 # Switch to root user to install curl
 USER root

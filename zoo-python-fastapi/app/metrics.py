@@ -8,9 +8,13 @@ def init_metrics(app):
 
 
 # Define your custom counters using prometheus_client.Counter
-projects_counter = Counter('graphql_get_projects_requests_total', 'Total number of requests to getProjects')
-tasks_counter = Counter('graphql_get_tasks_requests_total', 'Total number of requests to getTasks')
+gql_counter = Counter('graphql_requests_count',
+                      'Total number of requests to getProjects',
+                      ['environment', 'request', 'status'])
 
 # Define histograms to track request durations using prometheus_client.Histogram
-projects_duration = Histogram('graphql_get_projects_duration_seconds', 'Duration of getProjects method in seconds')
-tasks_duration = Histogram('graphql_get_tasks_duration_seconds', 'Duration of getTasks method in seconds')
+gql_duration = Histogram('graphql_requests_duration_seconds',
+                         'Duration of getProjects method in seconds',
+                         ['environment', 'request'],
+                         buckets=[0.0000005, 0.00001, 0.025, 0.5, 1, 1.5, 2, 3, 5, 7.5, 10, 15, 20, 30, 500, 1500, 150000,
+                                  1000000])

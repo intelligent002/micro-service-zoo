@@ -6,6 +6,9 @@ services:
             context: ./zoo-prometheus # Set build context to the respective folder
             dockerfile: Dockerfile
         container_name: zoo-prometheus
+        command:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --web.enable-lifecycle
         healthcheck:
             test: ["CMD-SHELL", "curl -f http://localhost:9090/-/healthy || exit 1"]
             interval: 60s
@@ -14,15 +17,53 @@ services:
             timeout: 10s
         volumes:
             - ./zoo-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+            - ./zoo-prometheus/rules/:/etc/prometheus/rules/
             - prometheus-data:/prometheus
         ports:
             - "9091:9090"
         networks:
             - zoo
 
+    zoo-alert-manager:
+        build:
+            context: ./zoo-alert-manager # Set build context to the respective folder
+            dockerfile: Dockerfile
+        container_name: zoo-alert-manager
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:9093/-/healthy || exit 1"]
+            interval: 60s
+            retries: 3
+            start_period: 10s
+            timeout: 10s
+        volumes:
+            - ./zoo-alert-manager/alertmanager.yml:/etc/alertmanager/config.yml
+            - alert-manager-data:/alertmanager
+        ports:
+            - "9093:9093"
+        command:
+            - --config.file=/etc/alertmanager/config.yml
+        networks:
+            - zoo
+
+    zoo-node-exporter:
+        build:
+            context: ./zoo-node-exporter # Set build context to the respective folder
+            dockerfile: Dockerfile
+        container_name: zoo-node-exporter
+        ports:
+            - "9100:9100"
+        networks:
+            - zoo
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:9100/metrics || exit 1"]
+            interval: 60s
+            retries: 3
+            start_period: 10s
+            timeout: 10s
+
     # Graphana
     zoo-grafana:
-        image: grafana/grafana:11.2.2-security-01
+        image: grafana/grafana:11.2.2
         container_name: zoo-grafana
         healthcheck:
             test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
@@ -33,11 +74,12 @@ services:
         ports:
             - "3000:3000"
         volumes:
+            - ./zoo-grafana/grafana.ini:/etc/grafana/grafana.ini
             - grafana-data:/var/lib/grafana
         networks:
             - zoo
         environment:
-            - GF_SECURITY_ADMIN_PASSWORD=admin
+            - GF_SECURITY_ADMIN_PASSWORD=very-secret
     
     # Jaeger
     zoo-jaeger:
@@ -59,6 +101,50 @@ services:
         networks:
             - zoo
 
+    zoo-promtail:
+        build:
+            context: ./zoo-promtail # Set build context to the respective folder
+            dockerfile: Dockerfile
+        #image: grafana/promtail:3.0.0
+        container_name: zoo-promtail
+        ports:
+            - "9080:9080"
+        volumes:
+            - /var/log:/var/log
+            - ${DOCKER_LOG_PATH}:/var/lib/docker/containers:ro
+            - ./zoo-promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+        command:
+            - --config.file=/etc/promtail/promtail-config.yml
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:9080/ready || exit 1"]
+            interval: 60s
+            retries: 3
+            start_period: 10s
+            timeout: 10s
+        networks:
+            - zoo
+
+    zoo-loki:
+        build:
+            context: ./zoo-loki # Set build context to the respective folder
+            dockerfile: Dockerfile
+        container_name: zoo-loki
+        ports:
+            - "3100:3100"
+        volumes:
+            - ./zoo-loki/local-config.yaml:/etc/loki/local-config.yaml
+            - loki-data:/loki
+        command:
+            - --config.file=/etc/loki/local-config.yaml
+        networks:
+            - zoo
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:3100/ready || exit 1"]
+            interval: 60s
+            retries: 3
+            start_period: 10s
+            timeout: 10s
+            
     # MySQL Service
     zoo-mysql:
         image: mysql:8.0
@@ -314,10 +400,12 @@ services:
 
 # Named volumes for persistent data storage
 volumes:
+    alert-manager-data:
+    grafana-data:
+    jaeger-data:
+    loki-data:
     mysql-data:
     prometheus-data:
-    jaeger-data:
-    grafana-data:
 
 # Shared network between the containers
 networks:

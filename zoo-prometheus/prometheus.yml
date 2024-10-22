@@ -9,3 +9,16 @@ scrape_configs:
   - job_name: 'zoo-python-flask'
     static_configs:
       - targets: ['zoo-python-flask:8100']
+
+  - job_name: 'zoo-python-fastapi'
+    static_configs:
+      - targets: ['zoo-python-fastapi:8101']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "zoo-alertmanager:9093"  # Alertmanager service name and port in Docker Compose
+
+rule_files:
+  - "/etc/prometheus/rules/*.yml"  # Define your alerting rules here

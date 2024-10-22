@@ -1,4 +1,4 @@
-FROM prom/prometheus:v2.54.1
+FROM prom/alertmanager:v0.27.0
 
 # Switch to root user to install curl
 USER root
