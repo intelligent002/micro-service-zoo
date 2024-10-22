@@ -10,8 +10,8 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
-                        chmod +x zoo.sh
-                        ./zoo.sh
+                        chmod +x zoo.start.sh zoo.stop.sh
+                        ./zoo.start.sh
                     '''
                 }
             }
@@ -73,7 +73,7 @@ pipeline {
         always {
             // Bring down the containers after the check
             sh '''
-                docker compose down
+                ./zoo.stop.sh
             '''
         }
     }
