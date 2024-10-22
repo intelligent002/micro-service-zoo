@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.config import Config
-from app.metrics import gql_duration, gql_counter
+from app.metrics import gql_duration, gql_counter, async_time_decorator
 from app.models.sqlalchemy import Project as ProjectSQL, Task as TaskSQL
 from app.models.strawberry import Project as ProjectSTR, Task as TaskSTR
 from app.services.graphql.get_logger import get_logger
@@ -18,7 +18,7 @@ class Query:
 
     # Field to query Projects
     @strawberry.field
-    @gql_duration.labels(environment=Config.ENVIRONMENT, request="projects").time()
+    @async_time_decorator(gql_duration, {'environment': Config.ENVIRONMENT, 'request': 'Projects'})
     async def get_projects(
             self,
             info,  # GraphQL context, used to access FastAPI dependencies like DB session
@@ -63,14 +63,17 @@ class Query:
             ) for p in projects]
 
         except Exception as e:
+
             # Log any exception that occurs
-            gql_counter.labels(environment=Config.ENVIRONMENT, request="Projects",status="ERROR").inc()
-            logger.warning(f"Failed to process get_projects(id={id}, name={name}): {str(e)}")
-            return []  # Return an empty list on error
+            logger.error(f"Failed to process get_projects(id={id}, name={name}): {str(e)}")
+            gql_counter.labels(environment=Config.ENVIRONMENT, request="Projects", status="ERROR").inc()
+
+            # Return an empty list on error
+            return []
 
     # Field to query Tasks
     @strawberry.field
-    @gql_duration.labels(environment=Config.ENVIRONMENT, request="Tasks").time()
+    @async_time_decorator(gql_duration, {'environment': Config.ENVIRONMENT, 'request': 'Tasks'})
     async def get_tasks(
             self,
             info,  # GraphQL context, used to access FastAPI dependencies like DB session
@@ -78,7 +81,7 @@ class Query:
             project_id: Optional[int] = None  # Optional filter by associated project ID
     ) -> List[TaskSTR]:
         # Initialize logger
-        start_time = time.time()
+        start_time = time.perf_counter()
         logger = get_logger()
         try:
             # Extract the SQLAlchemy session from the GraphQL context
@@ -106,8 +109,7 @@ class Query:
             # Log success message
             logger.info(f"Processed get_tasks(name={name}, project_id={project_id})")
             gql_counter.labels(environment=Config.ENVIRONMENT, request="Tasks", status="OK").inc()
-            duration = time.time() - start_time
-            logger.error(f"duration is {duration}")
+
             # Return a list of Task objects, mapped from the database results
             return [TaskSTR(
                 id=t.id,
@@ -118,10 +120,13 @@ class Query:
             ) for t in tasks]
 
         except Exception as e:
+
             # Log any exception that occurs
+            logger.error(f"Failed to process get_tasks(name={name}, project_id={project_id}): {str(e)}")
             gql_counter.labels(environment=Config.ENVIRONMENT, request="Tasks", status="ERROR").inc()
-            logger.warning(f"Failed to process get_tasks(name={name}, project_id={project_id}): {str(e)}")
-            return []  # Return an empty list on error
+
+            # Return an empty list on error
+            return []
 
 
 # Create the GraphQL schema and attach the Query class
