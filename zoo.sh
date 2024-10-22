@@ -13,4 +13,4 @@ else
 fi
 
 # Start Docker Compose
-docker-compose up
+docker compose up
