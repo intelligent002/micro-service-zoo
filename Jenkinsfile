@@ -10,7 +10,7 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
-                        docker compose up --build -d
+                        ./zoo.sh
                     '''
                 }
             }
