@@ -18,6 +18,7 @@ class Config:
     DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() == 'true'
     APP_PORT = os.getenv('APP_PORT', 8001)
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG').upper()
+    ENVIRONMENT = os.getenv('ENVIRONMENT','DEV').upper()
 
     # Directory to store schema files
     SCHEMA_DIR = os.path.join(os.getcwd(), 'schemas')

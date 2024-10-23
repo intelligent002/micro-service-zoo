@@ -10,7 +10,8 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
-                        docker compose -f docker-compose-dev.yaml up --build -d
+                        chmod +x zoo.start.sh zoo.stop.sh
+                        ./zoo.start.sh
                     '''
                 }
             }
@@ -72,7 +73,7 @@ pipeline {
         always {
             // Bring down the containers after the check
             sh '''
-                docker compose -f docker-compose-dev.yaml down
+                ./zoo.stop.sh
             '''
         }
     }

@@ -1,0 +1,46 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'your-email@gmail.com'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: 'your-password'
+  smtp_require_tls: true
+  
+route:
+  # The root route for all alerts
+  receiver: 'default-receiver'
+
+  # Optionally, define specific routes for alerts
+  routes:
+    - match:
+        severity: critical
+      receiver: 'critical-email'
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 3h
+
+    - match:
+        severity: warning
+      receiver: 'slack-notifications'
+
+receivers:
+  # Default receiver
+  - name: 'default-receiver'
+    email_configs:
+      - to: 'admin@example.com'
+
+  # Receiver for critical alerts
+  - name: 'critical-email'
+    email_configs:
+      - to: 'critical@example.com'
+
+  # Receiver for Slack notifications
+  - name: 'slack-notifications'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts'
+        send_resolved: true
+
+# Optionally, configure templates
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
