@@ -10,7 +10,6 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
-                    sh '''
                         # Validate script existence
                         for script in zoo.start.sh zoo.stop.sh; do
                             if [ ! -f "$script" ]; then
@@ -31,7 +30,6 @@ pipeline {
                             echo "Error: Failed to start containers"
                             exit 1
                         fi
-                    '''
                     '''
                 }
             }

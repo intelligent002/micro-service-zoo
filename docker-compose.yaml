@@ -110,7 +110,7 @@ services:
         ports:
             - "9080:9080"
         volumes:
-            - /var/log:/var/log
+            # - /var/log:/var/log
             - ${DOCKER_LOG_PATH}:/var/lib/docker/containers:ro
             - ./zoo-promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
         command:
