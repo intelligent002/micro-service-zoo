@@ -10,8 +10,28 @@ pipeline {
                 script {
                     // Start the containers
                     sh '''
+                    sh '''
+                        # Validate script existence
+                        for script in zoo.start.sh zoo.stop.sh; do
+                            if [ ! -f "$script" ]; then
+                                echo "Error: Required script $script not found"
+                                exit 1
+                            fi
+                        done
+
                         chmod +x zoo.start.sh zoo.stop.sh
+                        # Verify permissions were set correctly
+                        if [ ! -x "zoo.start.sh" ] || [ ! -x "zoo.stop.sh" ]; then
+                            echo "Error: Failed to set execute permissions"
+                            exit 1
+                        fi
+
                         ./zoo.start.sh
+                        if [ $? -ne 0 ]; then
+                            echo "Error: Failed to start containers"
+                            exit 1
+                        fi
+                    '''
                     '''
                 }
             }
