@@ -51,7 +51,11 @@ class Query:
 
             # Log success message
             logger.info(f"Processed get_projects(id={id}, name={name})")
-            gql_counter.labels(environment=Config.ENVIRONMENT, request="Projects", status="OK").inc()
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Projects",
+                status="OK"
+            ).inc()
 
             # Return a list of Project objects, mapped from the database results
             return [ProjectSTR(
@@ -65,7 +69,11 @@ class Query:
 
             # Log any exception that occurs
             logger.error(f"Failed to process get_projects(id={id}, name={name}): {str(e)}")
-            gql_counter.labels(environment=Config.ENVIRONMENT, request="Projects", status="ERROR").inc()
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Projects",
+                status="ERROR"
+            ).inc()
 
             # Return an empty list on error
             return []
@@ -106,7 +114,11 @@ class Query:
 
             # Log success message
             logger.info(f"Processed get_tasks(name={name}, project_id={project_id})")
-            gql_counter.labels(environment=Config.ENVIRONMENT, request="Tasks", status="OK").inc()
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Tasks",
+                status="OK"
+            ).inc()
 
             # Return a list of Task objects, mapped from the database results
             return [TaskSTR(
@@ -121,7 +133,11 @@ class Query:
 
             # Log any exception that occurs
             logger.error(f"Failed to process get_tasks(name={name}, project_id={project_id}): {str(e)}")
-            gql_counter.labels(environment=Config.ENVIRONMENT, request="Tasks", status="ERROR").inc()
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Tasks",
+                status="ERROR"
+            ).inc()
 
             # Return an empty list on error
             return []
