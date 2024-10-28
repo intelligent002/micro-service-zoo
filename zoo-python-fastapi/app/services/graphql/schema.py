@@ -1,4 +1,3 @@
-import time
 from typing import List, Optional
 
 import strawberry
@@ -81,7 +80,6 @@ class Query:
             project_id: Optional[int] = None  # Optional filter by associated project ID
     ) -> List[TaskSTR]:
         # Initialize logger
-        start_time = time.perf_counter()
         logger = get_logger()
         try:
             # Extract the SQLAlchemy session from the GraphQL context

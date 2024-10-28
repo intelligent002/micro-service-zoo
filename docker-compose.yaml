@@ -42,6 +42,8 @@ services:
             - "9093:9093"
         command:
             - --config.file=/etc/alertmanager/config.yml
+        depends_on:
+            - zoo-prometheus  
         networks:
             - zoo
 
@@ -78,9 +80,12 @@ services:
             - grafana-data:/var/lib/grafana
         networks:
             - zoo
+        depends_on:
+            - zoo-prometheus
+            - zoo-loki
         environment:
             - GF_SECURITY_ADMIN_PASSWORD=very-secret
-    
+
     # Jaeger
     zoo-jaeger:
         build:
@@ -105,7 +110,6 @@ services:
         build:
             context: ./zoo-promtail # Set build context to the respective folder
             dockerfile: Dockerfile
-        #image: grafana/promtail:3.0.0
         container_name: zoo-promtail
         ports:
             - "9080:9080"
@@ -121,6 +125,8 @@ services:
             retries: 3
             start_period: 10s
             timeout: 10s
+        depends_on:
+            - zoo-loki
         networks:
             - zoo
 
@@ -144,7 +150,7 @@ services:
             retries: 3
             start_period: 10s
             timeout: 10s
-            
+
     # MySQL Service
     zoo-mysql:
         image: mysql:8.0
@@ -165,7 +171,7 @@ services:
         # we can set the execute flag as we are running as root
         entrypoint: ["/bin/bash", "-c", "chmod +x /mysql-health.sh && docker-entrypoint.sh mysqld"]
         healthcheck:
-            # Test availabiltiy of mysql service, listening & actually serving - via mounted script
+            # Test availability of mysql service, listening & actually serving - via mounted script
             test: [ "CMD", "/mysql-health.sh" ]
             interval: 60s
             retries: 3
@@ -193,7 +199,7 @@ services:
             - LOG_LEVEL=DEBUG
             - SERVICE_NAME=zoo-python-flask
         healthcheck:
-            # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ
+            # Test availability of gunicorn service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8100/graphql/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -226,7 +232,7 @@ services:
             - LOG_LEVEL=DEBUG
             - SERVICE_NAME=zoo-python-fastapi
         healthcheck:
-            # Test availabiltiy of gunicorn service, listening & serving - via inline curl request parsed by JQ
+            # Test availability of uvicorn service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -254,7 +260,7 @@ services:
             - SERVICE_NAME=zoo-typescript-react
             - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
         healthcheck:
-            # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
+            # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8102/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -289,7 +295,7 @@ services:
             - LOG_LEVEL=debug
             - SERVICE_NAME=zoo-php-laravel
         healthcheck:
-            # Test availabiltiy of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
+            # Test availability of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
             test: ["CMD-SHELL", "response=$$(REQUEST_URI=/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -322,7 +328,7 @@ services:
         volumes:
             - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/
         healthcheck:
-            # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
+            # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8104/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -350,7 +356,7 @@ services:
             - SERVICE_NAME=zoo-typescript-angular
             - BACKEND_HOSTNAME=http://private-api.docker.r7g.org:8120
         healthcheck:
-            # Test availabiltiy of nginx service, listening & serving - via inline curl request parsed by JQ
+            # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8105/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -384,7 +390,7 @@ services:
         volumes:
             - ./zoo-router/probe/:/var/www/html/
         healthcheck:
-            # Test availabiltiy of nginx service, listening & serving - via inline curl request compared as is
+            # Test availability of nginx service, listening & serving - via inline curl request compared as is
             test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8120/liveness | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
@@ -400,12 +406,24 @@ services:
 
 # Named volumes for persistent data storage
 volumes:
-    alert-manager-data:
-    grafana-data:
-    jaeger-data:
-    loki-data:
     mysql-data:
+        labels:
+            com.docker.stack.namespace: zoo-database
+    alert-manager-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    grafana-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    jaeger-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    loki-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
     prometheus-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
 
 # Shared network between the containers
 networks:
