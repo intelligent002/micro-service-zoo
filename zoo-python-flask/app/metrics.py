@@ -1,9 +1,12 @@
 from prometheus_client import Counter, Histogram
 
-# Define your custom counters
-projects_counter = Counter('graphql_get_projects_requests_total', 'Total number of requests to getProjects')
-tasks_counter = Counter('graphql_get_tasks_requests_total', 'Total number of requests to getTasks')
+# Define your custom counters using prometheus_client.Counter
+gql_counter = Counter('graphql_requests_count',
+                      'Total number of requests to getProjects',
+                      ['environment', 'request', 'status'])
 
-# Define histograms to track request durations
-projects_duration = Histogram('graphql_get_projects_duration_seconds', 'Duration of getProjects method')
-tasks_duration = Histogram('graphql_get_tasks_duration_seconds', 'Duration of getTasks method')
+# Define histograms to track request durations using prometheus_client.Histogram
+gql_duration = Histogram('graphql_requests_duration_seconds',
+                         'Duration of getProjects method in seconds',
+                         ['environment', 'request'],
+                         buckets=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 15, 20, 30])
