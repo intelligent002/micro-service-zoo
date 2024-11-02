@@ -11,14 +11,13 @@ Route::prefix('api')->group(function () {
     Route::apiResource('projects', ProjectController::class);
 
     // Routes for Tasks
+    Route::post('projects/{project}/tasks/prioritize', [TaskController::class, 'prioritize'])->name('tasks.prioritize');
     Route::post('projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.create');
     Route::get('projects/{project}/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('projects/{project}/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
     Route::post('projects/{project}/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('projects/{project}/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::patch('projects/{project}/tasks/{task}/migrate', [TaskController::class, 'migrate'])->name('tasks.migrate');
-    Route::post('projects/{project}/tasks/prioritize', [TaskController::class, 'prioritize'])->name('tasks.prioritize');
-
 });
 
 // OAuth callback route for Swagger

@@ -303,7 +303,6 @@ services:
             dockerfile: Dockerfile
             args:
                 APP_URL: "http://localhost:8003/"
-        container_name: zoo-php-laravel
         restart: unless-stopped
         environment:
             - APP_PORT=8103
@@ -329,8 +328,12 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
-        ports:
-            - "8103:8103"
+        expose:
+            - "8103"
+        deploy:
+            replicas: 3
+            restart_policy:
+                condition: on-failure
         depends_on:
             - zoo-mysql
             - zoo-redis
@@ -343,7 +346,6 @@ services:
         build:
             context: ./zoo-php-laravel-http2fpm
             dockerfile: Dockerfile
-        container_name: zoo-php-laravel-http2fpm
         restart: unless-stopped
         environment:
             - ENVIRONMENT=docker-compose
@@ -361,10 +363,14 @@ services:
             retries: 3
             start_period: 3s
             timeout: 10s
+        expose:
+            - "8104"
         depends_on:
             - zoo-php-laravel
-        ports:
-            - "8104:8104"
+        deploy:
+            replicas: 3
+            restart_policy:
+                condition: on-failure
         networks:
             - zoo
 
