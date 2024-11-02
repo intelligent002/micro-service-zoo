@@ -10,11 +10,14 @@ RUN apt update && apt install -y \
     git \
     jq \
     nano \
+    telnet \
     zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
     && docker-php-source delete \
     && rm -rf /tmp/* /var/tmp/*
 

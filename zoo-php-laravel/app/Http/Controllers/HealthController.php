@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpFoundation\Response;
 
 class HealthController extends Controller
@@ -30,7 +31,8 @@ class HealthController extends Controller
     {
         // we're an optimists
         $readiness_status = [
-            "MySQL" => "OK"
+            "MySQL" => "OK",
+            "Redis" => "OK"
         ];
 
         try {
@@ -40,6 +42,14 @@ class HealthController extends Controller
             // If connection fails, set MySQL status to ERROR and keep testing
             Log::error("Readiness check failed. Mysql: " . $e->getCode() . ":" . $e->getMessage());
             $readiness_status["MySQL"] = "ERROR";
+        }
+
+        // Check Redis connection
+        try {
+            Redis::connection()->ping();
+        } catch (Exception $e) {
+            Log::error("Readiness check failed. Redis: " . $e->getCode() . ":" . $e->getMessage());
+            $readiness_status["Redis"] = "ERROR";
         }
 
         if (in_array("ERROR", $readiness_status)) {

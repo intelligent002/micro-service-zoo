@@ -3,7 +3,7 @@ services:
     # Prometheus
     zoo-prometheus:
         build:
-            context: ./zoo-prometheus # Set build context to the respective folder
+            context: ./zoo-prometheus
             dockerfile: Dockerfile
         container_name: zoo-prometheus
         command:
@@ -26,7 +26,7 @@ services:
 
     zoo-alert-manager:
         build:
-            context: ./zoo-alert-manager # Set build context to the respective folder
+            context: ./zoo-alert-manager
             dockerfile: Dockerfile
         container_name: zoo-alert-manager
         healthcheck:
@@ -43,13 +43,13 @@ services:
         command:
             - --config.file=/etc/alertmanager/config.yml
         depends_on:
-            - zoo-prometheus  
+            - zoo-prometheus
         networks:
             - zoo
 
     zoo-node-exporter:
         build:
-            context: ./zoo-node-exporter # Set build context to the respective folder
+            context: ./zoo-node-exporter
             dockerfile: Dockerfile
         container_name: zoo-node-exporter
         ports:
@@ -89,7 +89,7 @@ services:
     # Jaeger
     zoo-jaeger:
         build:
-            context: ./zoo-jaeger # Set build context to the respective folder
+            context: ./zoo-jaeger
             dockerfile: Dockerfile
         container_name: zoo-jaeger
         healthcheck:
@@ -108,7 +108,7 @@ services:
 
     zoo-promtail:
         build:
-            context: ./zoo-promtail # Set build context to the respective folder
+            context: ./zoo-promtail
             dockerfile: Dockerfile
         container_name: zoo-promtail
         ports:
@@ -132,7 +132,7 @@ services:
 
     zoo-loki:
         build:
-            context: ./zoo-loki # Set build context to the respective folder
+            context: ./zoo-loki
             dockerfile: Dockerfile
         container_name: zoo-loki
         ports:
@@ -161,7 +161,7 @@ services:
         environment:
             - MYSQL_DATABASE=zoo-db
             - MYSQL_HOSTNAME=localhost
-            - MYSQL_PASSWORD=zoo-password
+            - MYSQL_PASSWORD=zoo-pass
             - MYSQL_ROOT_PASSWORD=007
             - MYSQL_TCP_PORT=3307
             - MYSQL_USER=zoo-user
@@ -183,7 +183,7 @@ services:
     # Backend written in Python/Flask (python:3.12.5-alpine3.20)
     zoo-python-flask:
         build:
-            context: ./zoo-python-flask # Set build context to the respective folder
+            context: ./zoo-python-flask
             dockerfile: Dockerfile
         container_name: zoo-python-flask
         restart: unless-stopped
@@ -191,7 +191,7 @@ services:
             - APP_PORT=8100
             - DB_DATABASE=zoo-db
             - DB_HOSTNAME=zoo-mysql
-            - DB_PASSWORD=zoo-password
+            - DB_PASSWORD=zoo-pass
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
             - DEBUG_MODE=False
@@ -216,7 +216,7 @@ services:
     # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
     zoo-python-fastapi:
         build:
-            context: ./zoo-python-fastapi # Set build context to the respective folder
+            context: ./zoo-python-fastapi
             dockerfile: Dockerfile
         container_name: zoo-python-fastapi
         restart: unless-stopped
@@ -224,7 +224,7 @@ services:
             - APP_PORT=8101
             - DB_DATABASE=zoo-db
             - DB_HOSTNAME=zoo-mysql
-            - DB_PASSWORD=zoo-password
+            - DB_PASSWORD=zoo-pass
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
             - DEBUG_MODE=False
@@ -249,7 +249,7 @@ services:
     # Frontend written in TypeScript/React (node:20.18.0-alpine3.20)
     zoo-typescript-react:
         build:
-            context: ./zoo-typescript-react # Set build context to the respective folder
+            context: ./zoo-typescript-react
             dockerfile: Dockerfile
         container_name: zoo-typescript-react
         restart: unless-stopped
@@ -274,10 +274,30 @@ services:
         networks:
             - zoo
 
+    # Redis for PHP Metrics and other usages
+    zoo-redis:
+        container_name: zoo-redis
+        build:
+            context: ./zoo-redis
+            dockerfile: Dockerfile
+        healthcheck:
+            test: ["CMD-SHELL", "response=$$(redis-cli -u redis://default:zoo-pass@127.0.0.1:6379 ping); \
+                    if [ \"$$response\" != \"PONG\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            interval: 60s
+            retries: 3
+            start_period: 3s
+            timeout: 10s
+        env_file:
+            - ./zoo-redis/.env
+        volumes:
+            - redis-data:/data
+        ports:
+            - "6379:6379"
+
     # Backend written in PHP/Laravel (php:8.2-fpm)
     zoo-php-laravel:
         build:
-            context: ./zoo-php-laravel # Set build context to the respective folder
+            context: ./zoo-php-laravel
             dockerfile: Dockerfile
             args:
                 APP_URL: "http://localhost:8003/"
@@ -288,15 +308,20 @@ services:
             - APP_URL=http://localhost:8003/
             - DB_DATABASE=zoo-db
             - DB_HOSTNAME=zoo-mysql
-            - DB_PASSWORD=zoo-password
+            - DB_PASSWORD=zoo-pass
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
             - ENVIRONMENT=docker-compose
             - LOG_LEVEL=debug
             - SERVICE_NAME=zoo-php-laravel
+            - REDIS_HOST=zoo-redis
+            - REDIS_PORT=6379
+            - REDIS_USERNAME=zoo-user
+            - REDIS_PASSWORD=zoo-pass
+            - REDIS_BASE=0
         healthcheck:
             # Test availability of php-fpm service, listening & serving - via inline cgi-fcgi request parsed by JQ
-            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
+            test: ["CMD-SHELL", "response=$$(REQUEST_URI=/health/liveness SCRIPT_FILENAME=/var/www/html/public/index.php REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
                     if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
             interval: 60s
             retries: 3
@@ -306,6 +331,7 @@ services:
             - "8103:8103"
         depends_on:
             - zoo-mysql
+            - zoo-redis
         # we cannot change the execute flag because we are running as www-data, so we add this file and it's permissions in Dockerfile.
         # dont start the migrations before mysql is really ready to serve requests
         command: ["/bin/sh", "-c", "/mysql-wait.sh && php artisan migrate --force && php-fpm"]
@@ -315,7 +341,7 @@ services:
     # NGINX Service (Reverse Proxy + HTTP to PHP-FPM converter + Static File Serving)
     zoo-php-laravel-http2fpm:
         build:
-            context: ./zoo-php-laravel-http2fpm # Set build context to the respective folder
+            context: ./zoo-php-laravel-http2fpm
             dockerfile: Dockerfile
         container_name: zoo-php-laravel-http2fpm
         restart: unless-stopped
@@ -345,7 +371,7 @@ services:
     # Frontend written in TypeScript/angular (node:20.18.0-alpine3.20)
     zoo-typescript-angular:
         build:
-            context: ./zoo-typescript-angular # Set build context to the respective folder
+            context: ./zoo-typescript-angular
             dockerfile: Dockerfile
         container_name: zoo-typescript-angular
         restart: unless-stopped
@@ -373,7 +399,7 @@ services:
     # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
     zoo-router:
         build:
-            context: ./zoo-router # Set build context to the respective folder
+            context: ./zoo-router
             dockerfile: Dockerfile
         container_name: zoo-router
         restart: unless-stopped
@@ -407,6 +433,9 @@ services:
 # Named volumes for persistent data storage
 volumes:
     mysql-data:
+        labels:
+            com.docker.stack.namespace: zoo-database
+    redis-data:
         labels:
             com.docker.stack.namespace: zoo-database
     alert-manager-data:

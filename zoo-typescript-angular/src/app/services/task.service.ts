@@ -37,7 +37,7 @@ export class TaskService {
   // Load tasks for a specific project from server
   loadTasksFromServer(projectId: number): Observable<Task[]> {
     return this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Task[]>>(`${this.apiUrl}/projects/${projectId}/tasks`)
+      this.http.get<RestApiResponse<Task[]>>(`${this.apiUrl}/api/projects/${projectId}/tasks`)
     ).pipe(
       tap((tasks) => {
         // Initialize the BehaviorSubject for the project if it doesn't exist
@@ -65,7 +65,7 @@ export class TaskService {
       taskData: Task
     }): Observable<Task> {
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks`, taskData)
+      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/api/projects/${projectId}/tasks`, taskData)
     ).pipe(
       // post-factum emit the updated list
       tap((newTask) => {
@@ -88,7 +88,7 @@ export class TaskService {
   ): Observable<Task> {
     // no speedups, perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${task.project_id}/tasks/${task.id}`, task)
+      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/api/projects/${task.project_id}/tasks/${task.id}`, task)
     ).pipe(
       // post-factum emit the updated list
       tap((updatedTask) => {
@@ -126,7 +126,7 @@ export class TaskService {
     }
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.delete<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/${taskId}`)
+      this.http.delete<RestApiResponse<Task>>(`${this.apiUrl}/api/projects/${projectId}/tasks/${taskId}`)
     ).pipe(
       tap(() => {
         console.debug(`Task #${taskId} was deleted successfully`);
@@ -150,7 +150,7 @@ export class TaskService {
     // nothing to speedup, already drag-n-dropped
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/projects/${projectId}/tasks/prioritize`, {task_ids: taskIds})
+      this.http.post<RestApiResponse<Task>>(`${this.apiUrl}/api/projects/${projectId}/tasks/prioritize`, {task_ids: taskIds})
     ).pipe(
       tap(() => {
         console.debug(`Project #${projectId} had its task prioritized successfully`);
@@ -182,7 +182,7 @@ export class TaskService {
 
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.patch<RestApiResponse<Task>>(`${this.apiUrl}/projects/${project.id}/tasks/${task.id}/migrate`, {})
+      this.http.patch<RestApiResponse<Task>>(`${this.apiUrl}/api/projects/${project.id}/tasks/${task.id}/migrate`, {})
     ).pipe(
       tap(() => {
         console.log(`Task #${task.id} migrated to project #${project.id} successfully`);

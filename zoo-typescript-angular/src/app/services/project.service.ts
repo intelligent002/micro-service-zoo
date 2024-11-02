@@ -44,7 +44,7 @@ export class ProjectService {
   // Load projects from the server and manage BehaviorSubjects
   loadProjectsFromServer(): Observable<Project[]> {
     return this.responseHandler.handleResponse(
-      this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/projects`)
+      this.http.get<RestApiResponse<Project[]>>(`${this.apiUrl}/api/projects`)
     ).pipe(
       tap((projects) => {
         if (!this.projectsSubject) {
@@ -75,7 +75,7 @@ export class ProjectService {
   // Create a new project
   createProject(project: Project): Observable<Project> {
     return this.responseHandler.handleResponse(
-      this.http.post<RestApiResponse<Project>>(`${this.apiUrl}/projects`, project)
+      this.http.post<RestApiResponse<Project>>(`${this.apiUrl}/api/projects`, project)
     ).pipe(
       tap((newProject) => {
         // we cannot render anything quick, until we actually get the data to render.
@@ -96,7 +96,7 @@ export class ProjectService {
   // Update a project
   updateProject(project: Project): Observable<Project> {
     return this.responseHandler.handleResponse(
-      this.http.put<RestApiResponse<Project>>(`${this.apiUrl}/projects/${project.id}`, project)
+      this.http.put<RestApiResponse<Project>>(`${this.apiUrl}/api/projects/${project.id}`, project)
     ).pipe(
       tap((updatedProject) => {
         const currentProjects = this.projectsSubject.getValue();
@@ -121,7 +121,7 @@ export class ProjectService {
 
     // perform the actual job
     return this.responseHandler.handleResponse(
-      this.http.delete<RestApiResponse<Project>>(`${this.apiUrl}/projects/${projectId}`)
+      this.http.delete<RestApiResponse<Project>>(`${this.apiUrl}/api/projects/${projectId}`)
     ).pipe(
       tap(() => {
         console.debug(`Project #${projectId} was deleted successfully`)
