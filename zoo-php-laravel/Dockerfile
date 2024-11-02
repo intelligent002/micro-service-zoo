@@ -1,5 +1,5 @@
 # Use the official PHP image
-FROM php:8.2-fpm
+FROM php:8.3.13-fpm
 
 # Install System packages
 RUN apt update && apt install -y \
