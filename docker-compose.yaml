@@ -293,6 +293,8 @@ services:
             - redis-data:/data
         ports:
             - "6379:6379"
+        networks:
+            - zoo
 
     # Backend written in PHP/Laravel (php:8.2-fpm)
     zoo-php-laravel:
@@ -332,8 +334,6 @@ services:
         depends_on:
             - zoo-mysql
             - zoo-redis
-        # we cannot change the execute flag because we are running as www-data, so we add this file and it's permissions in Dockerfile.
-        # dont start the migrations before mysql is really ready to serve requests
         command: ["/bin/sh", "-c", "/mysql-wait.sh && php artisan migrate --force && php-fpm"]
         networks:
             - zoo

@@ -22,7 +22,13 @@ class PrometheusMetricsMiddleware
     {
         try {
             // Set Redis connection options for Prometheus client
-            $redisStorage = new Redis();
+            $redisStorage = new Redis([
+                'host' => config('database.redis.default.host'),
+                'port' => config('database.redis.default.port'),
+                'username' => config('database.redis.default.username'),
+                'password' => config('database.redis.default.password'),
+                'timeout' => 0.5, // Adjust timeout as needed
+            ]);
             $this->registry = new CollectorRegistry($redisStorage);
         } catch (\Exception $e) {
             Log::error("Failed to initialize metrics registry: " . $e->getCode() . ":" . $e->getMessage());

@@ -46,7 +46,10 @@ class HealthController extends Controller
 
         // Check Redis connection
         try {
-            Redis::connection()->ping();
+            $redis = Redis::connection();
+            if ("PONG" != $redis->ping()) {
+                throw new \Exception('no pong');
+            }
         } catch (Exception $e) {
             Log::error("Readiness check failed. Redis: " . $e->getCode() . ":" . $e->getMessage());
             $readiness_status["Redis"] = "ERROR";
