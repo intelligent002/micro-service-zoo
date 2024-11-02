@@ -7,6 +7,7 @@ RUN apt update && apt install -y \
     curl \
     default-mysql-client \
     fcgiwrap \
+    iputils-ping \
     git \
     jq \
     nano \
