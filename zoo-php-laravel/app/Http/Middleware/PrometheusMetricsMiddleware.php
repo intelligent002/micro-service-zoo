@@ -23,11 +23,11 @@ class PrometheusMetricsMiddleware
         try {
             // Set Redis connection options for Prometheus client
             $redisStorage = new Redis([
-                'host' => config('database.redis.default.host'),
-                'port' => config('database.redis.default.port'),
+                'host'     => config('database.redis.default.host'),
+                'port'     => config('database.redis.default.port'),
                 'username' => config('database.redis.default.username'),
                 'password' => config('database.redis.default.password'),
-                'timeout' => 0.5, // Adjust timeout as needed
+                'timeout'  => 0.5, // Adjust timeout as needed
             ]);
             $this->registry = new CollectorRegistry($redisStorage);
         } catch (\Exception $e) {
@@ -67,7 +67,10 @@ class PrometheusMetricsMiddleware
 
             // Observe the duration for the request, including labels
             $hostname = gethostname(); // Unique pod identifier
-            $histogram->observe($duration, [$request->method(), $request->path(), $hostname]);
+            $endpoint = $request->route()
+                ? $request->route()->getName()
+                : 'unknown';
+            $histogram->observe($duration, [$request->method(), $endpoint, $hostname]);
 
             return $response;
         }
