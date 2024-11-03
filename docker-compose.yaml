@@ -190,98 +190,6 @@ services:
             - mysql-data:/var/lib/mysql
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
 
-    # Backend written in Python/Flask (python:3.12.5-alpine3.20)
-    zoo-python-flask:
-        build:
-            context: ./zoo-python-flask
-            dockerfile: Dockerfile
-        depends_on:
-            - zoo-mysql
-        environment:
-            - APP_PORT=8100
-            - DB_DATABASE=zoo-db
-            - DB_HOSTNAME=zoo-mysql
-            - DB_PASSWORD=zoo-pass
-            - DB_PORT=3307
-            - DB_USERNAME=zoo-user
-            - DEBUG_MODE=False
-            - ENVIRONMENT=docker-compose
-            - LOG_LEVEL=DEBUG
-            - SERVICE_NAME=zoo-python-flask
-        healthcheck:
-            # Test availability of gunicorn service, listening & serving - via inline curl request parsed by JQ
-            interval: 60s
-            retries: 3
-            start_period: 3s
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8100/graphql/liveness | jq -r '.status'); \
-                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
-            timeout: 10s
-        networks:
-            - zoo
-        ports:
-            - "8100:8100"
-        restart: always
-
-
-    # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
-    zoo-python-fastapi:
-        build:
-            context: ./zoo-python-fastapi
-            dockerfile: Dockerfile
-        depends_on:
-            - zoo-mysql
-        environment:
-            - APP_PORT=8101
-            - DB_DATABASE=zoo-db
-            - DB_HOSTNAME=zoo-mysql
-            - DB_PASSWORD=zoo-pass
-            - DB_PORT=3307
-            - DB_USERNAME=zoo-user
-            - DEBUG_MODE=False
-            - ENVIRONMENT=docker-compose
-            - LOG_LEVEL=DEBUG
-            - SERVICE_NAME=zoo-python-fastapi
-        healthcheck:
-            # Test availability of uvicorn service, listening & serving - via inline curl request parsed by JQ
-            interval: 60s
-            retries: 3
-            start_period: 3s
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/liveness | jq -r '.status'); \
-                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
-            timeout: 10s
-        networks:
-            - zoo
-        ports:
-            - "8101:8101"
-        restart: always
-
-    # Frontend written in TypeScript/React (node:20.18.0-alpine3.20)
-    zoo-typescript-react:
-        build:
-            context: ./zoo-typescript-react
-            dockerfile: Dockerfile
-        depends_on:
-            - zoo-python-flask
-        environment:
-            - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
-            - ENVIRONMENT=docker-compose
-            - LOG_LEVEL=debug
-            - NGINX_PORT=8102
-            - SERVICE_NAME=zoo-typescript-react
-        healthcheck:
-            # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
-            interval: 60s
-            retries: 3
-            start_period: 3s
-            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8102/liveness | jq -r '.status'); \
-                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
-            timeout: 10s
-        networks:
-            - zoo
-        ports:
-            - "8102:8102"
-        restart: always
-
     # Redis for PHP Metrics and other usages
     zoo-redis:
         build:
@@ -304,6 +212,106 @@ services:
         restart: always
         volumes:
             - redis-data:/data
+
+    # Backend written in Python/Flask (python:3.12.5-alpine3.20)
+    zoo-python-flask:
+        build:
+            context: ./zoo-python-flask
+            dockerfile: Dockerfile
+        depends_on:
+            - zoo-mysql
+        deploy:
+            replicas: 3
+            restart_policy:
+                condition: on-failure
+        environment:
+            - APP_PORT=8100
+            - DB_DATABASE=zoo-db
+            - DB_HOSTNAME=zoo-mysql
+            - DB_PASSWORD=zoo-pass
+            - DB_PORT=3307
+            - DB_USERNAME=zoo-user
+            - DEBUG_MODE=False
+            - ENVIRONMENT=docker-compose
+            - LOG_LEVEL=DEBUG
+            - SERVICE_NAME=zoo-python-flask
+        expose:
+            - "8100"
+        healthcheck:
+            # Test availability of gunicorn service, listening & serving - via inline curl request parsed by JQ
+            interval: 60s
+            retries: 3
+            start_period: 3s
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8100/graphql/liveness | jq -r '.status'); \
+                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            timeout: 10s
+        networks:
+            - zoo
+        restart: always
+
+
+    # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
+    zoo-python-fastapi:
+        build:
+            context: ./zoo-python-fastapi
+            dockerfile: Dockerfile
+        depends_on:
+            - zoo-mysql
+        deploy:
+            replicas: 3
+            restart_policy:
+                condition: on-failure
+        environment:
+            - APP_PORT=8101
+            - DB_DATABASE=zoo-db
+            - DB_HOSTNAME=zoo-mysql
+            - DB_PASSWORD=zoo-pass
+            - DB_PORT=3307
+            - DB_USERNAME=zoo-user
+            - DEBUG_MODE=False
+            - ENVIRONMENT=docker-compose
+            - LOG_LEVEL=DEBUG
+            - SERVICE_NAME=zoo-python-fastapi
+        expose:
+            - "8101"
+        healthcheck:
+            # Test availability of uvicorn service, listening & serving - via inline curl request parsed by JQ
+            interval: 60s
+            retries: 3
+            start_period: 3s
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8101/liveness | jq -r '.status'); \
+                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            timeout: 10s
+        networks:
+            - zoo
+        restart: always
+
+    # Frontend written in TypeScript/React (node:20.18.0-alpine3.20)
+    zoo-typescript-react:
+        build:
+            context: ./zoo-typescript-react
+            dockerfile: Dockerfile
+        depends_on:
+            - zoo-python-flask
+        environment:
+            - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
+            - ENVIRONMENT=docker-compose
+            - LOG_LEVEL=debug
+            - NGINX_PORT=8102
+            - SERVICE_NAME=zoo-typescript-react
+        expose:
+            - "8102"
+        healthcheck:
+            # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
+            interval: 60s
+            retries: 3
+            start_period: 3s
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8102/liveness | jq -r '.status'); \
+                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            timeout: 10s
+        networks:
+            - zoo
+        restart: always
 
     # Backend written in PHP/Laravel (php:8.2-fpm)
     zoo-php-laravel:
@@ -397,6 +405,8 @@ services:
             - LOG_LEVEL=debug
             - NGINX_PORT=8105
             - SERVICE_NAME=zoo-typescript-angular
+        expose:
+            - "8105"
         healthcheck:
             # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
             interval: 60s
@@ -407,8 +417,6 @@ services:
             timeout: 10s
         networks:
             - zoo
-        ports:
-            - "8105:8105"
         restart: always
 
     # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)

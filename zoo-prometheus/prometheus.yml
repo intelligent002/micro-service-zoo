@@ -8,12 +8,18 @@ scrape_configs:
       - localhost:9090
 
   - job_name: 'zoo-python-flask'
-    static_configs:
-      - targets: ['zoo-python-flask:8100']
+    dns_sd_configs:
+      - names:
+          - 'zoo-python-flask'
+        type: 'A'
+        port: 8100
 
   - job_name: 'zoo-python-fastapi'
-    static_configs:
-      - targets: ['zoo-python-fastapi:8101']
+    dns_sd_configs:
+      - names:
+          - 'zoo-python-fastapi'
+        type: 'A'
+        port: 8101
 
   - job_name: 'zoo-php-laravel-http2fpm'
     dns_sd_configs:
