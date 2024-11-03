@@ -185,7 +185,7 @@ export class TaskService {
       this.http.patch<RestApiResponse<Task>>(`${this.apiUrl}/api/projects/${project.id}/tasks/${task.id}/migrate`, {})
     ).pipe(
       tap(() => {
-        console.log(`Task #${task.id} migrated to project #${project.id} successfully`);
+        console.debug(`Task #${task.id} migrated to project #${project.id} successfully`);
       }),
       catchError((error) => {
         console.error(`Error migrating tasks #${task.id} tp project #${project.id}:`, error);

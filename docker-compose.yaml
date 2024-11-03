@@ -184,11 +184,35 @@ services:
         networks:
             - zoo
         ports:
-            - "3307:3307"
+            - "3307"
         restart: always
         volumes:
             - mysql-data:/var/lib/mysql
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
+
+    zoo-mysqld-exporter:
+        build:
+            context: ./zoo-mysqld-exporter
+            dockerfile: Dockerfile
+        command:
+            - '--mysqld.address=zoo-mysql:3307'
+            - '--web.listen-address=:3308'
+        depends_on:
+            - zoo-mysql
+        healthcheck:
+            # Test availability of MySQLd Exporter service, listening & actually serving
+            interval: 60s
+            retries: 3
+            start_period: 10s
+            test: ["CMD-SHELL", "response=$$(curl -s http://localhost:3308/metrics | grep '^mysql_up ' | awk '{print $$2}'); \
+                  if [ \"$$response\" != \"1\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
+            timeout: 10s
+        networks:
+            - zoo
+        ports:
+            - "3308:3308"
+        volumes:
+            - ./zoo-mysqld-exporter/my.cnf:/.my.cnf
 
     # Redis for PHP Metrics and other usages
     zoo-redis:
@@ -221,7 +245,7 @@ services:
         depends_on:
             - zoo-mysql
         deploy:
-            replicas: 3
+            replicas: 2
             restart_policy:
                 condition: on-failure
         environment:
@@ -258,7 +282,7 @@ services:
         depends_on:
             - zoo-mysql
         deploy:
-            replicas: 3
+            replicas: 2
             restart_policy:
                 condition: on-failure
         environment:
@@ -325,7 +349,7 @@ services:
             - zoo-mysql
             - zoo-redis
         deploy:
-            replicas: 3
+            replicas: 2
             restart_policy:
                 condition: on-failure
         environment:
@@ -367,7 +391,7 @@ services:
         depends_on:
             - zoo-php-laravel
         deploy:
-            replicas: 3
+            replicas: 2
             restart_policy:
                 condition: on-failure
         environment:
