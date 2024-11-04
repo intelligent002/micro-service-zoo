@@ -80,6 +80,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - /sys:/sys
             - /var/lib/docker:/var/lib/docker:ro
+            - /data/docker:/data/docker:ro
 
     # Graphana
     zoo-grafana:
