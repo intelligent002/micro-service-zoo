@@ -79,7 +79,7 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - /sys:/sys
-            - /data/docker:/var/lib/docker:ro
+            - /var/lib/docker:/var/lib/docker:ro
 
     # Graphana
     zoo-grafana:
