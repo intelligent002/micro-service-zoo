@@ -31,6 +31,10 @@ scrape_configs:
           - 'zoo-php-laravel-http2fpm'
         type: 'A'
         port: 8104
+        
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['zoo-cadvisor:8080']
 
 alerting:
   alertmanagers:

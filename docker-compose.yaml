@@ -68,6 +68,19 @@ services:
             - "9100:9100"
         restart: always
 
+    # cAdvisor for container metrics
+    zoo-cadvisor:
+        image: gcr.io/cadvisor/cadvisor:latest
+        networks:
+            - zoo
+        ports:
+            - "8081:8080"
+        restart: always
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /sys:/sys
+            - /var/lib/docker/:/var/lib/docker:ro
+
     # Graphana
     zoo-grafana:
         depends_on:
@@ -190,6 +203,7 @@ services:
             - mysql-data:/var/lib/mysql
             - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
 
+    # MySQL Service exporter for Prometheus
     zoo-mysqld-exporter:
         build:
             context: ./zoo-mysqld-exporter
