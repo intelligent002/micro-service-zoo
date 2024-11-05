@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 1,
+  "id": 5,
   "links": [],
   "panels": [
     {
@@ -148,32 +148,7 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "Current Connections"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -234,14 +209,18 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "be2yax7uvwj5sa"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
-            "axisBorderShow": false,
+            "axisBorderShow": true,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -249,22 +228,22 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -323,8 +302,10 @@
             "8": "u",
             "9": "s"
           },
-          "expr": "rate(mysql_global_status_queries[5m])",
+          "editorMode": "code",
+          "expr": "rate(mysql_global_status_queries[$__rate_interval])",
           "legendFormat": "QPS",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -528,7 +509,11 @@
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "be2yax7uvwj5sa"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -582,7 +567,32 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Disk Writes"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -617,8 +627,10 @@
             "8": "u",
             "9": "s"
           },
-          "expr": "rate(mysql_global_status_innodb_data_reads[5m])",
+          "editorMode": "code",
+          "expr": "rate(mysql_global_status_innodb_data_reads[$__rate_interval])",
           "legendFormat": "Disk Reads",
+          "range": true,
           "refId": "A"
         },
         {
@@ -634,8 +646,10 @@
             "8": "u",
             "9": "s"
           },
-          "expr": "rate(mysql_global_status_innodb_data_writes[5m])",
+          "editorMode": "code",
+          "expr": "rate(mysql_global_status_innodb_data_writes[$__rate_interval])",
           "legendFormat": "Disk Writes",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -675,6 +689,6 @@
   "timezone": "",
   "title": "MySQL Exporter Dashboard",
   "uid": "ce2xay9gsak1sb",
-  "version": 6,
+  "version": 3,
   "weekStart": ""
 }
