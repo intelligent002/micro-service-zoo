@@ -1,5 +1,33 @@
-services:
+# Named volumes for persistent data storage
+volumes:
+    mysql-data:
+        labels:
+            com.docker.stack.namespace: zoo-database
+    redis-data:
+        labels:
+            com.docker.stack.namespace: zoo-database
+    alert-manager-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    grafana-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    jaeger-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    loki-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
+    prometheus-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
 
+# Shared network between the containers
+networks:
+    zoo:
+        driver: bridge
+
+services:
     # Prometheus
     zoo-prometheus:
         build:
@@ -492,32 +520,3 @@ services:
         restart: always
         volumes:
             - ./zoo-router/probe/:/var/www/html/
-
-# Named volumes for persistent data storage
-volumes:
-    mysql-data:
-        labels:
-            com.docker.stack.namespace: zoo-database
-    redis-data:
-        labels:
-            com.docker.stack.namespace: zoo-database
-    alert-manager-data:
-        labels:
-            com.docker.stack.namespace: zoo-monitoring
-    grafana-data:
-        labels:
-            com.docker.stack.namespace: zoo-monitoring
-    jaeger-data:
-        labels:
-            com.docker.stack.namespace: zoo-monitoring
-    loki-data:
-        labels:
-            com.docker.stack.namespace: zoo-monitoring
-    prometheus-data:
-        labels:
-            com.docker.stack.namespace: zoo-monitoring
-
-# Shared network between the containers
-networks:
-    zoo:
-        driver: bridge

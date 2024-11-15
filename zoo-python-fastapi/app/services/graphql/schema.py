@@ -17,7 +17,7 @@ class Query:
 
     # Field to query Projects
     @strawberry.field
-    @async_time_decorator(gql_duration, {'environment': Config.ENVIRONMENT, 'request': 'Projects'})
+    @async_time_decorator(gql_duration, {'environment': Config.ENVIRONMENT, 'request': 'get_projects'})
     async def get_projects(
             self,
             info,  # GraphQL context, used to access FastAPI dependencies like DB session
@@ -53,7 +53,7 @@ class Query:
             logger.info(f"Processed get_projects(id={id}, name={name})")
             gql_counter.labels(
                 environment=Config.ENVIRONMENT,
-                request="Projects",
+                request="get_projects",
                 status="OK"
             ).inc()
 
@@ -71,7 +71,7 @@ class Query:
             logger.error(f"Failed to process get_projects(id={id}, name={name}): {str(e)}")
             gql_counter.labels(
                 environment=Config.ENVIRONMENT,
-                request="Projects",
+                request="get_projects",
                 status="ERROR"
             ).inc()
 
@@ -80,7 +80,7 @@ class Query:
 
     # Field to query Tasks
     @strawberry.field
-    @async_time_decorator(gql_duration, {'environment': Config.ENVIRONMENT, 'request': 'Tasks'})
+    @async_time_decorator(gql_duration, {'environment': Config.ENVIRONMENT, 'request': 'get_tasks'})
     async def get_tasks(
             self,
             info,  # GraphQL context, used to access FastAPI dependencies like DB session
@@ -116,7 +116,7 @@ class Query:
             logger.info(f"Processed get_tasks(name={name}, project_id={project_id})")
             gql_counter.labels(
                 environment=Config.ENVIRONMENT,
-                request="Tasks",
+                request="get_tasks",
                 status="OK"
             ).inc()
 
@@ -135,7 +135,7 @@ class Query:
             logger.error(f"Failed to process get_tasks(name={name}, project_id={project_id}): {str(e)}")
             gql_counter.labels(
                 environment=Config.ENVIRONMENT,
-                request="Tasks",
+                request="get_tasks",
                 status="ERROR"
             ).inc()
 
