@@ -113,6 +113,9 @@ services:
 
     # Graphana
     zoo-grafana:
+        build:
+            context: ./zoo-grafana
+            dockerfile: Dockerfile
         depends_on:
             - zoo-prometheus
             - zoo-loki
@@ -125,7 +128,7 @@ services:
             start_period: 3s
             test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
             timeout: 10s
-        image: grafana/grafana:11.2.2
+        # image: grafana/grafana:11.2.2
         networks:
             - zoo
         ports:

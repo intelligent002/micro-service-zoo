@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # Detect the OS and set the Docker log path accordingly
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
