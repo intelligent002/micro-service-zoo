@@ -135,7 +135,6 @@ services:
             - "3000:3000"
         restart: always
         volumes:
-            - ./zoo-grafana/grafana.ini:/etc/grafana/grafana.ini
             - grafana-data:/var/lib/grafana
 
     # Jaeger
