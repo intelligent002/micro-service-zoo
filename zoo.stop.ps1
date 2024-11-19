@@ -13,5 +13,5 @@ if ($OSTYPE -like "*Linux*") {
     exit 1
 }
 
-# Run Docker Compose
-docker-compose down
+# Stop Docker Compose
+docker compose down --remove-orphans
