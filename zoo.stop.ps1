@@ -14,4 +14,4 @@ if ($OSTYPE -like "*Linux*") {
 }
 
 # Run Docker Compose
-docker-compose up --build
+docker-compose down
