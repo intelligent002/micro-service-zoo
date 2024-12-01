@@ -52,6 +52,7 @@ class HealthController extends Controller
         // Check Redis connection
         try {
             $redis = Redis::connection();
+            $redis->setex('write_check', 5, '1');  // Test write operation
             if ("PONG" != $redis->ping()) {
                 throw new \Exception('no pong');
             }
