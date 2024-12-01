@@ -7,9 +7,6 @@ server {
 
     index index.html;
 
-    # Rate limiting
-    limit_req_zone $binary_remote_addr zone=one:10m rate=30r/s;
-
     location / {
         try_files $uri /index.html;
 
