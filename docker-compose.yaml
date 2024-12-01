@@ -320,7 +320,7 @@ services:
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
             - DEBUG_MODE=False
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - LOG_LEVEL=DEBUG
             - SERVICE_NAME=zoo-python-flask
         expose:
@@ -359,7 +359,7 @@ services:
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
             - DEBUG_MODE=False
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - LOG_LEVEL=DEBUG
             - SERVICE_NAME=zoo-python-fastapi
         expose:
@@ -387,7 +387,7 @@ services:
                 restart: true
         environment:
             - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - LOG_LEVEL=debug
             - NGINX_PORT=8102
             - SERVICE_NAME=zoo-typescript-react
@@ -432,7 +432,7 @@ services:
             - DB_PASSWORD=zoo-pass
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - LOG_LEVEL=debug
             - REDIS_BASE=0
             - REDIS_HOST=zoo-redis
@@ -469,7 +469,7 @@ services:
             restart_policy:
                 condition: on-failure
         environment:
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - LOG_LEVEL=debug
             - NGINX_PORT=8104
             - SERVICE_NAME=zoo-php-laravel-http2fpm
@@ -501,7 +501,7 @@ services:
                 restart: false
         environment:
             - BACKEND_HOSTNAME=http://private-api.docker.r7g.org:8120
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - LOG_LEVEL=debug
             - NGINX_PORT=8105
             - SERVICE_NAME=zoo-typescript-angular
@@ -538,7 +538,7 @@ services:
                 condition: service_healthy
                 restart: false
         environment:
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=DEVELOPMENT
             - NGINX_PORT=8120
             - SERVICE_NAME=zoo-router
             - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
