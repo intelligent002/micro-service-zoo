@@ -402,7 +402,7 @@
             "8": "u",
             "9": "s"
           },
-          "expr": "mysql_global_status_slow_queries",
+          "expr": "rate(mysql_global_status_slow_queries[$__rate_interval])",
           "legendFormat": "Slow Queries",
           "refId": "A"
         }
@@ -502,7 +502,8 @@
           },
           "expr": "mysql_innodb_buffer_pool_pages_data / mysql_innodb_buffer_pool_pages_total",
           "legendFormat": "Buffer Pool Usage",
-          "refId": "A"
+          "refId": "A",
+          "format": "percentunit"
         }
       ],
       "title": "Buffer Pool Usage",
