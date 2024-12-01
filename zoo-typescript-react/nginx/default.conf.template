@@ -7,11 +7,13 @@ server {
 
     index index.html;
 
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=one:10m rate=30r/s;
+
     location / {
         try_files $uri /index.html;
 
         # Rate limiting
-        limit_req_zone $binary_remote_addr zone=one:10m rate=30r/s;
         limit_req zone=one burst=20 nodelay;
 
         # Security headers
@@ -22,7 +24,7 @@ server {
         add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;";
 
         # Request size limits
-        client_max_body_size 10M;
+        client_max_body_size 100M;
     }
 
     error_page 404 /index.html;
