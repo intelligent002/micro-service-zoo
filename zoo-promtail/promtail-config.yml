@@ -3,7 +3,7 @@ server:
   grpc_listen_port: 0  # We disable gRPC by setting this to 0
 
 positions:
-  filename: /data/positions.yaml
+  filename: /tmp/positions.yaml
 
 clients:
   - url: http://zoo-loki:3100/loki/api/v1/push  # The Loki endpoint where logs will be sent
