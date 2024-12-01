@@ -309,7 +309,7 @@ services:
                 condition: service_healthy
                 restart: true
         deploy:
-            replicas: 2
+            replicas: 1
             restart_policy:
                 condition: on-failure
         environment:
@@ -348,7 +348,7 @@ services:
                 condition: service_healthy
                 restart: true
         deploy:
-            replicas: 2
+            replicas: 1
             restart_policy:
                 condition: on-failure
         environment:
@@ -421,7 +421,7 @@ services:
                 condition: service_healthy
                 restart: false
         deploy:
-            replicas: 2
+            replicas: 1
             restart_policy:
                 condition: on-failure
         environment:
@@ -465,7 +465,7 @@ services:
                 condition: service_healthy
                 restart: false
         deploy:
-            replicas: 2
+            replicas: 1
             restart_policy:
                 condition: on-failure
         environment:
