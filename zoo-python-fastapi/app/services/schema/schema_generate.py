@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 
 import aiofiles  # For async file I/O
 from app.config import Config
-from app.metrics import rest_counter
 from app.config import Config
 from app.services.graphql.schema import schema  # GraphQL schema
 from app.services.schema.get_logger import get_logger

@@ -21,7 +21,11 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() == 'true'
     ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV').upper()
-    APP_PORT = os.getenv('APP_PORT', 8001)
+    ALLOWED_ENVIRONMENTS = {'DEV', 'STAGING', 'PROD'}
+    ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV').upper()
+    if ENVIRONMENT not in ALLOWED_ENVIRONMENTS:
+        raise ValueError(f"Invalid ENVIRONMENT. Must be one of: {', '.join(ALLOWED_ENVIRONMENTS)}")
+    APP_PORT = int(os.getenv('APP_PORT', 8001))
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG').upper()
 
     # Directory to store schema files

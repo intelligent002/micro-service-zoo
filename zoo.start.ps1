@@ -6,6 +6,7 @@
 . ./powershell_scripts/get_os.ps1
 . ./powershell_scripts/test_prerequisites.ps1
 
+
 # Define default docker paths
 $paths = @{
     'Linux' = @(
@@ -14,7 +15,7 @@ $paths = @{
     'Darwin' = @(
         '/var/lib/docker/containers'
     )
-    'Windows' = @(
+    'Windowss' = @(
         'C:\ProgramData\Docker\containers',
         '/mnt/wsl/docker-desktop-data/data/docker/containers',
         '/wsl$/docker-desktop/mnt/docker-desktop-disk/data/docker/containers'
@@ -24,7 +25,7 @@ $paths = @{
 # Boil out if no such OS paths
 if (-not $paths.ContainsKey($OS_Type))
 {
-    Write-Logs "Unsupported OS: [$OS_Type]"
+    Write-Logs "Unsupported OS: [$OS_Type]" -level 'ERROR'
     exit 1
 }
 

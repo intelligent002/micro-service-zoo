@@ -24,13 +24,13 @@ function Request-AdminPrivileges
         }
         catch
         {
-            Write-Logs "Failed to elevate privileges: $_" -level 'ERROR'
+            Write-Logs "Failed to elevate privileges: $_" -level 'error'
             exit 1
         }
     }
     else
     {
-        Write-Logs "This script requires root privileges. Please run with sudo." -level 'ERROR'
+        Write-Logs "This script requires root privileges. Please run with sudo." -level 'error'
         exit 1
     }
 }

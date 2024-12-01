@@ -11,6 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HealthController extends Controller
 {
+    const SERVICE_MYSQL = 'MySQL';
+    const SERVICE_REDIS = 'Redis';
+    const STATUS_OK = 'OK';
+    const STATUS_ERROR = 'ERROR';
+
     /**
      * Health check liveness - app local scope only
      * @return JsonResponse
@@ -19,7 +24,7 @@ class HealthController extends Controller
     {
         Log::info("Liveness check passed.");
         return response()->json([
-            'status' => 'OK'
+            'status' => self::STATUS_OK
         ], Response::HTTP_OK);
     }
 
@@ -31,8 +36,8 @@ class HealthController extends Controller
     {
         // we're an optimists
         $readiness_status = [
-            "MySQL" => "OK",
-            "Redis" => "OK"
+            self::SERVICE_MYSQL => self::STATUS_OK,
+            self::SERVICE_REDIS => self::STATUS_OK
         ];
 
         try {
@@ -41,7 +46,7 @@ class HealthController extends Controller
         } catch (Exception $e) {
             // If connection fails, set MySQL status to ERROR and keep testing
             Log::error("Readiness check failed. Mysql: " . $e->getCode() . ":" . $e->getMessage());
-            $readiness_status["MySQL"] = "ERROR";
+            $readiness_status[self::SERVICE_MYSQL] = self::STATUS_ERROR;
         }
 
         // Check Redis connection
@@ -52,13 +57,13 @@ class HealthController extends Controller
             }
         } catch (Exception $e) {
             Log::error("Readiness check failed. Redis: " . $e->getCode() . ":" . $e->getMessage());
-            $readiness_status["Redis"] = "ERROR";
+            $readiness_status[self::SERVICE_REDIS] = self::STATUS_ERROR;
         }
 
-        if (in_array("ERROR", $readiness_status)) {
+        if (in_array(self::STATUS_ERROR, $readiness_status)) {
             // found errors - return "status: ERROR"
             return response()->json([
-                'status' => 'ERROR',
+                'status' => self::STATUS_ERROR,
                 'result' => $readiness_status
             ], Response::HTTP_SERVICE_UNAVAILABLE); // 503
         }
@@ -66,7 +71,7 @@ class HealthController extends Controller
         // not found - return "status: OK"
         Log::info("Readiness check passed.");
         return response()->json([
-            'status' => 'OK',
+            'status' => self::STATUS_OK,
             'result' => $readiness_status
         ], Response::HTTP_OK); // 200 is the default status
     }

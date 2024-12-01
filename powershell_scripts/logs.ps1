@@ -1,32 +1,47 @@
-function Write-Logs {
+function Write-Logs
+{
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true, Position=0, ValueFromRemainingArguments=$true)]
-        [object[]]$Message, # Accept multiple objects like Write-Host
+        [Parameter(Mandatory = $true, Position = 0, ValueFromRemainingArguments = $true)]
+        [object[]]$Message,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [ValidateSet('INFO', 'WARNING', 'ERROR', 'DEBUG', 'CRITICAL')]
-        [string]$Level = 'INFO', # Default level is INFO
+        [string]$Level = 'INFO',
 
-    # Write-Host parameters
-        [string]$ForegroundColor = 'White',
-        [string]$BackgroundColor = 'Black',
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Black', 'DarkBlue', 'DarkGreen', 'DarkCyan', 'DarkRed', 'DarkMagenta', 'DarkYellow', 'Gray', 'DarkGray', 'Blue', 'Green', 'Cyan', 'Red', 'Magenta', 'Yellow', 'White')]
+        [string]$ForegroundColor,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Black', 'DarkBlue', 'DarkGreen', 'DarkCyan', 'DarkRed', 'DarkMagenta', 'DarkYellow', 'Gray', 'DarkGray', 'Blue', 'Green', 'Cyan', 'Red', 'Magenta', 'Yellow', 'White')]
+        [string]$BackgroundColor,
+
         [switch]$NoNewline
     )
 
-    # Map levels to default colors
-    $levelColors = @{
-        'INFO'     = 'White'
-        'WARNING'  = 'Yellow'
-        'ERROR'    = 'Red'
-        'DEBUG'    = 'Blue'
+    # Hashtable for levels and their default colors
+    $levelConfig = @{
+        'INFO' = 'White'
+        'WARNING' = 'Yellow'
+        'ERROR' = 'Red'
+        'DEBUG' = 'Blue'
         'CRITICAL' = 'Magenta'
     }
 
-    # Determine the color for the level
-    $levelColor = $ForegroundColor
-    if (-not $ForegroundColor -and $Level -in $levelColors.Keys) {
-        $levelColor = $levelColors[$Level]
+    # Convert Level to uppercase for output consistency
+    $Level = $Level.ToUpper()
+
+    # Default or validate ForegroundColor
+    if (-not $ForegroundColor)
+    {
+        $ForegroundColor = $levelConfig[$Level]
+    }
+
+    # Default or validate BackgroundColor
+    if (-not $BackgroundColor)
+    {
+        $BackgroundColor = 'Black'
     }
 
     # Get the current timestamp
@@ -35,12 +50,12 @@ function Write-Logs {
     # Prepend timestamp and level to the message
     $header = "$timestamp [$Level] -"
 
-    # Combine header and message into a single array
+    # Combine header and message
     $outputMessage = @($header) + $Message
 
     # Pass all parameters to Write-Host
     Write-Host @outputMessage `
-               -ForegroundColor $levelColor `
+               -ForegroundColor $ForegroundColor `
                -BackgroundColor $BackgroundColor `
                -NoNewline:$NoNewline
 }

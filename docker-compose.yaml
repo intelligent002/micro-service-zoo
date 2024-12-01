@@ -21,6 +21,9 @@ volumes:
     prometheus-data:
         labels:
             com.docker.stack.namespace: zoo-monitoring
+    promtail-data:
+        labels:
+            com.docker.stack.namespace: zoo-monitoring
 
 # Shared network between the containers
 networks:
@@ -36,6 +39,8 @@ services:
         command:
             - --config.file=/etc/prometheus/prometheus.yml
             - --web.enable-lifecycle
+            - --storage.tsdb.retention.time=15d
+            - --storage.tsdb.retention.size=5GB
         healthcheck:
             # Test availability of Prometheus service, listening & actually serving
             interval: 60s
@@ -61,7 +66,9 @@ services:
         command:
             - --config.file=/etc/alertmanager/config.yml
         depends_on:
-            - zoo-prometheus
+            zoo-prometheus:
+                condition: service_healthy
+                restart: true
         healthcheck:
             # Test availability of Alert Manager service, listening & actually serving
             interval: 60s
@@ -117,8 +124,12 @@ services:
             context: ./zoo-grafana
             dockerfile: Dockerfile
         depends_on:
-            - zoo-prometheus
-            - zoo-loki
+            zoo-prometheus:
+                condition: service_healthy
+                restart: false
+            zoo-loki:
+                condition: service_healthy
+                restart: false
         environment:
             - GF_SECURITY_ADMIN_PASSWORD=very-secret
         healthcheck:
@@ -166,7 +177,9 @@ services:
         command:
             - --config.file=/etc/promtail/promtail-config.yml
         depends_on:
-            - zoo-loki
+            zoo-loki:
+                condition: service_healthy
+                restart: true
         healthcheck:
             # Test availability of Promtail service, listening & actually serving
             interval: 60s
@@ -182,6 +195,7 @@ services:
         volumes:
             # - /var/log:/var/log
             - ${DOCKER_LOG_PATH:-/var/lib/docker/containers}:/var/lib/docker/containers:ro
+            - promtail:data/data
             - ./zoo-promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
 
     # Loki
@@ -244,7 +258,9 @@ services:
             - '--mysqld.address=zoo-mysql:3307'
             - '--web.listen-address=:3308'
         depends_on:
-            - zoo-mysql
+            zoo-mysql:
+                condition: service_healthy
+                restart: true
         healthcheck:
             # Test availability of MySQLd Exporter service, listening & actually serving
             interval: 60s
@@ -289,7 +305,9 @@ services:
             context: ./zoo-python-flask
             dockerfile: Dockerfile
         depends_on:
-            - zoo-mysql
+            zoo-mysql:
+                condition: service_healthy
+                restart: true
         deploy:
             replicas: 2
             restart_policy:
@@ -326,7 +344,9 @@ services:
             context: ./zoo-python-fastapi
             dockerfile: Dockerfile
         depends_on:
-            - zoo-mysql
+            zoo-mysql:
+                condition: service_healthy
+                restart: true
         deploy:
             replicas: 2
             restart_policy:
@@ -362,7 +382,9 @@ services:
             context: ./zoo-typescript-react
             dockerfile: Dockerfile
         depends_on:
-            - zoo-python-flask
+            zoo-python-flask:
+                condition: service_healthy
+                restart: true
         environment:
             - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
             - ENVIRONMENT=docker-compose
@@ -390,10 +412,14 @@ services:
                 APP_URL: "http://localhost:8003/"
             context: ./zoo-php-laravel
             dockerfile: Dockerfile
-        command: ["/bin/sh", "-c", "/mysql-wait.sh && php artisan migrate --force && php-fpm"]
+        command: ["/bin/sh", "-c", "set -e && /mysql-wait.sh && php artisan migrate --force && php-fpm"]
         depends_on:
-            - zoo-mysql
-            - zoo-redis
+            zoo-mysql:
+                condition: service_healthy
+                restart: false
+            zoo-redis:
+                condition: service_healthy
+                restart: false
         deploy:
             replicas: 2
             restart_policy:
@@ -435,7 +461,9 @@ services:
             context: ./zoo-php-laravel-http2fpm
             dockerfile: Dockerfile
         depends_on:
-            - zoo-php-laravel
+            zoo-php-laravel:
+                condition: service_healthy
+                restart: false
         deploy:
             replicas: 2
             restart_policy:
@@ -468,7 +496,9 @@ services:
             context: ./zoo-typescript-angular
             dockerfile: Dockerfile
         depends_on:
-            - zoo-php-laravel-http2fpm
+            zoo-php-laravel-http2fpm:
+                condition: service_healthy
+                restart: false
         environment:
             - BACKEND_HOSTNAME=http://private-api.docker.r7g.org:8120
             - ENVIRONMENT=docker-compose
@@ -495,10 +525,18 @@ services:
             context: ./zoo-router
             dockerfile: Dockerfile
         depends_on:
-            - zoo-typescript-angular
-            - zoo-typescript-react
-            - zoo-python-flask
-            - zoo-php-laravel-http2fpm
+            zoo-typescript-angular:
+                condition: service_healthy
+                restart: false
+            zoo-typescript-react:
+                condition: service_healthy
+                restart: false
+            zoo-python-flask:
+                condition: service_healthy
+                restart: false
+            zoo-php-laravel-http2fpm:
+                condition: service_healthy
+                restart: false
         environment:
             - ENVIRONMENT=docker-compose
             - NGINX_PORT=8120

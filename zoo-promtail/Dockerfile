@@ -4,7 +4,7 @@ FROM grafana/promtail:3.0.0
 USER root
 
 # Add curl to the image
-RUN apt update && apt install -y curl && \
+RUN apt-get update -y && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Switch back to non-root user (nobody)

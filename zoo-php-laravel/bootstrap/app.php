@@ -40,8 +40,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // Return json with custom error
             return response()->json([
                 'status'  => 'ERROR',
-                'message' => 'Request Failed, investigate the logs for additional details - removeme - ' . $e->getCode() . ":" . $e->getMessage()
-            ], Response::HTTP_OK);
+                'message' => 'Request Failed, investigate the logs for additional details'
+                ], Response::HTTP_OK);
         });
 
     })->create();

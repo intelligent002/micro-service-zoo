@@ -16,7 +16,7 @@ if not all([db_username, db_password, db_hostname, db_database]):
 class Config:
     DSN = f"mysql+aiomysql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_database}"
     DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() == 'true'
-    APP_PORT = os.getenv('APP_PORT', 8001)
+    APP_PORT = int(os.getenv('APP_PORT', 8001))
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'DEBUG').upper()
     ENVIRONMENT = os.getenv('ENVIRONMENT','DEV').upper()
 
