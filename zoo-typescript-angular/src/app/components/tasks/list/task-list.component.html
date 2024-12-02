@@ -16,7 +16,9 @@
         [cdkDropListData]="tasks || []"
         [cdkDropListConnectedTo]="allConnectedDropLists || []"
         (cdkDropListDropped)="onListDrop({$event, project})">
-        <li *ngFor="let task of tasks" cdkDrag
+        <li *ngFor="let task of tasks"
+            cdkDrag
+            [cdkDragDisabled]="task.isEditing"
             (cdkDragStarted)="onDragStart()"
             (cdkDragEnded)="onDragEnd()">
           <span>

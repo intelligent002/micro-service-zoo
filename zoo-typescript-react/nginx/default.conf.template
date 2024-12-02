@@ -9,6 +9,19 @@ server {
 
     location / {
         try_files $uri /index.html;
+
+        # Rate limiting
+        limit_req zone=one burst=20 nodelay;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options "nosniff";
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;";
+
+        # Request size limits
+        client_max_body_size 100M;
     }
 
     error_page 404 /index.html;

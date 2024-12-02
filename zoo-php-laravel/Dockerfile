@@ -1,5 +1,5 @@
 # Use the official PHP image
-FROM php:8.2-fpm
+FROM php:8.3.13-fpm
 
 # Install System packages
 RUN apt update && apt install -y \
@@ -7,14 +7,18 @@ RUN apt update && apt install -y \
     curl \
     default-mysql-client \
     fcgiwrap \
+    iputils-ping \
     git \
     jq \
     nano \
+    telnet \
     zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
     && docker-php-source delete \
     && rm -rf /tmp/* /var/tmp/*
 

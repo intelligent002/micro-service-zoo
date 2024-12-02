@@ -18,6 +18,9 @@ http {
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=one:10m rate=30r/s;
+
     # access_log  /var/log/nginx/access.log  main;
 
     sendfile        on;

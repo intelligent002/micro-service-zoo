@@ -1,10 +1,11 @@
 import graphene
 from flask import current_app
 from graphene import relay
-from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
+from graphene_sqlalchemy import SQLAlchemyObjectType
 
+from app.config import Config
 from app.graphql.models import Project as ProjectModel, Task as TaskModel
-from app.metrics import projects_counter, projects_duration, tasks_counter, tasks_duration
+from app.metrics import gql_counter, gql_duration
 
 
 class Project(SQLAlchemyObjectType):
@@ -43,13 +44,12 @@ class Query(graphene.ObjectType):
     get_tasks = graphene.List(Task, name=graphene.String(), project_id=graphene.Int())
 
     # Measure the duration of this method
-    @projects_duration.time()
+    @gql_duration.labels(environment=Config.ENVIRONMENT, request='Projects').time()
     def resolve_get_projects(self, info, **kwargs):
         try:
             # Log the passed arguments
             current_app.logger.debug(f"Received arguments: {kwargs}")
-            # Increment counter
-            projects_counter.inc()
+
             # Get the name filter
             name = kwargs.get('name', None)
 
@@ -60,19 +60,32 @@ class Query(graphene.ObjectType):
                 current_app.logger.debug(f"Fetching tasks with name filter: {name}")
                 project_query = project_query.filter(ProjectModel.name.ilike(f"%{name}%"))
 
-            project_query.all()
+            # Increment successful counter
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Projects",
+                status="OK"
+            ).inc()
+
+            return project_query.all()
+
         except Exception as e:
+
             current_app.logger.error(f"Error while fetching projects {str(e)}")
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Projects",
+                status="ERROR"
+            ).inc()
+
             return []
 
     # Measure the duration of this method
-    @tasks_duration.time()
+    @gql_duration.labels(environment=Config.ENVIRONMENT, request='Tasks').time()
     def resolve_get_tasks(self, info, **kwargs):
         try:
             # Log the passed arguments
             current_app.logger.debug(f"Received arguments: {kwargs}")
-            # Increment counter
-            tasks_counter.inc()
 
             # Get the name and project_id filters
             name = kwargs.get('name', None)
@@ -90,9 +103,24 @@ class Query(graphene.ObjectType):
                 current_app.logger.debug(f"Fetching tasks for project_id: {project_id}")
                 task_query = task_query.filter(TaskModel.project_id == project_id)
 
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Tasks",
+                status="OK"
+            ).inc()
+
             return task_query.all()
+
         except Exception as e:
+
             current_app.logger.error(f"Error while fetching tasks {str(e)}")
+            gql_counter.labels(
+                environment=Config.ENVIRONMENT,
+                request="Tasks",
+                status="ERROR"
+            ).inc()
+
             return []
+
 
 schema = graphene.Schema(query=Query)

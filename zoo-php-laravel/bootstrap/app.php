@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\PrometheusMetricsMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -10,13 +11,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
+        web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         apiPrefix: '/',
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->use([
-            HandleCors::class
+            HandleCors::class,
+            PrometheusMetricsMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -24,7 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Exception $e, Request $request) {
 
             // Get route information
-            $routeAction = $request->route()->getActionName(); // Get the controller and method
+            $routeAction = (null !== $request->route())
+                ? $request->route()->getActionName()
+                : "undefined"; // Get the controller and method
+
             $uri = $request->getRequestUri(); // Get the requested URI
             $method = $request->getMethod(); // Get the HTTP method (GET, POST, etc.)
 
@@ -34,8 +40,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // Return json with custom error
             return response()->json([
                 'status'  => 'ERROR',
-                'message' => 'Request Failed, investigate the logs for additional details' . $e->getMessage()
-            ], Response::HTTP_OK);
+                'message' => 'Request Failed, investigate the logs for additional details'
+                ], Response::HTTP_OK);
         });
 
     })->create();

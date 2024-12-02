@@ -37,7 +37,7 @@ export class TaskListComponent implements OnInit {
     this.tasks$ = this.taskService.getTasks(this.project).pipe(
       tap(tasks => {
         this.project.gotTasks = (0 < tasks.length)
-        console.log('project id: ', this.project.id, ' gotTasks: ', this.project.gotTasks, ' count: ', tasks.length)
+        console.debug('project id: ', this.project.id, ' gotTasks: ', this.project.gotTasks, ' count: ', tasks.length)
       })
     );
   }
@@ -94,7 +94,7 @@ export class TaskListComponent implements OnInit {
   ): void {
     if ($event.previousContainer === $event.container) {
       // Reordering within the same project
-      console.log('Prioritization');
+      console.debug('Prioritization');
       // Reorder the tasks directly from event.container.data
       moveItemInArray($event.container.data, $event.previousIndex, $event.currentIndex);
       // Get task IDs for reordering
@@ -105,7 +105,7 @@ export class TaskListComponent implements OnInit {
         taskIds: taskIds
       }).subscribe();
     } else {
-      console.log('Migration with priority');
+      console.debug('Migration with priority');
       // Get tasks from the previous project
       const sourceTasks = $event.previousContainer.data as Task[];
       // Get tasks from the target project

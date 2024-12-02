@@ -64,12 +64,18 @@ export class ProjectListComponent implements OnInit {
   }
 
   onDragStart() {
-    this.isDragging = true;
-    console.log('drag started');
+    setTimeout(() => {
+      this.isDragging = true;
+      console.debug('drag started');
+    });
+
   }
 
   onDragEnd() {
-    this.isDragging = false;
+    setTimeout(() => {
+      this.isDragging = false;
+      console.debug('drag ended');
+    });
   }
 
   // Middleware that detects drop on project card level
@@ -98,7 +104,7 @@ export class ProjectListComponent implements OnInit {
       concatMap(() => this.taskService.loadTasksFromServer(project.id)),
     ).subscribe({
       next: () => {
-        console.log('Migration and task reloading completed successfully.');
+        console.debug('Migration and task reloading completed successfully.');
       },
       error: (error) => {
         console.error('Error during task migration or loading:', error);
