@@ -194,7 +194,7 @@ services:
         restart: always
         volumes:
             - /var/log:/var/log
-            - ${DOCKER_LOG_PATH}:/var/lib/docker/containers:ro
+            - ${DOCKER_LOG_PATH:-/var/lib/docker/containers}:/var/lib/docker/containers:ro
             - promtail-data:/data
             - ./zoo-promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
 

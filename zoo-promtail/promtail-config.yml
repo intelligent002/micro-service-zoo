@@ -1,12 +1,12 @@
 server:
   http_listen_port: 9080
-  grpc_listen_port: 0  # We disable gRPC by setting this to 0
+  grpc_listen_port: 0
 
 positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://zoo-loki:3100/loki/api/v1/push  # The Loki endpoint where logs will be sent
+  - url: http://zoo-loki:3100/loki/api/v1/push
 
 scrape_configs:
   - job_name: docker-logs
@@ -15,4 +15,4 @@ scrape_configs:
           - localhost
         labels:
           job: docker
-          __path__: /var/lib/docker/containers/*/*-json.log  # Ensure this path is correctly mounted
+          __path__: /var/lib/docker/containers/*/*-json.log
