@@ -175,7 +175,7 @@ services:
             context: ./zoo-promtail
             dockerfile: Dockerfile
         command:
-            - --config.file=/etc/promtail/promtail-config.yml
+            - --config.file=/etc/promtail/promtail-config.yaml
         depends_on:
             zoo-loki:
                 condition: service_healthy
