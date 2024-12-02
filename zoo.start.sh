@@ -23,4 +23,4 @@ fi
 export DOCKER_LOG_PATH
 
 # Start Docker Compose
-docker compose up -d
+docker compose up --build -d
