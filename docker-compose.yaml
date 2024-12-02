@@ -175,7 +175,7 @@ services:
             context: ./zoo-promtail
             dockerfile: Dockerfile
         command:
-            - --config.file=/etc/promtail/promtail-config.yaml
+            - --config.file=/etc/promtail/promtail-config.yml
         depends_on:
             zoo-loki:
                 condition: service_healthy
@@ -193,7 +193,7 @@ services:
             - "9080:9080"
         restart: always
         volumes:
-            - ./zoo-promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
+            - ./zoo-promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
             - /var/lib/docker/containers:/var/lib/docker/containers:ro
             - /var/log:/var/log:ro
             - promtail-data:/tmp
