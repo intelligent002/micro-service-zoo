@@ -8,4 +8,4 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Switch back to non-root user (nobody)
-USER nobody
+# USER nobody
