@@ -116,7 +116,7 @@ services:
             - /sys:/sys:ro
             - /proc:/proc:ro
             - /var/lib/docker:/var/lib/docker:ro
-            - /data/docker:/data/docker:ro:delegated
+            - /data/docker:/data/docker:ro
 
     # Graphana
     zoo-grafana:
