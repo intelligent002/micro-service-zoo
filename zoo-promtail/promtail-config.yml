@@ -28,6 +28,9 @@ scrape_configs:
             service_name: service_name
             trace_id: trace_id
             request_id: request_id
+          # Add fallback values for critical fields
+          fail_on_error: false
+          expression_missing_action: skip
       - labels:  # Convert fields to labels
           message:
           level:
