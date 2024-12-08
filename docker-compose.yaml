@@ -118,7 +118,7 @@ services:
             - /var/lib/docker:/var/lib/docker:ro
             - /data/docker:/data/docker:ro
 
-    # Graphana
+    # Grafana
     zoo-grafana:
         build:
             context: ./zoo-grafana
@@ -130,8 +130,8 @@ services:
             zoo-loki:
                 condition: service_healthy
                 restart: false
-        environment:
-            - GF_SECURITY_ADMIN_PASSWORD=very-secret
+        env_file:
+          - .env
         healthcheck:
             # Test availability of Grafana service, listening & actually serving
             interval: 60s
@@ -225,13 +225,8 @@ services:
     # MySQL Service
     zoo-mysql:
         entrypoint: ["/bin/bash", "-c", "chmod +x /mysql-health.sh && docker-entrypoint.sh mysqld"]
-        environment:
-            - MYSQL_DATABASE=zoo-db
-            - MYSQL_HOSTNAME=localhost
-            - MYSQL_PASSWORD=zoo-pass
-            - MYSQL_ROOT_PASSWORD=007
-            - MYSQL_TCP_PORT=3307
-            - MYSQL_USER=zoo-user
+        env_file:
+          - .env
         healthcheck:
             # Test availability of mysql service, listening & actually serving - via mounted script
             interval: 60s
@@ -282,7 +277,7 @@ services:
             context: ./zoo-redis
             dockerfile: Dockerfile
         env_file:
-            - ./zoo-redis/.env
+            - .env
         healthcheck:
             # Test availability of Redis service, listening & serving - via inline redis-cli request
             interval: 60s

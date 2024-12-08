@@ -6,32 +6,18 @@ use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use Prometheus\CollectorRegistry;
 use Prometheus\Exception\MetricsRegistrationException;
 use Prometheus\RenderTextFormat;
-use Prometheus\Storage\Redis;
 use Throwable;
 
 class PrometheusMetricsMiddleware
 {
     protected ?CollectorRegistry $registry = null; // Make registry nullable
 
-    public function __construct()
+    public function __construct(CollectorRegistry $registry)
     {
-        try {
-            // Set Redis connection options for Prometheus client
-            $redisStorage = new Redis([
-                'host'     => config('database.redis.default.host'),
-                'port'     => config('database.redis.default.port'),
-                'username' => config('database.redis.default.username'),
-                'password' => config('database.redis.default.password'),
-                'timeout'  => 0.5, // Adjust timeout as needed
-            ]);
-            $this->registry = new CollectorRegistry($redisStorage);
-        } catch (\Exception $e) {
-            Log::error("Failed to initialize metrics registry: " . $e->getCode());
-        }
+        $this->registry = $registry;
     }
 
     /**
@@ -64,7 +50,7 @@ class PrometheusMetricsMiddleware
                     'api',
                     'rest_request_duration_seconds',
                     'Histogram of API Request durations in seconds for /api/*',
-                    ['method', 'endpoint', 'pod'],
+                    ['method', 'endpoint', 'hostname'],
                     [0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 20, 30]
                 );
 
