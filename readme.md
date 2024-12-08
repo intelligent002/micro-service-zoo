@@ -205,6 +205,6 @@ This repository demonstrates a suite of core microservices, each designed to hig
 
 ## Why the Zoo?
 
-This repository not only provides modular microservices but also demonstrates my approach to building transparent, well-integrated systems. It emphasizes clean code, functional design, and observability, ensuring the flow of data and processes is clear to stakeholders through meaningful dashboards.
+This repository provides modular microservices and demonstrates my approach to building transparent, well-integrated systems. It emphasizes clean code, functional design, and observability, ensuring the flow of data and processes is clear to stakeholders through meaningful dashboards.
 
 Get started by cloning this repository and deploying the services to experience the Zoo in action!

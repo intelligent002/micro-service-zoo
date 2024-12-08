@@ -50,16 +50,17 @@ class PrometheusMetricsMiddleware
                     'api',
                     'rest_request_duration_seconds',
                     'Histogram of API Request durations in seconds for /api/*',
-                    ['method', 'endpoint', 'hostname'],
+                    ['method', 'endpoint', 'pod', 'environment'],
                     [0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 20, 30]
                 );
 
                 // Observe the duration for the request, including labels
+                $environment = config('app.env', 'production');
                 $hostname = gethostname(); // Unique pod identifier
                 $endpoint = $request->route()
                     ? $request->route()->getName()
                     : 'unknown';
-                $histogram->observe($duration, [$request->method(), $endpoint, $hostname]);
+                $histogram->observe($duration, [$request->method(), $endpoint, $hostname, $environment]);
             }
             return $response;
         }

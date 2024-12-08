@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HealthController extends Controller
 {
-    const string SERVICE_MYSQL = 'MySQL';
-    const string STATUS_OK = 'OK';
-    const string STATUS_ERROR = 'ERROR';
+    private const string SERVICE_MYSQL = 'MySQL';
+    private const string STATUS_OK = 'OK';
+    private const string STATUS_ERROR = 'ERROR';
 
     /**
      * Health check liveness - app local scope only
