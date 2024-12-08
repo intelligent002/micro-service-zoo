@@ -1,0 +1,126 @@
+@startuml
+digraph ZooMicroservices {
+  rankdir=TB;  // Top-to-bottom layout
+
+  # Client Layer
+  subgraph cluster_client {
+    style=filled;
+    color=lightpink;
+    node [style=filled,color=white];
+    "client" [label="Client", shape=oval];
+    label = "Client Layer";
+  }
+
+  # Router Layer
+  subgraph cluster_router {
+    style=filled;
+    color=orange;
+    node [style=filled,color=white];
+    "zoo-router" [label="Router"];
+    label = "Router Layer";
+  }
+
+  # Frontend Services
+  subgraph cluster_frontend {
+    style=filled;
+    color=lightgrey;
+    node [style=filled,color=white];
+    "zoo-typescript-react" [label="Public\nFrontend"];
+    "zoo-typescript-angular" [label="Private\nFrontend"];
+    label = "Frontend Services";
+  }
+
+  # Backend Services
+  subgraph cluster_backend {
+    style=filled;
+    color=lightblue;
+    node [style=filled,color=white];
+    "zoo-python-fastapi" [label="Public\nBackend\n(FastAPI/Flask)"];
+    "zoo-php-laravel" [label="Private\nBackend\n(PHP)"];
+    "zoo-php-laravel-http2fpm" [label="HTTP2FPM\nProxy\n(Nginx)"];
+    label = "Backend Services";
+  }
+
+  # Data Access Layer
+  subgraph cluster_dal {
+    style=filled;
+    color=violet;
+    node [style=filled,color=white];
+    "zoo-mysql-dal" [label="MySQL\nDAL"];
+    label = "Data Access Layer (DAL)";
+  }
+
+  # Database Layer
+  subgraph cluster_database {
+    style=filled;
+    color=yellow;
+    node [style=filled,color=white];
+    "zoo-mysql" [label="MySQL Database"];
+    "zoo-redis" [label="Redis Database"];
+    label = "Database Layer";
+  }
+
+  # Exporters Layer
+  subgraph cluster_exporters {
+    style=filled;
+    color=khaki;
+    node [style=filled,color=white];
+    "zoo-mysqld-exporter" [label="MySQL\nExporter"];
+    "zoo-redis-exporter" [label="Redis\nExporter"];
+    "zoo-node-exporter" [label="Node\nExporter"];
+    label = "Exporters Layer";
+  }
+
+  # Monitoring Layer
+  subgraph cluster_monitoring {
+    style=filled;
+    color=green;
+    node [style=filled,color=white];
+    "zoo-prometheus" [label="Prometheus"];
+    "zoo-alert-manager" [label="Alert\nManager"];
+    "zoo-grafana" [label="Grafana"];
+    "zoo-promtail" [label="Promtail"];
+    "zoo-loki" [label="Loki"];
+    "zoo-jaeger" [label="Jaeger"];
+    label = "Monitoring Layer";
+  }
+
+  # Define relationships
+  ## Client to Router
+  "client" -> "zoo-router" [label="HTTP Request"];
+
+  ## Router to Frontend and Backend Services
+  "zoo-router" -> "zoo-typescript-react" [label="HTTP\nwith\ntrace_id"];
+  "zoo-router" -> "zoo-typescript-angular" [label="HTTP\nwith\ntrace_id"];
+  "zoo-router" -> "zoo-python-fastapi" [label="HTTP\nwith\ntrace_id"];
+  "zoo-router" -> "zoo-php-laravel-http2fpm" [label="HTTP\nwith\ntrace_id"];
+  "zoo-php-laravel-http2fpm" -> "zoo-php-laravel" [label="HTTP\nwith\ntrace_id"];
+
+  ## Backend to DAL
+  "zoo-python-fastapi" -> "zoo-mysql-dal" [label="Data\nAccess"];
+  "zoo-php-laravel" -> "zoo-mysql-dal" [label="Data\nAccess"];
+
+  ## DAL to Database Services
+  "zoo-mysql-dal" -> "zoo-mysql" [label="SQL Queries"];
+
+  ## Database to Exporters
+  "zoo-mysql" -> "zoo-mysqld-exporter" [label="Metrics"];
+  "zoo-redis" -> "zoo-redis-exporter" [label="Metrics"];
+
+  ## Exporters to Prometheus
+  "zoo-mysqld-exporter" -> "zoo-prometheus" [label="Metrics"];
+  "zoo-redis-exporter" -> "zoo-prometheus" [label="Metrics"];
+  "zoo-node-exporter" -> "zoo-prometheus" [label="Metrics"];
+
+  ## Promtail to Loki
+  "zoo-promtail" -> "zoo-loki" [label="Logs"];
+
+  ## Grafana Visualizations
+  "zoo-prometheus" -> "zoo-grafana" [label="Metrics"];
+  "zoo-loki" -> "zoo-grafana" [label="Logs"];
+  "zoo-jaeger" -> "zoo-grafana" [label="Traces"];
+
+  ## Alert Manager
+  "zoo-prometheus" -> "zoo-alert-manager" [label="Alerts"];
+}
+@enduml

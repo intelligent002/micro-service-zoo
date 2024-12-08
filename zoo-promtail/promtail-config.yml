@@ -1,6 +1,7 @@
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
+  log_level: info
 
 positions:
   filename: /tmp/positions.yaml
@@ -16,3 +17,25 @@ scrape_configs:
         labels:
           job: docker
           __path__: /var/lib/docker/containers/*/*-json.log
+    pipeline_stages:
+      - json:
+          expressions:
+            message: message
+            timestamp: timestamp
+            level: level
+            logger_name: logger_name
+            environment: environment
+            service_name: service_name
+            trace_id: trace_id
+            request_id: request_id
+          # Add fallback values for critical fields
+          fail_on_error: false
+          expression_missing_action: skip
+      - labels:  # Convert fields to labels
+          message:
+          level:
+          environment:
+          service_name:
+      - timestamp:  # Ensure the logs use the correct timestamp
+          source: timestamp
+          format: "2006-01-02T15:04:05.000000000Z"

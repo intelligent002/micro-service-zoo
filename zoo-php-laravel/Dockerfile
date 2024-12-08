@@ -17,8 +17,8 @@ RUN apt update && apt install -y \
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
+    && pecl install redis apcu \
+    && docker-php-ext-enable redis apcu \
     && docker-php-source delete \
     && rm -rf /tmp/* /var/tmp/*
 
@@ -32,6 +32,10 @@ COPY ./php-fpm/docker.conf /usr/local/etc/php-fpm.d/docker.conf
 
 # Copy custom PHP configurations
 COPY ./php-fpm/php.ini /usr/local/etc/php/php.ini
+
+# Add APCu configuration
+RUN echo "apc.enable_cli=1" >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini \
+    && echo "apc.shm_size=32M" >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini
 
 # Copy the mysql-wait.sh script
 COPY --chown=www-data:www-data ./php-fpm/mysql-wait.sh /mysql-wait.sh

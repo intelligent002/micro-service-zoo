@@ -10,28 +10,15 @@ use Illuminate\Support\Facades\Log;
 use Prometheus\CollectorRegistry;
 use Prometheus\Exception\MetricsRegistrationException;
 use Prometheus\RenderTextFormat;
-use Prometheus\Storage\Redis;
 use Throwable;
 
 class PrometheusMetricsMiddleware
 {
     protected ?CollectorRegistry $registry = null; // Make registry nullable
 
-    public function __construct()
+    public function __construct(CollectorRegistry $registry)
     {
-        try {
-            // Set Redis connection options for Prometheus client
-            $redisStorage = new Redis([
-                'host'     => config('database.redis.default.host'),
-                'port'     => config('database.redis.default.port'),
-                'username' => config('database.redis.default.username'),
-                'password' => config('database.redis.default.password'),
-                'timeout'  => 0.5, // Adjust timeout as needed
-            ]);
-            $this->registry = new CollectorRegistry($redisStorage);
-        } catch (\Exception $e) {
-            Log::error("Failed to initialize metrics registry: " . $e->getCode());
-        }
+        $this->registry = $registry;
     }
 
     /**
@@ -64,16 +51,21 @@ class PrometheusMetricsMiddleware
                     'api',
                     'rest_request_duration_seconds',
                     'Histogram of API Request durations in seconds for /api/*',
-                    ['method', 'endpoint', 'pod'],
+                    ['method', 'endpoint', 'pod', 'environment'],
                     [0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 20, 30]
                 );
 
                 // Observe the duration for the request, including labels
+                $environment = config('app.env', 'undefined');
                 $hostname = gethostname(); // Unique pod identifier
-                $endpoint = $request->route()
-                    ? $request->route()->getName()
-                    : 'unknown';
-                $histogram->observe($duration, [$request->method(), $endpoint, $hostname]);
+                $endpoint = $request->route()?->getName() ?? 'unknown';
+                if ($endpoint === 'unknown') {
+                    Log::warning('Unable to resolve route name for request', [
+                        'path'   => $request->path(),
+                        'method' => $request->method()
+                    ]);
+                }
+                $histogram->observe($duration, [$request->method(), $endpoint, $hostname, $environment]);
             }
             return $response;
         }
