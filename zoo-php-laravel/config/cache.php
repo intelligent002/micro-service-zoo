@@ -52,6 +52,10 @@ return [
             'lock_path' => storage_path('framework/cache/data'),
         ],
 
+        'apcu' => [
+            'driver' => 'apcu',
+        ],
+
         'memcached' => [
             'driver' => 'memcached',
             'persistent_id' => env('MEMCACHED_PERSISTENT_ID'),
