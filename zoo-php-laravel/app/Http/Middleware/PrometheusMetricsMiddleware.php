@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Prometheus\CollectorRegistry;
 use Prometheus\Exception\MetricsRegistrationException;
 use Prometheus\RenderTextFormat;
@@ -55,11 +56,15 @@ class PrometheusMetricsMiddleware
                 );
 
                 // Observe the duration for the request, including labels
-                $environment = config('app.env', 'production');
+                $environment = config('app.env', 'undefined');
                 $hostname = gethostname(); // Unique pod identifier
-                $endpoint = $request->route()
-                    ? $request->route()->getName()
-                    : 'unknown';
+                $endpoint = $request->route()?->getName() ?? 'unknown';
+                if ($endpoint === 'unknown') {
+                    Log::warning('Unable to resolve route name for request', [
+                        'path'   => $request->path(),
+                        'method' => $request->method()
+                    ]);
+                }
                 $histogram->observe($duration, [$request->method(), $endpoint, $hostname, $environment]);
             }
             return $response;
