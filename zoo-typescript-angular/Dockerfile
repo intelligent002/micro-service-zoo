@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package*json ./
 
 # Install dependencies
-RUN npm i
+RUN npm ci
 
 # Stage 2: Build
 FROM dependencies AS build
