@@ -8,7 +8,6 @@ from app.routes.health.namespace import ns_health
 # Define the READINESS response for serialization and validation
 response_subsidiary = ns_health.model('ResponseReadinessServices', {
     'MySQL': fields.String(required=True, description='Status of subsidiary service - MySQL', example='OK'),
-    'Redis': fields.String(required=True, description='Status of subsidiary service - Redis', example='OK')
 })
 
 response_readiness = ns_health.model('ResponseReadiness', {
@@ -23,7 +22,7 @@ class EndpointReadiness(Resource):
         """
         Health check readiness - app subsidiary services
         """
-        subsidiary_status = {"MySQL": "OK", "Redis": "OK"}
+        subsidiary_status = {"MySQL": "OK"}
 
         # Check MySQL Database
         try:

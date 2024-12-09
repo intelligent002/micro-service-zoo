@@ -13,7 +13,7 @@ async def readiness(db_session: AsyncSession = Depends(DBSessionDep)):
     Health check readiness - app subsidiary services
     """
     logger = get_logger()
-    subsidiary_status = {"MySQL": "OK", "Redis": "OK"}
+    subsidiary_status = {"MySQL": "OK"}
 
     # Check MySQL Database asynchronously
     try:
