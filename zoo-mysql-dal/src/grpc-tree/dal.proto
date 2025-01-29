@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package dal;
+
+import public "projects/index.proto";
+import public "tasks/index.proto";

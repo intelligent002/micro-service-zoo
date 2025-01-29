@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dal.tasks;
+
+import "common/messages/types.proto";
+
+message UpdateRequest {
+  optional dal.common.TaskObject task = 1;
+}
+
+message UpdateResponse {
+  optional dal.common.TaskObject task = 1;
+}

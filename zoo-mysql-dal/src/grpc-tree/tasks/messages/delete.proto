@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package dal.tasks;
+
+import "common/messages/types.proto";
+
+message DeleteRequest {
+  optional dal.common.TaskObject task = 1;
+}
+
+message DeleteResponse {}

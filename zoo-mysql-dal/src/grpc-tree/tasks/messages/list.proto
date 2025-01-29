@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dal.tasks;
+
+import "common/messages/types.proto";
+
+message ListRequest {
+  optional int32 project = 1;
+}
+
+message ListResponse {
+  repeated dal.common.TaskObject tasks = 1; // List of all tasks in that project
+}

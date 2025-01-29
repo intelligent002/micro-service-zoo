@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package dal;
+
+// The ProjectService definition
+service ProjectService {
+  rpc ProjectCreate(ProjectCreateRequest) returns (ProjectCreateResponse);
+  rpc ProjectList(ProjectListRequest) returns (ProjectListResponse);
+  rpc ProjectUpdate(ProjectUpdateRequest) returns (ProjectUpdateResponse);
+  rpc ProjectDelete(ProjectDeleteRequest) returns (ProjectDeleteResponse);
+}
+
+message ProjectCreateRequest {
+  optional string name = 1; // Name of the project
+}
+
+message ProjectCreateResponse {
+  optional ProjectObject project = 1; // The created project
+}
+
+message ProjectListRequest {}
+
+message ProjectUpdateRequest {
+  optional ProjectObject project = 1;
+}
+
+message ProjectUpdateResponse {
+  optional ProjectObject project = 1;
+}
+
+message ProjectListResponse {
+  repeated ProjectObject projects = 1; // List of all projects
+}
+
+message ProjectDeleteRequest {
+  optional ProjectId projectId = 1;
+}
+
+message ProjectDeleteResponse {}
+
+
+message ProjectId {
+  optional int32 projectId = 1;      // Project ID
+}
+
+message ProjectObject {
+  optional ProjectId id = 1;         // Project ID
+  optional string name = 2;          // Project name
+  optional string createdAt = 3;     // Project creation date (ISO 8601)
+  optional string updatedAt = 4;     // Project update date (ISO 8601)
+}
+
+// The TaskService definition
+service TaskService {
+  rpc TaskCreate(TaskCreateRequest) returns (TaskCreateResponse);
+  rpc TaskList(TaskListRequest) returns (TaskListResponse);
+  rpc TaskUpdate(TaskUpdateRequest) returns (TaskUpdateResponse);
+  rpc TaskDelete(TaskDeleteRequest) returns (TaskDeleteResponse);
+}
+
+message TaskCreateRequest {
+  optional string name = 1; // Name of the task
+}
+
+message TaskCreateResponse {
+  optional TaskObject task = 1; // The created task
+}
+
+message TaskListRequest {
+  optional ProjectId projectId = 1;
+}
+
+message TaskListResponse {
+  repeated TaskObject tasks = 1; // List of all tasks in that project
+}
+
+message TaskUpdateRequest {
+  optional TaskObject task = 1;
+}
+
+message TaskUpdateResponse {
+  optional TaskObject task = 1;
+}
+
+message TaskDeleteRequest {
+  optional TaskId taskId = 1;
+}
+
+message TaskDeleteResponse {}
+
+
+message TaskMigrateRequest {
+  optional TaskId taskId = 1;
+  optional ProjectId projectId = 2;
+}
+
+message TaskMigrateResponse {
+  optional TaskObject task = 1;
+}
+
+message TaskId {
+  optional int32 id = 1;             // Task ID
+}
+
+message TaskObject {
+  optional TaskId id = 1;            // Task ID
+  optional ProjectId projectId = 2;  // Project ID the task belongs to
+  optional string name = 3;          // Task name
+  optional string createdAt = 4;     // Task creation date (ISO 8601)
+  optional string updatedAt = 5;     // Task update date (ISO 8601)
+}
