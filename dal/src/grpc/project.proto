@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package project;
+
+// The ProjectService definition
+service ProjectService {
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+  rpc ListProjects(Empty) returns (ListProjectsResponse);
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  rpc MigrateTask(MigrateTaskRequest) returns (MigrateTaskResponse);
+}
+
+// Messages for CreateProject
+message CreateProjectRequest {
+  string name = 1; // Name of the project
+}
+
+message CreateProjectResponse {
+  Project project = 1; // The created project
+}
+
+// Messages for ListProjects
+message Empty {} // No fields for an empty request
+
+message ListProjectsResponse {
+  repeated Project projects = 1; // List of all projects
+}
+
+// Messages for CreateTask
+message CreateTaskRequest {
+  int32 projectId = 1; // ID of the project
+  string name = 2;     // Name of the task
+}
+
+message CreateTaskResponse {
+  Task task = 1; // The created task
+}
+
+// Messages for MigrateTask
+message MigrateTaskRequest {
+  int32 taskId = 1;       // ID of the task to migrate
+  int32 newProjectId = 2; // ID of the new project
+}
+
+message MigrateTaskResponse {
+  Task task = 1; // The migrated task
+}
+
+// Shared messages
+message Project {
+  int32 id = 1;         // Project ID
+  string name = 2;      // Project name
+  string createdAt = 3; // Project creation date (ISO 8601)
+  string updatedAt = 4; // Project update date (ISO 8601)
+}
+
+message Task {
+  int32 id = 1;         // Task ID
+  int32 projectId = 2;  // Project ID the task belongs to
+  string name = 3;      // Task name
+  string createdAt = 4; // Task creation date (ISO 8601)
+  string updatedAt = 5; // Task update date (ISO 8601)
+}
