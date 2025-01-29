@@ -1,0 +1,15 @@
+FROM php:8.3.13
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install protoc and PHP plugins
+RUN apt-get update && apt-get install -y unzip git curl \
+  && curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip \
+  && unzip protoc-21.12-linux-x86_64.zip -d /usr/local/bin \
+  && rm protoc-21.12-linux-x86_64.zip \
+  && composer global require grpc/protoc-gen-php-grpc
+
+# Set PATH for protoc-gen-php-grpc
+ENV PATH="/root/.composer/vendor/bin:$PATH"
+
+# Working directory for generation
+WORKDIR /app

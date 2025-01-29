@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dal.tasks;
+
+import "common/messages/types.proto";
+
+message MigrateRequest {
+  optional dal.common.TaskId taskid = 1;
+}
+
+message MigrateResponse {
+  optional dal.common.TaskObject task = 1;
+}

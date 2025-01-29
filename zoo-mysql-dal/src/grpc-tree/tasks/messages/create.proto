@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dal.tasks;
+
+import "common/messages/types.proto";
+
+message CreateRequest {
+  optional string name = 1; // Name of the task
+}
+
+message CreateResponse {
+  optional dal.common.TaskObject task = 1; // The created task
+}

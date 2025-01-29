@@ -1,0 +1,8 @@
+# Use Python image
+FROM python:3.10-slim
+
+# Install required Python plugins
+RUN pip install grpcio grpcio-tools
+
+# Working directory for generation
+WORKDIR /app
