@@ -1,0 +1,27 @@
+{
+  "name": "zoo-mysql-dal",
+  "version": "1.0.0",
+  "scripts": {
+    "generate:linux:ts": "npx protoc --plugin=protoc-gen-ts_proto=node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/generated --proto_path=./src/grpc src/grpc/dal.proto",
+    "generate:windows:js": "npx grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./src/generated --grpc_out=grpc_js:./src/generated --ts_out=grpc_js:./src/generated --proto_path=./src/grpc src/grpc/dal.proto",
+    "generate:windows:ts": "npx protoc --plugin=protoc-gen-ts_proto.ps1=node_modules/.bin/protoc-gen-ts_proto.ps1 --ts_proto_out=./src/generated/ts --proto_path=./src/grpc src/grpc/dal.proto",
+    "generate:windows:php": "docker build -t grpc-php-generator -f src/generator/Dockerfile-php . && docker run --rm -v %cd%:/app grpc-php-generator protoc --php_out=./src/generated/php --grpc_out=./src/generated/php --proto_path=./src/grpc src/grpc/dal.proto",
+    "generate:windows:python": "docker build -t grpc-python-generator -f src/generator/Dockerfile-python . && docker run --rm -v %cd%:/app grpc-python-generator python -m grpc_tools.protoc -I./src/grpc --python_out=./src/generated/python --grpc_python_out=./src/generated/python src/grpc/dal.proto"
+  },
+  "dependencies": {
+    "@bufbuild/buf": "^1.47.2",
+    "@grpc/grpc-js": "^1.12.4",
+    "@grpc/proto-loader": "^0.7.13",
+    "dotenv": "^16.4.7",
+    "google-protobuf": "^3.21.4",
+    "mysql2": "^3.11.5",
+    "ts-node": "^10.9.2",
+    "ts-proto": "^2.6.0",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "protoc": "^1.1.3",
+    "protoc-gen-ts": "^0.8.7"
+  }
+}
