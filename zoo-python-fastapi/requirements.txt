@@ -1,7 +1,7 @@
 aiofiles==24.1.0
 aiomysql==0.2.0
 alembic==1.14.0
-fastapi==0.115.6
+fastapi==0.115.8
 prometheus_client==0.21.1
 prometheus_fastapi_instrumentator==7.0.0
 pydantic==2.10.3
