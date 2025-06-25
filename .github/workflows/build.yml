@@ -56,9 +56,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug repo owner
-        run: echo "Repository Owner is ${{ github.actor }}"
-
       - name: Set Timestamp Tag
         id: tag
         run: echo "tag=$(date '+%Y-%m-%d---%H-%M-%S')" >> $GITHUB_OUTPUT
@@ -69,7 +66,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: Set IMAGE_NAME
         run: echo "IMAGE_NAME=${{ matrix.service }}" >> $GITHUB_ENV
