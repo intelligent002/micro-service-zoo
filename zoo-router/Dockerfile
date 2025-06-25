@@ -1,4 +1,4 @@
-FROM fabiocicerchia/nginx-lua:1.27.1-alpine3.20.3
+FROM fabiocicerchia/nginx-lua:1.29.0-alpine3.22.0
 
 # Install necessary dependencies
 RUN apk update && apk add --no-cache \
@@ -13,7 +13,6 @@ RUN apk update && apk add --no-cache \
 RUN luarocks install lua-resty-uuid \
     && luarocks purge --old-versions \
     && rm -rf /root/.cache/luarocks
-
 
 # Copy configuration and starter files
 COPY nginx/default.conf.template /etc/nginx/conf.d/
