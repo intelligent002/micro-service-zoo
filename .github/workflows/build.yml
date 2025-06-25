@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Debug repo owner
-        run: echo "Repository Owner is ${{ github.repository_owner }}"
+        run: echo "Repository Owner is ${{ github.actor }}"
 
       - name: Set Timestamp Tag
         id: tag
@@ -74,7 +74,7 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ github.actor }}/zoo/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} ./${{ matrix.service }}
           docker tag ghcr.io/${{ github.actor }}/zoo/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
-                     ghcr.io/${{ github.actor }}/zoo/${{ env.IMAGE_NAME }}:latest
+                     ghcr.io/${{ github.actor }}/zoo/${{ env.IMAGE_NAME }}:latest 
           docker push ghcr.io/${{ github.actor }}/zoo/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
           docker push ghcr.io/${{ github.actor }}/zoo/${{ env.IMAGE_NAME }}:latest
           
