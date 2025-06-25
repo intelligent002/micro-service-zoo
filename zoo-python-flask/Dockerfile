@@ -15,6 +15,7 @@ RUN adduser -u 82 -D -S -G www-data www-data
 # Switch to the non-root user
 USER www-data
 
+
 # Add the user's local bin to PATH
 ENV PATH="/home/www-data/.local/bin:$PATH"
 

@@ -16,6 +16,7 @@ RUN npm ci
 # Stage 2: Build
 FROM dependencies AS build
 
+
 # Copy the rest of the app files into the container
 COPY . .
 

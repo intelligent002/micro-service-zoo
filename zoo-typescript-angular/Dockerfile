@@ -48,5 +48,6 @@ RUN chmod +x /start.sh && rm -f /etc/nginx/conf.d/default.conf
 # Expose the Nginx port
 EXPOSE 8002/tcp
 
+
 # Start Nginx server via new starter
 CMD ["/start.sh"]
