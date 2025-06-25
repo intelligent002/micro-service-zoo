@@ -18,7 +18,6 @@ USER www-data
 # Add the user's local bin to PATH
 ENV PATH="/home/www-data/.local/bin:$PATH"
 
-
 # Set the working directory inside the container
 WORKDIR /app
 
