@@ -69,15 +69,10 @@ jobs:
 
       - name: Build Docker Images with Timestamp and Latest Tags
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+          docker build -t ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
                        ./${{ matrix.service }}
-          docker tag ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
-                     ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Push Timestamp Tag
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
-
-      - name: Push Latest Tag
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          docker tag ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+                     ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+                      ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:latest
+          
