@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package dal.common;
+
+message ProjectId {
+  optional int32 projectId = 1;      // Project ID
+}
+
+message ProjectObject {
+  optional ProjectId id = 1;         // Project ID
+  optional string name = 2;          // Project name
+  optional string createdAt = 3;     // Project creation date (ISO 8601)
+  optional string updatedAt = 4;     // Project update date (ISO 8601)
+}
+
+message TaskId {
+  optional int32 id = 1;             // Task ID
+}
+
+message TaskObject {
+  optional TaskId id = 1;            // Task ID
+  optional ProjectId projectId = 2;  // Project ID the task belongs to
+  optional string name = 3;          // Task name
+  optional string createdAt = 4;     // Task creation date (ISO 8601)
+  optional string updatedAt = 5;     // Task update date (ISO 8601)
+}

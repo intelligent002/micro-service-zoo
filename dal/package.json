@@ -1,0 +1,22 @@
+{
+  "name": "zoo-mysql-dal",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/out-tsc/grpc/server.js",
+    "generate:proto": "npx grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./src/generated --grpc_out=grpc_js:./src/generated --ts_out=grpc_js:./src/generated --proto_path=./src/grpc ./src/grpc/project.proto"
+  },
+  "dependencies": {
+    "@bufbuild/buf": "^1.47.2",
+    "@grpc/grpc-js": "^1.12.4",
+    "@grpc/proto-loader": "^0.7.13",
+    "dotenv": "^16.4.7",
+    "google-protobuf": "^3.21.4",
+    "mysql2": "^3.11.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "protoc-gen-ts": "^0.8.7"
+  }
+}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dal.projects;
+
+import "common/messages/types.proto";
+
+message CreateRequest {
+  optional string name = 1; // Name of the project
+}
+
+message CreateResponse {
+  optional dal.common.ProjectObject project = 1; // The created project
+}

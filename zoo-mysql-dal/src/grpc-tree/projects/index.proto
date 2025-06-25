@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package dal.projects;
+
+import public "common/messages/types.proto";
+
+import public "projects/messages/create.proto";
+import public "projects/messages/update.proto";
+import public "projects/messages/list.proto";
+import public "projects/messages/delete.proto";
+
+import public "projects/service.proto";

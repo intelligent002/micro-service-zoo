@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package dal.projects;
+
+import "common/messages/types.proto";
+
+message DeleteRequest {
+  optional dal.common.ProjectObject project = 1;
+}
+
+message DeleteResponse {}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package dal.tasks;
+
+import  "tasks/messages/create.proto";
+import  "tasks/messages/update.proto";
+import  "tasks/messages/list.proto";
+import  "tasks/messages/delete.proto";
+
+// The ProjectService definition
+service Service {
+  rpc Create(CreateRequest) returns (CreateResponse);
+  rpc List(ListRequest) returns (ListResponse);
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+}
