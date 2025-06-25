@@ -2,7 +2,8 @@
 FROM python:3.10-slim
 
 # Install required Python plugins
-RUN pip install grpcio grpcio-tools
-
+- RUN pip install grpcio grpcio-tools
++ RUN python -m pip install --upgrade pip && \
++     pip install --no-cache-dir grpcio==1.63.0 grpcio-tools==1.63.0
 # Working directory for generation
 WORKDIR /app
