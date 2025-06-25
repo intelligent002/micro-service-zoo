@@ -73,6 +73,6 @@ jobs:
                        ./${{ matrix.service }}
           docker tag ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
                      ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:latest
-          docker push ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
-                      ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:latest
+          docker push ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+          docker push ghcr.io/${{ github.actor }}/${{ env.IMAGE_NAME }}:latest
           
