@@ -18,4 +18,5 @@ COPY . .
 
 # Build the app
 RUN npm run generate:proto-ts
+
 #RUN npm run build

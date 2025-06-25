@@ -9,7 +9,6 @@ RUN apk update && apk add --no-cache \
     util-linux \
     && rm -rf /var/cache/apk/* /tmp/*
 
-
 # Install lua-resty-uuid via luarocks and clean up
 RUN luarocks install lua-resty-uuid \
     && luarocks purge --old-versions \

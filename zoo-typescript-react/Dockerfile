@@ -16,13 +16,11 @@ RUN npm ci
 # Stage 2: Build
 FROM dependencies AS build
 
-
 # Copy the rest of the app files into the container
 COPY . .
 
 # Build the React app (production build)
 RUN npm run build
-
 
 # Stage 3: Serve
 FROM nginx:1.27.2-alpine-slim AS serve
