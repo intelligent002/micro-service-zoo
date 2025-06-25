@@ -53,9 +53,7 @@ services:
 
     # Backend written in Python/Flask (python:3.12.5-alpine3.20)
     zoo-python-flask:
-        build:
-            context: ./zoo-python-flask
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-python-flask:latest
         container_name: zoo-python-flask
         restart: unless-stopped
         environment:
@@ -66,7 +64,7 @@ services:
             - DB_PORT=3307
             - DB_USERNAME=zoo-user
             - DEBUG_MODE=False
-            - ENVIRONMENT=docker-compose
+            - ENVIRONMENT=PRODUCTION
             - LOG_LEVEL=DEBUG
             - SERVICE_NAME=zoo-python-flask
         labels:
@@ -93,9 +91,7 @@ services:
 
     # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
     zoo-python-fastapi:
-        build:
-            context: ./zoo-python-fastapi
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-python-fastapi:latest
         container_name: zoo-python-fastapi
         restart: unless-stopped
         environment:
@@ -132,9 +128,7 @@ services:
 
     # Frontend written in TypeScript/React (node:18-alpine3.20)
     zoo-typescript-react:
-        build:
-            context: ./zoo-typescript-react
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-typescript-react:latest
         container_name: zoo-typescript-react
         restart: unless-stopped
         environment:
@@ -166,9 +160,7 @@ services:
 
     # Backend written in PHP/Laravel (php:8.2-fpm)
     zoo-php-laravel:
-        build:
-            context: ./zoo-php-laravel
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-php-laravel:latest
         container_name: zoo-php-laravel
         restart: unless-stopped
         environment:
@@ -206,9 +198,7 @@ services:
             
     # NGINX Service (Reverse Proxy + HTTP to PHP-FPM converter + Static File Serving)
     zoo-php-laravel-http2fpm:
-        build:
-            context: ./zoo-php-laravel-http2fpm
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-php-laravel-http2fpm:latest
         container_name: zoo-php-laravel-http2fpm
         restart: unless-stopped
         environment:

@@ -9,8 +9,16 @@ function TasksList({project}) {
         skip: !project.id, // Skip the query if projectId is not provided
     });
 
-    if (loading) return <p>Loading tasks...</p>;
-    if (error) return <p>Error loading tasks</p>;
+    if (loading) {
+        return <p>Loading tasks...</p>;
+    }
+    if (error) {
+        return <p>Error loading tasks</p>;
+    }
+
+    if (!data || !data.getTasks || data.getTasks.length === 0) {
+        return <p>No tasks available in that project.</p>;
+    }
 
     return (
         <div>

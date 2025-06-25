@@ -1,4 +1,4 @@
-FROM fabiocicerchia/nginx-lua:1.27.1-alpine3.20.3
+FROM fabiocicerchia/nginx-lua:1.29.0-alpine3.22.0
 
 # Install necessary dependencies
 RUN apk update && apk add --no-cache \

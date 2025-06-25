@@ -5,6 +5,9 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/zoo-php-laravel/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/zoo-php-laravel/vendor" />
+      <excludeFolder url="file://$MODULE_DIR$/zoo-python-fastapi/.idea" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

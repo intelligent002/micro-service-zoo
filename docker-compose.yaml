@@ -25,6 +25,7 @@ volumes:
         labels:
             com.docker.stack.namespace: zoo-monitoring
 
+
 # Shared network between the containers
 networks:
     zoo:
