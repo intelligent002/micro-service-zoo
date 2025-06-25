@@ -505,10 +505,10 @@ services:
             - ENVIRONMENT=DEVELOPMENT
             - NGINX_PORT=8120
             - SERVICE_NAME=zoo-router
-            - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
             - ZOO_PYTHON_FASTAPI_PORT=8101
-            - ZOO_TYPESCRIPT_ANGULAR_PORT=8105
             - ZOO_TYPESCRIPT_REACT_PORT=8102
+            - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
+            - ZOO_TYPESCRIPT_ANGULAR_PORT=8105
         healthcheck:
             # Test availability of nginx service, listening & serving - via inline curl request compared as is
             interval: 60s
