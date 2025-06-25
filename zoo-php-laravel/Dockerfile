@@ -15,6 +15,7 @@ RUN apt update && apt install -y \
     zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql \
     && pecl install redis apcu \
