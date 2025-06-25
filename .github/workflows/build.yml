@@ -64,11 +64,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push ${{ matrix.service }}
-        uses: docker/build-push-action@v5
-        with:
-          context: ./${{ matrix.service }}
-          file: ./${{ matrix.service }}/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/${{ matrix.service }}:${{ steps.tag.outputs.tag }}
+      - name: Set IMAGE_NAME
+        run: echo "IMAGE_NAME=${{ matrix.service }}" >> $GITHUB_ENV
+
+      - name: Build Docker Images with Timestamp and Latest Tags
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+                       ./${{ matrix.service }}
+          docker tag ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }} \
+                     ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push Timestamp Tag
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+
+      - name: Push Latest Tag
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
