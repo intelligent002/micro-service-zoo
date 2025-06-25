@@ -1,5 +1,5 @@
 # Stage 1: Dependencies
-FROM node:20.18.0-bullseye AS dependencies
+FROM node:22.16.0-bullseye AS dependencies
 
 # Install Python and build tools
 RUN apt-get update && apt-get install -y python3 build-essential
