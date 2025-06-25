@@ -12,5 +12,6 @@ COPY nginx/nginx.conf.template /etc/nginx/
 COPY nginx/start.sh /start.sh
 RUN chmod +x /start.sh && rm -f /etc/nginx/conf.d/default.conf
 
+
 # Start Nginx server via new starter
 CMD ["/start.sh"]

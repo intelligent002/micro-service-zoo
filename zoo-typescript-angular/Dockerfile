@@ -19,6 +19,7 @@ FROM dependencies AS build
 # Copy the rest of the app files into the container
 COPY . .
 
+
 # Build the React app (production build)
 RUN npm run build
 

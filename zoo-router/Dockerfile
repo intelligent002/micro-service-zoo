@@ -14,6 +14,7 @@ RUN luarocks install lua-resty-uuid \
     && luarocks purge --old-versions \
     && rm -rf /root/.cache/luarocks
 
+
 # Copy configuration and starter files
 COPY nginx/default.conf.template /etc/nginx/conf.d/
 COPY nginx/nginx.conf.template /etc/nginx/
