@@ -34,9 +34,7 @@ networks:
 services:
     # Prometheus
     zoo-prometheus:
-        build:
-            context: ./zoo-prometheus
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-prometheus:latest
         command:
             - --config.file=/etc/prometheus/prometheus.yml
             - --web.enable-lifecycle
@@ -61,9 +59,7 @@ services:
 
     # Alert Manager
     zoo-alert-manager:
-        build:
-            context: ./zoo-alert-manager
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-alert-manager:latest
         command:
             - --config.file=/etc/alertmanager/config.yml
         depends_on:
@@ -88,9 +84,7 @@ services:
 
     # Node Exporter
     zoo-node-exporter:
-        build:
-            context: ./zoo-node-exporter
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-node-exporter:latest
         healthcheck:
             # Test availability of Node Exporter service, listening & actually serving
             interval: 60s
@@ -121,9 +115,7 @@ services:
 
     # Grafana
     zoo-grafana:
-        build:
-            context: ./zoo-grafana
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-grafana:latest
         depends_on:
             zoo-prometheus:
                 condition: service_healthy
@@ -151,9 +143,7 @@ services:
 
     # Jaeger
     zoo-jaeger:
-        build:
-            context: ./zoo-jaeger
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-jaeger:latest
         healthcheck:
             # Test availability of Jaeger service, listening & actually serving
             interval: 60s
@@ -172,9 +162,7 @@ services:
 
     # Promtail
     zoo-promtail:
-        build:
-            context: ./zoo-promtail
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-promtail:latest
         command:
             - --config.file=/etc/promtail/promtail-config.yml
         depends_on:
@@ -201,9 +189,7 @@ services:
 
     # Loki
     zoo-loki:
-        build:
-            context: ./zoo-loki
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-loki:latest
         command:
             - --config.file=/etc/loki/local-config.yaml
         healthcheck:
@@ -247,9 +233,7 @@ services:
 
     # MySQL Service exporter for Prometheus
     zoo-mysqld-exporter:
-        build:
-            context: ./zoo-mysqld-exporter
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-mysqld-exporter:latest
         command:
             - '--mysqld.address=zoo-mysql:3307'
             - '--web.listen-address=:3308'
@@ -297,9 +281,7 @@ services:
 
     # Backend written in Python/Flask (python:3.12.5-alpine3.20)
     zoo-python-flask:
-        build:
-            context: ./zoo-python-flask
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-python-flask:latest
         depends_on:
             zoo-mysql:
                 condition: service_healthy
@@ -336,9 +318,7 @@ services:
 
     # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
     zoo-python-fastapi:
-        build:
-            context: ./zoo-python-fastapi
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-python-fastapi:latest
         depends_on:
             zoo-mysql:
                 condition: service_healthy
@@ -374,9 +354,7 @@ services:
 
     # Frontend written in TypeScript/React (node:20.18.0-alpine3.20)
     zoo-typescript-react:
-        build:
-            context: ./zoo-typescript-react
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-typescript-react:latest
         depends_on:
             zoo-python-flask:
                 condition: service_healthy
@@ -403,11 +381,7 @@ services:
 
     # Backend written in PHP/Laravel (php:8.2-fpm)
     zoo-php-laravel:
-        build:
-            args:
-                APP_URL: "http://localhost:8003/"
-            context: ./zoo-php-laravel
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-php-laravel:latest
         command: ["/bin/sh", "-c", "set -e && /mysql-wait.sh && php artisan migrate --force && php-fpm"]
         depends_on:
             zoo-mysql:
@@ -453,9 +427,7 @@ services:
 
     # NGINX Service (Reverse Proxy + HTTP to PHP-FPM converter + Static File Serving)
     zoo-php-laravel-http2fpm:
-        build:
-            context: ./zoo-php-laravel-http2fpm
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-php-laravel-http2fpm:latest
         depends_on:
             zoo-php-laravel:
                 condition: service_healthy
@@ -488,9 +460,7 @@ services:
 
     # Frontend written in TypeScript/angular (node:20.18.0-alpine3.20)
     zoo-typescript-angular:
-        build:
-            context: ./zoo-typescript-angular
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-typescript-angular:latest
         depends_on:
             zoo-php-laravel-http2fpm:
                 condition: service_healthy
@@ -517,9 +487,7 @@ services:
 
     # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
     zoo-router:
-        build:
-            context: ./zoo-router
-            dockerfile: Dockerfile
+        image: ghcr.io/intelligent002/zoo/zoo-router:latest
         depends_on:
             zoo-typescript-angular:
                 condition: service_healthy
