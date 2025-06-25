@@ -50,14 +50,14 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_OWNER: intelligent002
+      IMAGE_OWNER: ${{ github.actor }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Debug repo owner
-        run: echo "Repository Owner is intelligent002"
+        run: echo "Repository Owner is ${{ github.actor }}"
 
       - name: Set Timestamp Tag
         id: tag
@@ -67,7 +67,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: intelligent002
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
 
