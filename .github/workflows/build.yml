@@ -53,6 +53,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug repo owner
+        run: echo "Repository Owner is ${{ github.repository_owner }}"
+
       - name: Set Timestamp Tag
         id: tag
         run: echo "tag=$(date '+%Y-%m-%d---%H-%M-%S')" >> $GITHUB_OUTPUT
