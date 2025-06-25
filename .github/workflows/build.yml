@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_OWNER: ${{ github.actor }}
-
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -48,6 +44,10 @@ jobs:
       matrix:
         service: ${{ fromJson(needs.changes.outputs.matrix) }}
     runs-on: ubuntu-latest
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_OWNER: ${{ github.actor }}
 
     steps:
       - name: Checkout
