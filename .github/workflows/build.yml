@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [main]
 
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -47,7 +48,7 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_OWNER: ${{ github.repository_owner }}
+      IMAGE_OWNER: ${{ github.actor }}
 
     steps:
       - name: Checkout
