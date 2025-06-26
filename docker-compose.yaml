@@ -237,15 +237,6 @@ services:
       - REDIS_PORT=6379
       - REDIS_USERNAME=zoo-user
       - SERVICE_NAME=zoo-php-laravel
-    labels:
-      - "traefik.http.services.zoo-php-laravel-http2fpm.loadbalancer.server.port=8104"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm.entrypoints=web"
-      #- "traefik.http.routers.zoo-php-laravel-http2fpm.middlewares=redirect-to-https"
-      #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
-      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.entrypoints=websecure"
-      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.tls.certresolver=myresolver"
     expose:
       - "8103"
     healthcheck:
