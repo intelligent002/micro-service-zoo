@@ -10,7 +10,7 @@
         "darkaonline/l5-swagger": "^9.0",
         "laravel/framework": "^v12.2.0",
         "laravel/tinker": "^2.9",
-        "predis/predis": "^2.2",
+        "predis/predis": "^3.0",
         "promphp/prometheus_client_php": "^2.12"
     },
     "require-dev": {
