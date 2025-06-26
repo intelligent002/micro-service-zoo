@@ -243,8 +243,8 @@ services:
       - "traefik.http.routers.zoo-php-laravel-http2fpm.entrypoints=web"
       #- "traefik.http.routers.zoo-php-laravel-http2fpm.middlewares=redirect-to-https"
       #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm-secure.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm-secure.entrypoints=websecure"
+      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
+      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.entrypoints=websecure"
       #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.tls.certresolver=myresolver"
     expose:
       - "8103"
@@ -280,12 +280,12 @@ services:
       - ZOO_PHP_LARAVEL_PORT=8103
     labels:
       - "traefik.http.services.zoo-php-laravel-http2fpm.loadbalancer.server.port=8104"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
+      - "traefik.http.routers.zoo-php-laravel-http2fpm.rule=Host(`private-api.docker.r7g.org`)"
       - "traefik.http.routers.zoo-php-laravel-http2fpm.entrypoints=web"
       #- "traefik.http.routers.zoo-php-laravel-http2fpm.middlewares=redirect-to-https"
       #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm-secure.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
-      - "traefik.http.routers.zoo-php-laravel-http2fpm-secure.entrypoints=websecure"
+      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.rule=Host(`zoo-php-laravel-http2fpm.docker.r7g.org`)"
+      #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.entrypoints=websecure"
       #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.tls.certresolver=myresolver"
     expose:
       - "8104"
@@ -417,12 +417,12 @@ services:
       - SERVICE_NAME=zoo-python-fastapi
     labels:
       - "traefik.http.services.zoo-python-fastapi.loadbalancer.server.port=8101"
-      - "traefik.http.routers.zoo-python-fastapi.rule=Host(`zoo-python-fastapi.docker.r7g.org`)"
+      - "traefik.http.routers.zoo-python-fastapi.rule=Host(`public-api.docker.r7g.org`)"
       - "traefik.http.routers.zoo-python-fastapi.entrypoints=web"
       #- "traefik.http.routers.zoo-python-fastapi.middlewares=redirect-to-https"
       #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.zoo-python-fastapi-secure.rule=Host(`zoo-python-fastapi.docker.r7g.org`)"
-      - "traefik.http.routers.zoo-python-fastapi-secure.entrypoints=websecure"
+      #- "traefik.http.routers.zoo-python-fastapi-secure.rule=Host(`zoo-python-fastapi.docker.r7g.org`)"
+      #- "traefik.http.routers.zoo-python-fastapi-secure.entrypoints=websecure"
       #- "traefik.http.routers.zoo-python-fastapi-secure.tls.certresolver=myresolver"
     expose:
       - "8101"
@@ -506,18 +506,18 @@ services:
       - "--api.insecure=true"  # Enable Traefik dashboard at :8080 (disable in production)
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
+      #- "--entrypoints.websecure.address=:443"
       #- "--certificatesresolvers.myresolver.acme.httpchallenge=false"
       #- "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       #- "--certificatesresolvers.myresolver.acme.email=your-email@example.com"
       #- "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"         # HTTP
-      - "443:443"       # HTTPS
+      #- "443:443"       # HTTPS
       - "8080:8080"     # Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./letsencrypt:/letsencrypt"
+      # - "./letsencrypt:/letsencrypt"
     networks:
       - zoo
 
@@ -529,19 +529,19 @@ services:
         condition: service_healthy
         restart: true
     environment:
-      - BACKEND_HOSTNAME=http://public-api.docker.r7g.org:8120/graphql
+      - BACKEND_HOSTNAME=http://public-api.docker.r7g.org/graphql
       - ENVIRONMENT=DEVELOPMENT
       - LOG_LEVEL=debug
       - NGINX_PORT=8102
       - SERVICE_NAME=zoo-typescript-react
     labels:
       - "traefik.http.services.zoo-typescript-react.loadbalancer.server.port=8102"
-      - "traefik.http.routers.zoo-typescript-react.rule=Host(`zoo-typescript-react.docker.r7g.org`)"
+      - "traefik.http.routers.zoo-typescript-react.rule=Host(`public.docker.r7g.org`)"
       - "traefik.http.routers.zoo-typescript-react.entrypoints=web"
       #- "traefik.http.routers.zoo-typescript-react.middlewares=redirect-to-https"
       #- "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.zoo-typescript-react-secure.rule=Host(`zoo-typescript-react.docker.r7g.org`)"
-      - "traefik.http.routers.zoo-typescript-react-secure.entrypoints=websecure"
+      #- "traefik.http.routers.zoo-typescript-react-secure.rule=Host(`zoo-typescript-react.docker.r7g.org`)"
+      #- "traefik.http.routers.zoo-typescript-react-secure.entrypoints=websecure"
       #- "traefik.http.routers.zoo-typescript-react-secure.tls.certresolver=myresolver"
     expose:
       - "8102"
@@ -565,19 +565,19 @@ services:
         condition: service_healthy
         restart: false
     environment:
-      - BACKEND_HOSTNAME=http://private-api.docker.r7g.org:8120
+      - BACKEND_HOSTNAME=http://private-api.docker.r7g.org
       - ENVIRONMENT=DEVELOPMENT
       - LOG_LEVEL=debug
       - NGINX_PORT=8105
       - SERVICE_NAME=zoo-typescript-angular
     labels:
-      - "traefik.http.services.zoo-typescript-angular.loadbalancer.server.port=8102"
-      - "traefik.http.routers.zoo-typescript-angular.rule=Host(`zoo-typescript-angular.docker.r7g.org`)"
+      - "traefik.http.services.zoo-typescript-angular.loadbalancer.server.port=8105"
+      - "traefik.http.routers.zoo-typescript-angular.rule=Host(`private.docker.r7g.org`)"
       - "traefik.http.routers.zoo-typescript-angular.entrypoints=web"
       #- "traefik.http.routers.zoo-typescript-angular.middlewares=redirect-to-https"
       #- "traefik.http.middlewares.redirect-to-angular.redirectscheme.scheme=https"
-      - "traefik.http.routers.zoo-typescript-angular-secure.rule=Host(`zoo-typescript-angular.docker.r7g.org`)"
-      - "traefik.http.routers.zoo-typescript-angular-secure.entrypoints=websecure"
+      #- "traefik.http.routers.zoo-typescript-angular-secure.rule=Host(`zoo-typescript-angular.docker.r7g.org`)"
+      #- "traefik.http.routers.zoo-typescript-angular-secure.entrypoints=websecure"
       #- "traefik.http.routers.zoo-typescript-angular-secure.tls.certresolver=myresolver"
     expose:
       - "8105"
