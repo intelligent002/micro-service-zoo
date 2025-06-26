@@ -459,45 +459,45 @@ services:
     volumes:
       - redis-data:/data
 
-  # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
-  zoo-router:
-    image: ghcr.io/intelligent002/zoo/zoo-router:latest
-    depends_on:
-      zoo-typescript-angular:
-        condition: service_healthy
-        restart: false
-      zoo-typescript-react:
-        condition: service_healthy
-        restart: false
-      zoo-python-flask:
-        condition: service_healthy
-        restart: false
-      zoo-php-laravel-http2fpm:
-        condition: service_healthy
-        restart: false
-    environment:
-      - ENVIRONMENT=DEVELOPMENT
-      - NGINX_PORT=8120
-      - SERVICE_NAME=zoo-router
-      - ZOO_PYTHON_FASTAPI_PORT=8101
-      - ZOO_TYPESCRIPT_REACT_PORT=8102
-      - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
-      - ZOO_TYPESCRIPT_ANGULAR_PORT=8105
-    healthcheck:
-      # Test availability of nginx service, listening & serving - via inline curl request compared as is
-      interval: 60s
-      retries: 3
-      start_period: 3s
-      test: [ "CMD-SHELL", "response=$$(curl -s http://localhost:8120/liveness | jq -r '.status'); \
-                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "8120:8120"
-    restart: always
-    volumes:
-      - ./zoo-router/probe/:/var/www/html/
+# NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
+#  zoo-router:
+#    image: ghcr.io/intelligent002/zoo/zoo-router:latest
+#    depends_on:
+#      zoo-typescript-angular:
+#        condition: service_healthy
+#        restart: false
+#      zoo-typescript-react:
+#        condition: service_healthy
+#        restart: false
+#      zoo-python-flask:
+#        condition: service_healthy
+#        restart: false
+#      zoo-php-laravel-http2fpm:
+#        condition: service_healthy
+#        restart: false
+#    environment:
+#      - ENVIRONMENT=DEVELOPMENT
+#      - NGINX_PORT=8120
+#      - SERVICE_NAME=zoo-router
+#      - ZOO_PYTHON_FASTAPI_PORT=8101
+#      - ZOO_TYPESCRIPT_REACT_PORT=8102
+#      - ZOO_PHP_LARAVEL_HTTP2FPM_PORT=8104
+#      - ZOO_TYPESCRIPT_ANGULAR_PORT=8105
+#    healthcheck:
+#      # Test availability of nginx service, listening & serving - via inline curl request compared as is
+#      interval: 60s
+#      retries: 3
+#      start_period: 3s
+#      test: [ "CMD-SHELL", "response=$$(curl -s http://localhost:8120/liveness | jq -r '.status'); \
+#                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi" ]
+#      timeout: 10s
+#    networks:
+#      - zoo
+#    ports:
+#      - "8120:8120"
+#    restart: always
+#    volumes:
+#      - ./zoo-router/probe/:/var/www/html/
 
   # Traefik reverse proxy
   zoo-traefik:
