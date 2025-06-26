@@ -3,9 +3,9 @@ volumes:
   mysql-data:
     labels:
       com.docker.stack.namespace: zoo-database
-  #    redis-data:
-  #        labels:
-  #            com.docker.stack.namespace: zoo-database
+  redis-data:
+    labels:
+      com.docker.stack.namespace: zoo-database
   alert-manager-data:
     labels:
       com.docker.stack.namespace: zoo-monitoring
@@ -214,9 +214,9 @@ services:
       zoo-mysql:
         condition: service_healthy
         restart: false
-    #            zoo-redis:
-    #                condition: service_healthy
-    #                restart: false
+      zoo-redis:
+        condition: service_healthy
+        restart: false
     deploy:
       replicas: 1
       restart_policy:
@@ -231,11 +231,11 @@ services:
       - DB_USERNAME=zoo-user
       - ENVIRONMENT=DEVELOPMENT
       - LOG_LEVEL=debug
-      #            - REDIS_BASE=0
-      #            - REDIS_HOST=zoo-redis
-      #            - REDIS_PASSWORD=zoo-pass
-      #            - REDIS_PORT=6379
-      #            - REDIS_USERNAME=zoo-user
+      - REDIS_BASE=0
+      - REDIS_HOST=zoo-redis
+      - REDIS_PASSWORD=zoo-pass
+      - REDIS_PORT=6379
+      - REDIS_USERNAME=zoo-user
       - SERVICE_NAME=zoo-php-laravel
     labels:
       - "traefik.http.services.zoo-php-laravel-http2fpm.loadbalancer.server.port=8104"
@@ -356,30 +356,6 @@ services:
       - /var/log:/var/log:ro
       - promtail-data:/tmp
 
-
-  # Redis for PHP Metrics and other usages
-  #    zoo-redis:
-  #        build:
-  #            context: ./zoo-redis
-  #            dockerfile: Dockerfile
-  #        env_file:
-  #            - .env
-  #        healthcheck:
-  #            # Test availability of Redis service, listening & serving - via inline redis-cli request
-  #            interval: 60s
-  #            retries: 3
-  #            start_period: 3s
-  #            test: ["CMD-SHELL", "response=$$(redis-cli -u redis://default:zoo-pass@127.0.0.1:6379 ping); \
-  #                  if [ \"$$response\" != \"PONG\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi"]
-  #            timeout: 10s
-  #        networks:
-  #            - zoo
-  #        ports:
-  #            - "6379:6379"
-  #        restart: always
-  #        volumes:
-  #            - redis-data:/data
-
   # Backend written in Python/Flask (python:3.12.5-alpine3.20)
   zoo-python-flask:
     image: ghcr.io/intelligent002/zoo/zoo-python-flask:latest
@@ -462,6 +438,26 @@ services:
       - zoo
     restart: always
 
+  # Redis for PHP Metrics and other usages
+  zoo-redis:
+    image: ghcr.io/intelligent002/zoo/zoo-redis:latest
+    env_file:
+      - .env
+    healthcheck:
+      # Test availability of Redis service, listening & serving - via inline redis-cli request
+      interval: 60s
+      retries: 3
+      start_period: 3s
+      test: [ "CMD-SHELL", "response=$$(redis-cli -u redis://default:zoo-pass@127.0.0.1:6379 ping); \
+                  if [ \"$$response\" != \"PONG\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi" ]
+      timeout: 10s
+    networks:
+      - zoo
+    ports:
+      - "6379:6379"
+    restart: always
+    volumes:
+      - redis-data:/data
 
   # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
   zoo-router:
@@ -506,7 +502,6 @@ services:
   # Traefik reverse proxy
   zoo-traefik:
     image: traefik:v2.10
-    container_name: zoo-traefik
     command:
       - "--api.insecure=true"  # Enable Traefik dashboard at :8080 (disable in production)
       - "--providers.docker=true"
