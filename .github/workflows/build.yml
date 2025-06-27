@@ -1,4 +1,4 @@
-name: Selective Docker Builds with Timestamps
+name: Selective Docker Builds
 
 permissions:
   contents: read
