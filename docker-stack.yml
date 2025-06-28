@@ -137,8 +137,7 @@ services:
         condition: any
 
   zoo-mysql:
-    image: mysql:8.0
-    entrypoint: ["/bin/bash", "-c", "chmod +x /mysql-health.sh && docker-entrypoint.sh mysqld"]
+    image: ghcr.io/intelligent002/zoo/zoo-mysql:latest
     healthcheck:
       test: ["CMD", "/mysql-health.sh"]
       interval: 60s
@@ -148,9 +147,6 @@ services:
     env_file:
       - .env
     volumes:
-      - type: bind
-        source: /run/desktop/mnt/host/d/www/testedrecruits/micro-service-zoo/zoo-mysql/mysql-health.sh
-        target: /mysql-health.sh
       - mysql-data:/var/lib/mysql
     networks:
       - zoo

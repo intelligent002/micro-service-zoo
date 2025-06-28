@@ -27,6 +27,7 @@ jobs:
             zoo-grafana: ["zoo-grafana/**"]
             zoo-jaeger: ["zoo-jaeger/**"]
             zoo-loki: ["zoo-loki/**"]
+            zoo-mysql: ["zoo-mysql/**"]
             zoo-mysqld-exporter: ["zoo-mysqld-exporter/**"]
             zoo-node-exporter: ["zoo-node-exporter/**"]
             zoo-php-laravel-http2fpm: ["zoo-php-laravel-http2fpm/**"]
