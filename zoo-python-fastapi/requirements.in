@@ -1,0 +1,11 @@
+SQLAlchemy
+aiofiles
+aiomysql
+alembic
+fastapi
+prometheus_client
+prometheus_fastapi_instrumentator
+pydantic
+python-json-logger
+strawberry-graphql
+uvicorn
