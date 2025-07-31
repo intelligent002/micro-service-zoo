@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "git pull"
+git pull
+
 echo "🚀 Starting update process..."
 
 # Track job info
@@ -44,3 +47,8 @@ else
   done
   exit 1
 fi
+
+echo "git commit"
+git add *
+git commit -m "updates"
+git push
