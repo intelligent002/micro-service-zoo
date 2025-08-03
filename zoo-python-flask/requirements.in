@@ -1,11 +1,11 @@
-Flask-GraphQL
-Flask-SQLAlchemy
-PyMySQL
 flask-cors
+Flask-GraphQL
 flask-restx
+Flask-SQLAlchemy
 graphene-sqlalchemy
 gunicorn
 mysql-connector-python
 pip-tools
 prometheus_flask_exporter
+PyMySQL
 python-json-logger
