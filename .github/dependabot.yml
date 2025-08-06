@@ -5,7 +5,7 @@ updates:
     directory: "/zoo-python-fastapi" # Location of requirements.txt in the microservice directory
     open-pull-requests-limit: 10
     schedule:
-      interval: "daily"
+      interval: "weekly"
     commit-message:
       prefix: "python"
     target-branch: "main" # Optional: specify the target branch
@@ -15,7 +15,7 @@ updates:
     directory: "/zoo-python-flask" # Location of requirements.txt in the microservice directory
     open-pull-requests-limit: 10
     schedule:
-      interval: "daily"
+      interval: "weekly"
     commit-message:
       prefix: "python"
     target-branch: "main" # Optional: specify the target branch
@@ -25,7 +25,7 @@ updates:
     directory: "/zoo-php-laravel"  # Location of composer.json in the microservice directory
     open-pull-requests-limit: 10
     schedule:
-      interval: "daily"  # Check for updates every day
+      interval: "weekly"  # Check for updates every day
     ignore:
       - dependency-name: "php"  # Ignore updates to PHP itself (if needed)
     commit-message:
@@ -37,7 +37,7 @@ updates:
     directory: "/zoo-typescript-angular"  # Location of package.json in the microservice directory
     open-pull-requests-limit: 10
     schedule:
-      interval: "daily"  # Check for updates every day
+      interval: "weekly"  # Check for updates every day
     commit-message:
       prefix: "npm"
     target-branch: "main" # Optional: specify the target branch
@@ -47,7 +47,7 @@ updates:
     directory: "/zoo-typescript-react"  # Location of package.json in the microservice directory
     open-pull-requests-limit: 10
     schedule:
-      interval: "daily"  # Check for updates every day
+      interval: "weekly"  # Check for updates every day
     commit-message:
       prefix: "npm"
     target-branch: "main" # Optional: specify the target branch
