@@ -23,7 +23,7 @@
     "@babel/plugin-transform-optional-chaining": "^7.27.1",
     "@babel/plugin-transform-private-methods": "^7.27.1",
     "@rollup/plugin-terser": "^0.4.4",
-    "eslint": "^9.33.0",
+    "eslint": "^9.36.0",
     "glob": "^11.0.3",
     "rimraf": "^6.0.1",
     "vite": "^7.1.1",
