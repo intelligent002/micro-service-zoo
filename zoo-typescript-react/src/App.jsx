@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ApolloProvider} from '@apollo/client';
+import {ApolloProvider} from '@apollo/client/react';
 import {getApolloClient} from './graphql/apollo-client';
 import {BrowserRouter as Router} from 'react-router-dom';
 import ProjectsList from './components/Project/ProjectsList'
