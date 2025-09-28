@@ -1,6 +1,6 @@
 # What is that repository?
 
-Since registering on GitHub, I have been deeply involved in a variety of projects. Unfortunately, none of these projects are publicly available due to their proprietary nature. Many of them include work on sensitive or classified applications, including some in the military domain.
+During my technological career, I have been deeply involved in a variety of projects. Unfortunately, none of these projects are publicly available due to their proprietary nature. Many of them include work on sensitive or classified applications, including the military domain.
 
 As a result, I am unable to showcase these projects here.
 
