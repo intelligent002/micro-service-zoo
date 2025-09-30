@@ -54,7 +54,7 @@ services:
       timeout: 10s
     volumes:
       - type: bind
-        source: /opt/zoo/zoo-alert-manager/alertmanager.yml
+        source: ./zoo-alert-manager/alertmanager.yml
         target: /etc/alertmanager/config.yml
       - alert-manager-data:/alertmanager
     networks:
@@ -64,20 +64,20 @@ services:
       restart_policy:
         condition: any
 
-  zoo-cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /sys:/sys
-      - /proc:/proc
-      - /var/lib/docker:/var/lib/docker:ro
-      - /data/docker:/data/docker:ro
-    networks:
-      - zoo
-    deploy:
-      mode: global
-      restart_policy:
-        condition: any
+#  zoo-cadvisor:
+#    image: gcr.io/cadvisor/cadvisor:latest
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - /sys:/sys
+#      - /proc:/proc
+#      - /var/lib/docker:/var/lib/docker:ro
+#      - /data/docker:/data/docker:ro
+#    networks:
+#      - zoo
+#    deploy:
+#      mode: global
+#      restart_policy:
+#        condition: any
 
   zoo-grafana:
     image: ghcr.io/intelligent002/zoo/zoo-grafana:latest
@@ -126,7 +126,7 @@ services:
       timeout: 10s
     volumes:
       - type: bind
-        source: /opt/zoo/zoo-loki/local-config.yaml
+        source: ./zoo-loki/local-config.yaml
         target: /etc/loki/local-config.yaml
       - loki-data:/loki
     networks:
@@ -168,7 +168,7 @@ services:
       timeout: 10s
     volumes:
       - type: bind
-        source: /opt/zoo/zoo-mysqld-exporter/my.cnf
+        source: ./zoo-mysqld-exporter/my.cnf
         target: /.my.cnf
     networks:
       - zoo
@@ -207,10 +207,10 @@ services:
       timeout: 10s
     volumes:
       - type: bind
-        source: /opt/zoo/zoo-prometheus/prometheus.yml
+        source: ./zoo-prometheus/prometheus.yml
         target: /etc/prometheus/prometheus.yml
       - type: bind
-        source: /opt/zoo/zoo-prometheus/rules/
+        source: ./zoo-prometheus/rules/
         target: /etc/prometheus/rules/
       - prometheus-data:/prometheus
     networks:
@@ -231,7 +231,7 @@ services:
       timeout: 10s
     volumes:
       - type: bind
-        source: /opt/zoo/zoo-promtail/promtail-config.yml
+        source: ./zoo-promtail/promtail-config.yml
         target: /etc/promtail/promtail-config.yml
         read_only: true
       - /var/lib/docker/containers:/var/lib/docker/containers:ro

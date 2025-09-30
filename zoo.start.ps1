@@ -15,7 +15,7 @@ $paths = @{
     'Darwin' = @(
         '/var/lib/docker/containers'
     )
-    'Windowss' = @(
+    'Windows' = @(
         'C:\ProgramData\Docker\containers',
         '/mnt/wsl/docker-desktop-data/data/docker/containers',
         '/wsl$/docker-desktop/mnt/docker-desktop-disk/data/docker/containers'
@@ -29,14 +29,20 @@ if (-not $paths.ContainsKey($OS_Type))
     exit 1
 }
 
-# Try to get the path of the contaiers
+# Try to get the path of the containers
 $validPath = $paths[$OS_Type] | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $validPath)
 {
-    Write-Log "No valid Docker container path found. Specify your paths."
-    exit 1
+    Write-Logs "No valid Docker container path found. Specify your paths." -level 'ERROR'
+    #exit 1
 }
 $env:DOCKER_LOG_PATH = $validPath
 
-# Run Docker Compose
-docker-compose up --build -d
+# enable docker swarm mode
+docker swarm init
+
+# create zoo network
+docker network create --driver overlay --attachable --subnet 172.30.1.0/24 --gateway 172.30.1.1 zoo
+
+# deploy microservices
+docker stack deploy -c docker-swarm.yml zoo --detach=false

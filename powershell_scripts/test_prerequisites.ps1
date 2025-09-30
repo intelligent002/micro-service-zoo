@@ -45,14 +45,20 @@ function Test-DockerCompose {
     param ()
 
     try {
-        Write-logs "Checking for Docker Compose plugin... 111" -level 'debug'
-        docker compose version -ErrorAction Stop
+        Write-logs "Checking for Docker Compose plugin..." -level 'debug'
+        docker compose --version
+        if ($LASTEXITCODE -ne 0) {
+            throw "Вocker compose plugin not found or failed"
+        }
         Write-Verbose "Docker Compose plugin is supported."
         return "plugin"
     } catch {
         Write-Verbose "Docker Compose plugin not found. Checking for standalone binary..."
         try {
-            docker-compose --version -ErrorAction Stop
+            docker-compose --version
+            if ($LASTEXITCODE -ne 0) {
+                throw "docker-compose not found or failed"
+            }
             Write-Verbose "Standalone Docker Compose binary is supported."
             return "standalone"
         } catch {

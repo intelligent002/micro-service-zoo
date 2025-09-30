@@ -1,17 +1,8 @@
-# PowerShell script to handle the OS detection and Docker Compose command
+#!/usr/bin/pwsh
 
-$OSTYPE = $env:OS
-
-if ($OSTYPE -like "*Linux*") {
-    $env:DOCKER_LOG_PATH = "/var/lib/docker/containers"
-} elseif ($OSTYPE -like "*Darwin*") {
-    $env:DOCKER_LOG_PATH = "/var/lib/docker/containers"
-} elseif ($OSTYPE -like "*Windows*") {
-    $env:DOCKER_LOG_PATH = "/mnt/wsl/docker-desktop-data/data/docker/containers"
-} else {
-    Write-Host "Unsupported OS"
-    exit 1
-}
-
-# Stop Docker Compose
-docker compose down --remove-orphans
+# remove zoo stack
+docker stack rm zoo
+# remove zoo network
+docker network rm zoo
+# leave docker swarm mode
+docker swarm leave --force
