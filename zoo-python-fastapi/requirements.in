@@ -1,6 +1,7 @@
 aiofiles
 aiomysql
 alembic
+cryptography
 fastapi
 pip-tools
 prometheus-fastapi-instrumentator

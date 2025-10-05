@@ -1,8 +1,9 @@
 aiofiles==24.1.0
 aiomysql==0.2.0
 alembic==1.16.5
+cryptography==46.0.2
 fastapi==0.118.0
-pip-tools==7.5.0
+pip-tools==7.5.1
 prometheus-fastapi-instrumentator==7.1.0
 python-json-logger==3.3.0
 strawberry-graphql==0.282.0
