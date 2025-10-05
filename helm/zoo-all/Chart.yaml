@@ -20,6 +20,10 @@ dependencies:
     version: 0.1.0
     repository: "file://../zoo-php-laravel"
 
+  - name: zoo-typescript-react
+    version: 0.1.0
+    repository: "file://../zoo-typescript-react"
+
   - name: zoo-mysql
     version: 0.1.0
     repository: "file://../zoo-mysql"
