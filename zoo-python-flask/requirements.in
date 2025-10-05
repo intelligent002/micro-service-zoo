@@ -1,6 +1,7 @@
 Flask-GraphQL
 Flask-SQLAlchemy
 PyMySQL
+cryptography
 flask-cors
 flask-restx
 graphene-sqlalchemy
