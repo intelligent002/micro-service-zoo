@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zoo-common.fullname" . }}
+  labels:
+    {{- include "zoo-common.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "zoo-common.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "zoo-common.labels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: wait-for-pvc
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "⏳ Waiting for /var/lib/mysql to be mounted..."
+              i=0
+              while [ ! -d /var/lib/mysql ] && [ $i -lt 60 ]; do
+                echo "PVC not yet mounted, retrying ($i/60)..."
+                sleep 2
+                i=$((i+1))
+              done
+              if [ ! -d /var/lib/mysql ]; then
+                echo "❌ PVC not mounted after 120s, exiting."
+                exit 1
+              fi
+              echo "✅ PVC mounted, continuing."
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.secretName }}
+                  key: MYSQL_BASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.secretName }}
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.secretName }}
+                  key: MYSQL_PASS
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.db.secretName }}
+                  key: MYSQL_ROOT
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: {{ include "zoo-common.fullname" . }}-pvc

@@ -7,21 +7,29 @@ networks:
 
 volumes:
   mysql-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-database
   redis-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-database
   alert-manager-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-monitoring
   grafana-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-monitoring
   jaeger-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-monitoring
   loki-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-monitoring
   prometheus-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-monitoring
   promtail-data:
-    driver: local
+    labels:
+      com.docker.stack.namespace: zoo-monitoring
 
 services:
 
@@ -220,29 +228,29 @@ services:
       restart_policy:
         condition: any
 
-  zoo-promtail:
-    image: ghcr.io/intelligent002/zoo/zoo-promtail:latest
-    command: ["--config.file=/etc/promtail/promtail-config.yml"]
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:9080/ready || exit 1"]
-      interval: 60s
-      retries: 3
-      start_period: 10s
-      timeout: 10s
-    volumes:
-      - type: bind
-        source: ./zoo-promtail/promtail-config.yml
-        target: /etc/promtail/promtail-config.yml
-        read_only: true
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/log:/var/log:ro
-      - promtail-data:/tmp
-    networks:
-      - zoo
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
+#  zoo-promtail:
+#    image: ghcr.io/intelligent002/zoo/zoo-promtail:latest
+#    command: ["--config.file=/etc/promtail/promtail-config.yml"]
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -f http://localhost:9080/ready || exit 1"]
+#      interval: 60s
+#      retries: 3
+#      start_period: 10s
+#      timeout: 10s
+#    volumes:
+#      - type: bind
+#        source: ./zoo-promtail/promtail-config.yml
+#        target: /etc/promtail/promtail-config.yml
+#        read_only: true
+#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+#      - /var/log:/var/log:ro
+#      - promtail-data:/tmp
+#    networks:
+#      - zoo
+#    deploy:
+#      replicas: 1
+#      restart_policy:
+#        condition: any
 
   zoo-php-laravel:
     image: ghcr.io/intelligent002/zoo/zoo-php-laravel:latest
@@ -284,6 +292,8 @@ services:
       - NGINX_PORT=8104
       - SERVICE_NAME=zoo-php-laravel-http2fpm
       - ZOO_PHP_LARAVEL_PORT=8103
+    depends_on:
+      - zoo-php-laravel
     healthcheck:
       test: ["CMD-SHELL", "response=$$(curl -s http://localhost:8104/liveness | jq -r '.status'); if [ \"$$response\" != \"OK\" ]; then exit 1; else exit 0; fi"]
       interval: 60s

@@ -1,0 +1,9 @@
+db:
+  secretName: zoo-db-secret
+
+storage:
+  size: 2Gi
+
+service:
+  type: ClusterIP
+  port: 3306

@@ -1,0 +1,88 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/intelligent002/zoo/zoo-php-laravel
+  tag: latest
+  pullPolicy: IfNotPresent
+
+db:
+  enabled: true
+  secretName: zoo-db-secret
+
+service:
+  type: ClusterIP
+  port: 8101
+
+extraEnv:
+  - name: DB_HOSTNAME
+    valueFrom:
+      secretKeyRef:
+        name: zoo-db-secret
+        key: MYSQL_HOST
+  - name: DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: zoo-db-secret
+        key: MYSQL_USER
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: zoo-db-secret
+        key: MYSQL_PASS
+  - name: DB_DATABASE
+    valueFrom:
+      secretKeyRef:
+        name: zoo-db-secret
+        key: MYSQL_BASE
+
+env:
+  APP_PORT: "8101"
+  DEBUG_MODE: "False"
+  ENVIRONMENT: "DEVELOPMENT"
+  LOG_LEVEL: "DEBUG"
+  SERVICE_NAME: "zoo-php-laravel"
+
+# HTTP health checks for FastAPI
+startupProbe:                # startup probe, delays other probes
+  httpGet:
+    path: /liveness
+    port: 8101
+  initialDelaySeconds: 5     # wait 5s before first probe
+  periodSeconds: 5           # then probe every 5s
+  failureThreshold: 5        # 5×5s = 25s extra grace
+
+livenessProbe:               # self check only
+  httpGet:
+    path: /liveness
+    port: 8101
+  initialDelaySeconds: 0     # begins after startupProbe finishes
+  periodSeconds: 120         # check only once 2 minutes
+  timeoutSeconds: 3
+  failureThreshold: 3        # needs 3 failures = ~3 min before pod restart
+
+readinessProbe:              # composite checkup, expensive
+  httpGet:
+    path: /readiness
+    port: 8101
+  initialDelaySeconds: 0     # begins after startupProbe finishes
+  periodSeconds: 30          # check every 20s
+  timeoutSeconds: 2
+  failureThreshold: 1        # one fail pulls pod from LB pool
+
+ingress:
+  enabled: true
+  className: traefik
+  host: private-api.docker.r7g.org
+  path: /
+  pathType: Prefix
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  tls: []
+
+resources: {}
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: false
+  name: default

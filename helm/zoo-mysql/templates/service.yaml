@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zoo-mysql.fullname" . }}
+  labels:
+    {{- include "zoo-mysql.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  ports:
+    - port: {{ .Values.service.port | default 3306 }}
+      targetPort: 3306
+      protocol: TCP
+      name: mysql
+  selector:
+    {{- include "zoo-mysql.selectorLabels" . | nindent 4 }}

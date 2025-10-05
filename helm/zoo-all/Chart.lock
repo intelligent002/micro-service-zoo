@@ -1,0 +1,15 @@
+dependencies:
+- name: zoo-python-fastapi
+  repository: file://../zoo-python-fastapi
+  version: 0.1.0
+- name: zoo-python-flask
+  repository: file://../zoo-python-flask
+  version: 0.1.0
+- name: zoo-php-laravel
+  repository: file://../zoo-php-laravel
+  version: 0.1.0
+- name: zoo-mysql
+  repository: file://../zoo-mysql
+  version: 0.1.0
+digest: sha256:a5d4bb64a1d64d62c298edd1d34ab5f00403d458fb07a7cb25d8c232e201fb03
+generated: "2025-10-05T05:40:03.2523135-07:00"

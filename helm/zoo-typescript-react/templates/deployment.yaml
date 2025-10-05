@@ -1,0 +1,1 @@
+{{- include "zoo-common.deployment" . | nindent 0 }}
