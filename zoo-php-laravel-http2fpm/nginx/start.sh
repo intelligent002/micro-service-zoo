@@ -30,8 +30,10 @@ $ENVIRONMENT \
 ' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 # Debugging substitutions
-# cat /etc/nginx/conf.d/default.conf
-# cat /etc/nginx/nginx.conf
+echo "---=[/etc/nginx/conf.d/default.conf]=---"
+cat /etc/nginx/conf.d/default.conf
+echo "---=[/etc/nginx/nginx.conf]=---"
+cat /etc/nginx/nginx.conf
 
 # Start NGINX
 nginx -g 'daemon off;'
