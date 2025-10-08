@@ -70,7 +70,6 @@ readinessProbe:              # composite checkup, expensive
 
 ingress:
   enabled: true
-  host: public-api.k8s.intel.r7g.org
 
 resources: {}
 autoscaling:

@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: {{ .Values.ingress.className | default "nginx" }}
   rules:
-    - host: {{ .Values.ingress.host }}
+    - host: {{ include "zoo-common.ingress-host-self" $ }}
       http:
         paths:
           - path: {{ .Values.ingress.path | default "/" }}

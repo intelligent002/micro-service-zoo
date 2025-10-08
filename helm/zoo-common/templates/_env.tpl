@@ -1,5 +1,6 @@
 {{- define "zoo-common.env" -}}
-{{- if or .Values.env .Values.extraEnv }}
+{{- $extra := (include "extra-env" . | default "" | trim) -}}
+{{- if or .Values.env .Values.extraEnv $extra }}
 env:
 {{- if .Values.env }}
 {{- range $k, $v := .Values.env }}
@@ -7,22 +8,27 @@ env:
     value: {{ $v | quote }}
 {{- end }}
 {{- end }}
+
 {{- if .Values.extraEnv }}
 {{- range .Values.extraEnv }}
   - name: {{ .name }}
-    {{- if .value }}
-    value: {{ .value | quote }}
-    {{- else if .valueFrom }}
+    {{- if hasKey . "valueFrom" }}
     valueFrom:
-      {{- if .valueFrom.secretKeyRef }}
+      {{- if and (hasKey .valueFrom "secretKeyRef") (hasKey .valueFrom.secretKeyRef "key") }}
       secretKeyRef:
-        name: {{ include "zoo-common.zoo-db-SecretName" $ }}
+        # Prefer the provided name; fallback to your DB secret helper if absent
+        name: {{ default .valueFrom.secretKeyRef.name (include "zoo-common.zoo-db-SecretName" $) }}
         key: {{ .valueFrom.secretKeyRef.key }}
       {{- else }}
       {{- toYaml .valueFrom | nindent 6 }}
       {{- end }}
+    {{- else if hasKey . "value" }}
+    value: {{ .value | quote }}
     {{- end }}
 {{- end }}
+{{- end }}
+{{- if $extra }}
+{{ tpl $extra . | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

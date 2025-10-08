@@ -5,6 +5,8 @@ global:
     registry: ghcr.io/intelligent002/zoo
   db:
     enabled: true
+  ingress:
+    hostBase: "k8s.intel.r7g.org"
 
 zoo-mysql:
   db:
@@ -24,7 +26,6 @@ zoo-python-fastapi:
   ingress:
     enabled: true
     className: nginx
-    host: public-api.k8s.intel.r7g.org
 
 zoo-python-flask:
   replicaCount: 2
@@ -38,7 +39,6 @@ zoo-python-flask:
   ingress:
     enabled: true
     className: nginx
-    host: public-api-off.k8s.intel.r7g.org
 
 zoo-typescript-react:
   replicaCount: 2
@@ -49,7 +49,6 @@ zoo-typescript-react:
   ingress:
     enabled: true
     className: nginx
-    host: public.k8s.intel.r7g.org
 
 zoo-php-laravel:
   replicaCount: 2
@@ -70,6 +69,4 @@ zoo-php-laravel-http2fpm:
   ingress:
     enabled: true
     className: nginx
-    host: private-api.k8s.intel.r7g.org
-
 
