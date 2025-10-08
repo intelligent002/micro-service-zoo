@@ -1,149 +1,21 @@
 # Named volumes for persistent data storage
 volumes:
-  mysql-data:
-    labels:
-      com.docker.stack.namespace: zoo-database
-  redis-data:
-    labels:
-      com.docker.stack.namespace: zoo-database
-  alert-manager-data:
-    labels:
-      com.docker.stack.namespace: zoo-monitoring
-  grafana-data:
-    labels:
-      com.docker.stack.namespace: zoo-monitoring
-  jaeger-data:
-    labels:
-      com.docker.stack.namespace: zoo-monitoring
-  loki-data:
-    labels:
-      com.docker.stack.namespace: zoo-monitoring
-  prometheus-data:
-    labels:
-      com.docker.stack.namespace: zoo-monitoring
-  promtail-data:
-    labels:
-      com.docker.stack.namespace: zoo-monitoring
-
-
+  zoo-mysql-data:
+    name: zoo-mysql-data
+  zoo-redis-data:
+    name: zoo-redis-data
 # Shared network between the containers
 networks:
   zoo:
+    name: zoo
     driver: bridge
 
 services:
 
-
-  # Alert Manager
-  zoo-alert-manager:
-    image: ghcr.io/intelligent002/zoo/zoo-alert-manager:latest
-    command:
-      - --config.file=/etc/alertmanager/config.yml
-    depends_on:
-      zoo-prometheus:
-        condition: service_healthy
-        restart: true
-    healthcheck:
-      # Test availability of Alert Manager service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 10s
-      test: [ "CMD-SHELL", "curl -f http://localhost:9093/-/healthy || exit 1" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "9093:9093"
-    restart: always
-    volumes:
-      - ./zoo-alert-manager/alertmanager.yml:/etc/alertmanager/config.yml
-      - alert-manager-data:/alertmanager
-
-  # cAdvisor for container metrics
-  zoo-cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    networks:
-      - zoo
-    ports:
-      - "8081:8080"
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /sys:/sys
-      - /proc:/proc
-      - /var/lib/docker:/var/lib/docker:ro
-      - /data/docker:/data/docker:ro
-
-  # Grafana
-  zoo-grafana:
-    image: ghcr.io/intelligent002/zoo/zoo-grafana:latest
-    depends_on:
-      zoo-prometheus:
-        condition: service_healthy
-        restart: false
-      zoo-loki:
-        condition: service_healthy
-        restart: false
-    env_file:
-      - .env
-    healthcheck:
-      # Test availability of Grafana service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 3s
-      test: [ "CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1" ]
-      timeout: 10s
-    # image: grafana/grafana:11.2.2
-    networks:
-      - zoo
-    ports:
-      - "3000:3000"
-    restart: always
-    volumes:
-      - grafana-data:/var/lib/grafana
-
-  # Jaeger
-  zoo-jaeger:
-    image: ghcr.io/intelligent002/zoo/zoo-jaeger:latest
-    healthcheck:
-      # Test availability of Jaeger service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 3s
-      test: [ "CMD-SHELL", "curl -f http://localhost:16686 || exit 1" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "6831:6831/udp"
-      - "16686:16686"
-    restart: always
-    volumes:
-      - jaeger-data:/tmp
-
-  # Loki
-  zoo-loki:
-    image: ghcr.io/intelligent002/zoo/zoo-loki:latest
-    command:
-      - --config.file=/etc/loki/local-config.yaml
-    healthcheck:
-      # Test availability of Loki service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 10s
-      test: [ "CMD-SHELL", "curl -f http://localhost:3100/ready || exit 1" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "3100:3100"
-    restart: always
-    volumes:
-      - ./zoo-loki/local-config.yaml:/etc/loki/local-config.yaml
-      - loki-data:/loki
-
   # MySQL Service
   zoo-mysql:
+    container_name: zoo-mysql
+    hostname: zoo-mysql
     entrypoint: [ "/bin/bash", "-c", "chmod +x /mysql-health.sh && docker-entrypoint.sh mysqld" ]
     env_file:
       - .env
@@ -160,67 +32,21 @@ services:
     ports:
       - "3307"
     restart: always
+    labels:
+      - "traefik.enable=false"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - zoo-mysql-data:/var/lib/mysql
       - ./zoo-mysql/mysql-health.sh:/mysql-health.sh
-
-  # MySQL Service exporter for Prometheus
-  zoo-mysqld-exporter:
-    image: ghcr.io/intelligent002/zoo/zoo-mysqld-exporter:latest
-    command:
-      - '--mysqld.address=zoo-mysql:3307'
-      - '--web.listen-address=:3308'
-    depends_on:
-      zoo-mysql:
-        condition: service_healthy
-        restart: true
-    healthcheck:
-      # Test availability of MySQLd Exporter service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 10s
-      test: [ "CMD-SHELL", "response=$$(curl -s http://localhost:3308/metrics | grep '^mysql_up ' | awk '{print $$2}'); \
-                  if [ \"$$response\" != \"1\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "3308:3308"
-    volumes:
-      - ./zoo-mysqld-exporter/my.cnf:/.my.cnf
-
-  # Node Exporter
-  zoo-node-exporter:
-    image: ghcr.io/intelligent002/zoo/zoo-node-exporter:latest
-    healthcheck:
-      # Test availability of Node Exporter service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 10s
-      test: [ "CMD-SHELL", "curl -f http://localhost:9100/metrics || exit 1" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "9100:9100"
-    restart: always
-
 
   # Backend written in PHP/Laravel (php:8.2-fpm)
   zoo-php-laravel:
+    container_name: zoo-php-laravel
+    hostname: zoo-php-laravel
     image: ghcr.io/intelligent002/zoo/zoo-php-laravel:latest
     command: [ "/bin/sh", "-c", "set -e && /mysql-wait.sh && php artisan migrate --force && php-fpm" ]
     depends_on:
-      zoo-mysql:
-        condition: service_healthy
-        restart: false
-      zoo-redis:
-        condition: service_healthy
-        restart: false
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+      - zoo-mysql
+      - zoo-redis
     environment:
       - APP_PORT=8103
       - APP_URL=http://localhost:8003/
@@ -248,21 +74,19 @@ services:
                   REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:8103 | sed -n '/^{/,$$p' | jq -r '.status'); \
                   if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi" ]
       timeout: 10s
+    labels:
+      - "traefik.enable=false"
     networks:
       - zoo
     restart: always
 
   # NGINX Service (Reverse Proxy + HTTP to PHP-FPM converter + Static File Serving)
   zoo-php-laravel-http2fpm:
+    container_name: zoo-php-laravel-http2fpm
+    hostname: zoo-php-laravel-http2fpm
     image: ghcr.io/intelligent002/zoo/zoo-php-laravel-http2fpm:latest
     depends_on:
-      zoo-php-laravel:
-        condition: service_healthy
-        restart: false
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+      - zoo-php-laravel
     environment:
       - ENVIRONMENT=DEVELOPMENT
       - LOG_LEVEL=debug
@@ -270,6 +94,7 @@ services:
       - SERVICE_NAME=zoo-php-laravel-http2fpm
       - ZOO_PHP_LARAVEL_PORT=8103
     labels:
+      - "traefik.enable=true"
       - "traefik.http.services.zoo-php-laravel-http2fpm.loadbalancer.server.port=8104"
       - "traefik.http.routers.zoo-php-laravel-http2fpm.rule=Host(`private-api.docker.r7g.org`)"
       - "traefik.http.routers.zoo-php-laravel-http2fpm.entrypoints=web"
@@ -294,107 +119,13 @@ services:
     volumes:
       - ./zoo-php-laravel-http2fpm/probe/:/var/www/html/
 
-  # Prometheus
-  zoo-prometheus:
-    image: ghcr.io/intelligent002/zoo/zoo-prometheus:latest
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --web.enable-lifecycle
-      - --storage.tsdb.retention.time=15d
-      - --storage.tsdb.retention.size=5GB
-    healthcheck:
-      # Test availability of Prometheus service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 3s
-      test: [ "CMD-SHELL", "curl -f http://localhost:9090/-/healthy || exit 1" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "9091:9090"
-    restart: always
-    volumes:
-      - ./zoo-prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./zoo-prometheus/rules/:/etc/prometheus/rules/
-      - prometheus-data:/prometheus
-
-
-  # Promtail
-  zoo-promtail:
-    image: ghcr.io/intelligent002/zoo/zoo-promtail:latest
-    command:
-      - --config.file=/etc/promtail/promtail-config.yml
-    depends_on:
-      zoo-loki:
-        condition: service_healthy
-        restart: true
-    healthcheck:
-      # Test availability of Promtail service, listening & actually serving
-      interval: 60s
-      retries: 3
-      start_period: 10s
-      test: [ "CMD-SHELL", "curl -f http://localhost:9080/ready || exit 1" ]
-      timeout: 10s
-    networks:
-      - zoo
-    ports:
-      - "9080:9080"
-    restart: always
-    volumes:
-      - ./zoo-promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/log:/var/log:ro
-      - promtail-data:/tmp
-
-  # Backend written in Python/Flask (python:3.12.5-alpine3.20)
-  zoo-python-flask:
-    image: ghcr.io/intelligent002/zoo/zoo-python-flask:latest
-    depends_on:
-      zoo-mysql:
-        condition: service_healthy
-        restart: true
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    environment:
-      - APP_PORT=8100
-      - DB_DATABASE=zoo-db
-      - DB_HOSTNAME=zoo-mysql
-      - DB_PASSWORD=zoo-pass
-      - DB_PORT=3307
-      - DB_USERNAME=zoo-user
-      - DEBUG_MODE=False
-      - ENVIRONMENT=DEVELOPMENT
-      - LOG_LEVEL=DEBUG
-      - SERVICE_NAME=zoo-python-flask
-    expose:
-      - "8100"
-    healthcheck:
-      # Test availability of gunicorn service, listening & serving - via inline curl request parsed by JQ
-      interval: 60s
-      retries: 3
-      start_period: 3s
-      test: [ "CMD-SHELL", "response=$$(curl -s http://localhost:8100/graphql/liveness | jq -r '.status'); \
-                  if [ \"$$response\" != \"OK\" ]; then echo \"Status is not OK\" && exit 1; else echo \"Status is OK\" && exit 0; fi" ]
-      timeout: 10s
-    networks:
-      - zoo
-    restart: always
-
-
   # Backend written in Python/FastAPI (python:3.12.5-alpine3.20)
   zoo-python-fastapi:
+    container_name: zoo-python-fastapi
+    hostname: zoo-python-fastapi
     image: ghcr.io/intelligent002/zoo/zoo-python-fastapi:latest
     depends_on:
-      zoo-mysql:
-        condition: service_healthy
-        restart: true
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+      - zoo-mysql
     environment:
       - APP_PORT=8101
       - DB_DATABASE=zoo-db
@@ -407,6 +138,7 @@ services:
       - LOG_LEVEL=DEBUG
       - SERVICE_NAME=zoo-python-fastapi
     labels:
+      - "traefik.enable=true"
       - "traefik.http.services.zoo-python-fastapi.loadbalancer.server.port=8101"
       - "traefik.http.routers.zoo-python-fastapi.rule=Host(`public-api.docker.r7g.org`)"
       - "traefik.http.routers.zoo-python-fastapi.entrypoints=web"
@@ -431,6 +163,8 @@ services:
 
   # Redis for PHP Metrics and other usages
   zoo-redis:
+    container_name: zoo-redis
+    hostname: zoo-redis
     image: ghcr.io/intelligent002/zoo/zoo-redis:latest
     env_file:
       - .env
@@ -445,10 +179,12 @@ services:
     networks:
       - zoo
     ports:
-      - "6379:6379"
+      - "6379"
     restart: always
+    labels:
+      - "traefik.enable=false"
     volumes:
-      - redis-data:/data
+      - zoo-redis-data:/data
 
 # NGINX Service (Routing + Reverse Proxy + Caching + Static File Serving)
 #  zoo-router:
@@ -492,33 +228,32 @@ services:
 
   # Traefik reverse proxy
   zoo-traefik:
+    container_name: zoo-traefik
+    hostname: zoo-traefik
     image: traefik:v2.10
     command:
-      - "--api.insecure=true"  # Enable Traefik dashboard at :8080 (disable in production)
+      - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=zoo"
       - "--entrypoints.web.address=:80"
       #- "--entrypoints.websecure.address=:443"
-      #- "--certificatesresolvers.myresolver.acme.httpchallenge=false"
-      #- "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      #- "--certificatesresolvers.myresolver.acme.email=your-email@example.com"
-      #- "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "80:80"         # HTTP
-      #- "443:443"       # HTTPS
-      - "8080:8080"     # Traefik dashboard
+      - "80:80"
+      - "8080:8080"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      # - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - zoo
+    restart: always
 
   # Frontend written in TypeScript/React (node:20.18.0-alpine3.20)
   zoo-typescript-react:
+    container_name: zoo-typescript-react
+    hostname: zoo-typescript-react
     image: ghcr.io/intelligent002/zoo/zoo-typescript-react:latest
     depends_on:
-      zoo-python-flask:
-        condition: service_healthy
-        restart: true
+      - zoo-python-fastapi
     environment:
       - BACKEND_HOSTNAME=http://public-api.docker.r7g.org/graphql
       - ENVIRONMENT=DEVELOPMENT
@@ -526,6 +261,7 @@ services:
       - NGINX_PORT=8102
       - SERVICE_NAME=zoo-typescript-react
     labels:
+      - "traefik.enable=true"
       - "traefik.http.services.zoo-typescript-react.loadbalancer.server.port=8102"
       - "traefik.http.routers.zoo-typescript-react.rule=Host(`public.docker.r7g.org`)"
       - "traefik.http.routers.zoo-typescript-react.entrypoints=web"
@@ -550,11 +286,11 @@ services:
 
   # Frontend written in TypeScript/angular (node:20.18.0-alpine3.20)
   zoo-typescript-angular:
+    container_name: zoo-typescript-angular
+    hostname: zoo-typescript-angular
     image: ghcr.io/intelligent002/zoo/zoo-typescript-angular:latest
     depends_on:
-      zoo-php-laravel-http2fpm:
-        condition: service_healthy
-        restart: false
+      - zoo-php-laravel-http2fpm
     environment:
       - BACKEND_HOSTNAME=http://private-api.docker.r7g.org
       - ENVIRONMENT=DEVELOPMENT
@@ -562,6 +298,7 @@ services:
       - NGINX_PORT=8105
       - SERVICE_NAME=zoo-typescript-angular
     labels:
+      - "traefik.enable=true"
       - "traefik.http.services.zoo-typescript-angular.loadbalancer.server.port=8105"
       - "traefik.http.routers.zoo-typescript-angular.rule=Host(`private.docker.r7g.org`)"
       - "traefik.http.routers.zoo-typescript-angular.entrypoints=web"
