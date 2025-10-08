@@ -42,6 +42,7 @@ export const loadConfig = async (): Promise<void> => {
         } finally {
             configPromise = null;  // Clear the promise after loading
         }
+        console.log('config is loaded:'+config)
     })();
 
     return configPromise;
