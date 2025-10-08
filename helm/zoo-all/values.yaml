@@ -9,62 +9,67 @@ global:
 zoo-mysql:
   db:
     enabled: true
-    secretName: zoo-db-secret
   storage:
     size: 3Gi
 
 zoo-python-fastapi:
   replicaCount: 2
   image:
-    repository: ghcr.io/intelligent002/zoo/zoo-python-fastapi
     tag: latest
   global:
     db:
       enabled: true
-      secretName: zoo-db-secret
   service:
-    port: 8101
+    port: 8080
   ingress:
     enabled: true
-    host: public-api.docker.r7g.org
+    className: nginx
+    host: public-api.k8s.intel.r7g.org
 
 zoo-python-flask:
   replicaCount: 2
   image:
-    repository: ghcr.io/intelligent002/zoo/zoo-python-flask
     tag: latest
   global:
     db:
       enabled: true
-      secretName: zoo-db-secret
   service:
-    port: 8101
+    port: 8080
   ingress:
     enabled: true
-    host: public-api.docker.r7g.org
-
-zoo-php-laravel:
-  replicaCount: 2
-  image:
-    repository: ghcr.io/intelligent002/zoo/zoo-php-laravel
-    tag: latest
-  global:
-    db:
-      enabled: true
-      secretName: zoo-db-secret
-  service:
-    port: 8101
-  ingress:
-    enabled: true
-    host: private-api.docker.r7g.org
+    className: nginx
+    host: public-api-off.k8s.intel.r7g.org
 
 zoo-typescript-react:
   replicaCount: 2
   image:
-    repository: ghcr.io/intelligent002/zoo/zoo-typescript-react
     tag: latest
   service:
-    port: 8101
+    port: 8080
   ingress:
     enabled: true
-    host: public.docker.r7g.org
+    className: nginx
+    host: public.k8s.intel.r7g.org
+
+zoo-php-laravel:
+  replicaCount: 2
+  image:
+    tag: latest
+  global:
+    db:
+      enabled: true
+  service:
+    port: 8080
+
+zoo-php-laravel-http2fpm:
+  replicaCount: 2
+  image:
+    tag: latest
+  service:
+    port: 8080
+  ingress:
+    enabled: true
+    className: nginx
+    host: private-api.k8s.intel.r7g.org
+
+

@@ -8,7 +8,21 @@ env:
 {{- end }}
 {{- end }}
 {{- if .Values.extraEnv }}
-{{ toYaml .Values.extraEnv | nindent 2 }}
+{{- range .Values.extraEnv }}
+  - name: {{ .name }}
+    {{- if .value }}
+    value: {{ .value | quote }}
+    {{- else if .valueFrom }}
+    valueFrom:
+      {{- if .valueFrom.secretKeyRef }}
+      secretKeyRef:
+        name: {{ include "zoo-common.zoo-db-SecretName" $ }}
+        key: {{ .valueFrom.secretKeyRef.key }}
+      {{- else }}
+      {{- toYaml .valueFrom | nindent 6 }}
+      {{- end }}
+    {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -13,3 +13,11 @@
 {{- define "zoo-common.serviceAccountName" -}}
 {{- default "default" .Values.serviceAccount.name -}}
 {{- end -}}
+
+{{- define "zoo-common.zoo-db-SecretName-static" -}}
+{{- "stage-zoo-db-secret" -}}
+{{- end -}}
+
+{{- define "zoo-common.zoo-db-SecretName" -}}
+{{- printf "%s-zoo-db-secret" .Release.Name -}}
+{{- end -}}

@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/intelligent002/zoo/zoo-typescript-react
+  repository: ghcr.io/intelligent002/zoo/zoo-php-laravel-http2fpm
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: ClusterIP
@@ -11,12 +11,13 @@ service:
 
 env:
   APP_PORT: "8080"
+  ZOO_PHP_LARAVEL_PORT: "8080"
+  NGINX_PORT: "8080"
   DEBUG_MODE: "False"
   ENVIRONMENT: "DEVELOPMENT"
   LOG_LEVEL: "DEBUG"
-  SERVICE_NAME: "zoo-typescript-react"
-  BACKEND_HOSTNAME: "http://public-api.k8s.intel.r7g.org/graphql"
-  NGINX_PORT: "8080"
+  SERVICE_NAME: "zoo-php-laravel-http2fpm"
+
 
 # HTTP health checks for FastAPI
 startupProbe:                # startup probe, delays other probes
@@ -47,7 +48,7 @@ readinessProbe:              # composite checkup, expensive
 
 ingress:
   enabled: true
-  host: public.k8s.intel.r7g.org
+  host: private-api.k8s.intel.r7g.org
 
 resources: {}
 autoscaling:

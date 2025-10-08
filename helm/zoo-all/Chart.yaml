@@ -8,6 +8,10 @@ appVersion: "1.0.0"
 
 dependencies:
 
+  - name: zoo-mysql
+    version: 0.1.0
+    repository: "file://../zoo-mysql"
+
   - name: zoo-python-fastapi
     version: 0.1.0
     repository: "file://../zoo-python-fastapi"
@@ -20,10 +24,11 @@ dependencies:
     version: 0.1.0
     repository: "file://../zoo-php-laravel"
 
+  - name: zoo-php-laravel-http2fpm
+    version: 0.1.0
+    repository: "file://../zoo-php-laravel-http2fpm"
+
   - name: zoo-typescript-react
     version: 0.1.0
     repository: "file://../zoo-typescript-react"
 
-  - name: zoo-mysql
-    version: 0.1.0
-    repository: "file://../zoo-mysql"

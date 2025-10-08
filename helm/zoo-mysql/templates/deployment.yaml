@@ -44,22 +44,22 @@ spec:
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.db.secretName }}
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
                   key: MYSQL_BASE
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.db.secretName }}
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
                   key: MYSQL_USER
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.db.secretName }}
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
                   key: MYSQL_PASS
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.db.secretName }}
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
                   key: MYSQL_ROOT
           ports:
             - containerPort: 3306

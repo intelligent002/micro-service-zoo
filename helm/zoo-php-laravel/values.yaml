@@ -7,77 +7,68 @@ image:
 
 db:
   enabled: true
-  secretName: zoo-db-secret
 
 service:
   type: ClusterIP
-  port: 8101
+  port: 8080
 
 extraEnv:
   - name: DB_HOSTNAME
     valueFrom:
       secretKeyRef:
-        name: zoo-db-secret
         key: MYSQL_HOST
+  - name: DB_PORT
+    valueFrom:
+      secretKeyRef:
+        key: MYSQL_PORT
   - name: DB_USERNAME
     valueFrom:
       secretKeyRef:
-        name: zoo-db-secret
         key: MYSQL_USER
   - name: DB_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: zoo-db-secret
         key: MYSQL_PASS
   - name: DB_DATABASE
     valueFrom:
       secretKeyRef:
-        name: zoo-db-secret
         key: MYSQL_BASE
 
 env:
-  APP_PORT: "8101"
+  APP_PORT: "8081"
+  ZOO_PHP_LARAVEL_PORT: "8081"
   DEBUG_MODE: "False"
   ENVIRONMENT: "DEVELOPMENT"
   LOG_LEVEL: "DEBUG"
   SERVICE_NAME: "zoo-php-laravel"
+  REDIS_BASE: 0
+  REDIS_HOST: zoo-redis
+  REDIS_PASSWORD: zoo-pass
+  REDIS_PORT: 6379
+  REDIS_USERNAME: zoo-user
 
 # HTTP health checks for FastAPI
-startupProbe:                # startup probe, delays other probes
-  httpGet:
-    path: /liveness
-    port: 8101
-  initialDelaySeconds: 5     # wait 5s before first probe
-  periodSeconds: 5           # then probe every 5s
-  failureThreshold: 5        # 5×5s = 25s extra grace
-
-livenessProbe:               # self check only
-  httpGet:
-    path: /liveness
-    port: 8101
-  initialDelaySeconds: 0     # begins after startupProbe finishes
-  periodSeconds: 120         # check only once 2 minutes
-  timeoutSeconds: 3
-  failureThreshold: 3        # needs 3 failures = ~3 min before pod restart
-
-readinessProbe:              # composite checkup, expensive
-  httpGet:
-    path: /readiness
-    port: 8101
-  initialDelaySeconds: 0     # begins after startupProbe finishes
-  periodSeconds: 30          # check every 20s
-  timeoutSeconds: 2
-  failureThreshold: 1        # one fail pulls pod from LB pool
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - >
+        response=$(REQUEST_URI=/health/liveness SCRIPT_FILENAME=/var/www/html/public/index.php
+        REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 |
+        sed -n '/^{/,$p' | jq -r '.status');
+        if [ "$response" != "OK" ]; then
+          echo "Status is not OK" && exit 1;
+        else
+          echo "Status is OK" && exit 0;
+        fi
+  initialDelaySeconds: 3
+  periodSeconds: 60
+  failureThreshold: 3
+  timeoutSeconds: 10
 
 ingress:
-  enabled: true
-  className: traefik
-  host: private-api.docker.r7g.org
-  path: /
-  pathType: Prefix
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
-  tls: []
+  enabled: false
 
 resources: {}
 autoscaling:

@@ -1,5 +1,6 @@
+
 db:
-  secretName: zoo-db-secret
+  enabled: true
 
 storage:
   size: 2Gi
