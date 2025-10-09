@@ -288,7 +288,6 @@ services:
       timeout: 10s
     networks:
       - zoo
-    pull_policy: always
     restart: always
 
   # Frontend written in TypeScript/angular (node:20.18.0-alpine3.20)
