@@ -1,6 +1,6 @@
 import React from 'react';
 import TaskItem from './TaskItem';
-import {useQuery} from "@apollo/client/react";
+import {useQuery} from "@apollo/client";
 import {GET_TASKS} from "../../graphql/queries/taskQueries";
 
 function TasksList({project}) {
