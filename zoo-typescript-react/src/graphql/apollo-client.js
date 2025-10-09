@@ -8,6 +8,7 @@ export const getApolloClient = async () => {
     if (!client) {
         // Wait for the config to be loaded asynchronously
         const config = await getConfig();
+        console.log('Loaded config:', config);
         client = new ApolloClient({
             uri: config.apiUrl,
             cache: new InMemoryCache(),

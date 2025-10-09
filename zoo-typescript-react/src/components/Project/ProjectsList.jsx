@@ -1,6 +1,6 @@
 import React from 'react';
 import ProjectItem from './ProjectItem';
-import {useQuery} from "@apollo/client/react";
+import {useQuery} from "@apollo/client";
 import {GET_PROJECTS} from "../../graphql/queries/projectQueries";
 
 function ProjectsList({onSelect}) {
