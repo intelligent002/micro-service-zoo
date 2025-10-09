@@ -10,4 +10,4 @@ RUN CURL_SHA256="e1cd382311300fe1cef7bf99fbb88a015cd634a5516a21f8d8d16c3c257606d
  && chmod +x /usr/bin/curl
 
 # Switch back to non-root user (nobody)
-#USER nobody
+USER nobody

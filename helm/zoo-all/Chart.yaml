@@ -1,0 +1,34 @@
+apiVersion: v2
+name: zoo-all
+description: Umbrella chart deploying the full Zoo microservices stack
+icon: https://raw.githubusercontent.com/intelligent002/micro-service-zoo/main/docs/icon.svg
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+
+  - name: zoo-mysql
+    version: 0.1.0
+    repository: "file://../zoo-mysql"
+
+  - name: zoo-python-fastapi
+    version: 0.1.0
+    repository: "file://../zoo-python-fastapi"
+
+  - name: zoo-python-flask
+    version: 0.1.0
+    repository: "file://../zoo-python-flask"
+
+  - name: zoo-php-laravel
+    version: 0.1.0
+    repository: "file://../zoo-php-laravel"
+
+  - name: zoo-php-laravel-http2fpm
+    version: 0.1.0
+    repository: "file://../zoo-php-laravel-http2fpm"
+
+  - name: zoo-typescript-react
+    version: 0.1.0
+    repository: "file://../zoo-typescript-react"
+

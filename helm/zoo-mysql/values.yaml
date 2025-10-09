@@ -1,0 +1,13 @@
+
+db:
+  enabled: true
+
+storage:
+  size: 2Gi
+
+service:
+  type: ClusterIP
+  port: 3306
+
+ingress:
+  enabled: false

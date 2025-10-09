@@ -1,0 +1,79 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/intelligent002/zoo/zoo-php-laravel
+  tag: latest
+  pullPolicy: IfNotPresent
+
+db:
+  enabled: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+extraEnv:
+  - name: DB_HOSTNAME
+    valueFrom:
+      secretKeyRef:
+        key: MYSQL_HOST
+  - name: DB_PORT
+    valueFrom:
+      secretKeyRef:
+        key: MYSQL_PORT
+  - name: DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: MYSQL_USER
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: MYSQL_PASS
+  - name: DB_DATABASE
+    valueFrom:
+      secretKeyRef:
+        key: MYSQL_BASE
+
+env:
+  APP_PORT: "8081"
+  ZOO_PHP_LARAVEL_PORT: "8081"
+  DEBUG_MODE: "False"
+  ENVIRONMENT: "DEVELOPMENT"
+  LOG_LEVEL: "DEBUG"
+  SERVICE_NAME: "zoo-php-laravel"
+  REDIS_BASE: 0
+  REDIS_HOST: zoo-redis
+  REDIS_PASSWORD: zoo-pass
+  REDIS_PORT: 6379
+  REDIS_USERNAME: zoo-user
+
+# HTTP health checks for FastAPI
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - >
+        response=$(REQUEST_URI=/health/liveness SCRIPT_FILENAME=/var/www/html/public/index.php
+        REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 |
+        sed -n '/^{/,$p' | jq -r '.status');
+        if [ "$response" != "OK" ]; then
+          echo "Status is not OK" && exit 1;
+        else
+          echo "Status is OK" && exit 0;
+        fi
+  initialDelaySeconds: 3
+  periodSeconds: 60
+  failureThreshold: 3
+  timeoutSeconds: 10
+
+ingress:
+  enabled: false
+
+resources: {}
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: false
+  name: default

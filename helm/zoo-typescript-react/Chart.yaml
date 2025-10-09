@@ -1,0 +1,11 @@
+apiVersion: v2
+name: zoo-typescript-react
+description: Typescript-React microservice for Zoo project
+type: application
+version: 0.1.0
+appVersion: "latest"
+
+dependencies:
+  - name: zoo-common
+    version: 0.1.0
+    repository: "file://../zoo-common"

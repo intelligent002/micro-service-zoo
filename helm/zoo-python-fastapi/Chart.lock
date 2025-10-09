@@ -1,0 +1,6 @@
+dependencies:
+- name: zoo-common
+  repository: file://../zoo-common
+  version: 0.1.0
+digest: sha256:598e5e21c1f360ad57363be0b3e91bc377c997c195b0d89dee9b24f1cf72cfc8
+generated: "2025-10-04T08:54:34.1970569-07:00"

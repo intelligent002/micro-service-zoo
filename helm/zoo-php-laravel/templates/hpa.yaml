@@ -1,0 +1,1 @@
+{{- include "zoo-common.hpa" . | nindent 0 }}
