@@ -105,6 +105,8 @@ services:
       #- "traefik.http.routers.zoo-php-laravel-http2fpm-secure.tls.certresolver=myresolver"
     expose:
       - "8104"
+    ports:
+      - "8104:8104"
     healthcheck:
       # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
       interval: 60s
@@ -149,6 +151,8 @@ services:
       #- "traefik.http.routers.zoo-python-fastapi-secure.tls.certresolver=myresolver"
     expose:
       - "8101"
+    ports:
+      - "8101:8101"
     healthcheck:
       # Test availability of uvicorn service, listening & serving - via inline curl request parsed by JQ
       interval: 60s
@@ -230,11 +234,11 @@ services:
   zoo-traefik:
     container_name: zoo-traefik
     hostname: zoo-traefik
-    image: traefik:v2.10
+    image: traefik:v3
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.exposedbydefault=true"
       - "--providers.docker.network=zoo"
       - "--entrypoints.web.address=:80"
       #- "--entrypoints.websecure.address=:443"
@@ -272,6 +276,8 @@ services:
       #- "traefik.http.routers.zoo-typescript-react-secure.tls.certresolver=myresolver"
     expose:
       - "8102"
+    ports:
+      - "8102:8102"
     healthcheck:
       # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
       interval: 60s
@@ -309,6 +315,8 @@ services:
       #- "traefik.http.routers.zoo-typescript-angular-secure.tls.certresolver=myresolver"
     expose:
       - "8105"
+    ports:
+      - "8105:8105"
     healthcheck:
       # Test availability of nginx service, listening & serving - via inline curl request parsed by JQ
       interval: 60s
