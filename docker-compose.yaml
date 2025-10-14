@@ -234,7 +234,7 @@ services:
   zoo-traefik:
     container_name: zoo-traefik
     hostname: zoo-traefik
-    image: traefik:v3
+    image: traefik:v2
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"

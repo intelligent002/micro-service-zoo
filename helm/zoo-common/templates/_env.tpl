@@ -1,6 +1,7 @@
 {{- define "zoo-common.env" -}}
-{{- $extra := (include "extra-env" . | default "" | trim) -}}
-{{- if or .Values.env .Values.extraEnv $extra }}
+{{- $chartTemplate := printf "%s.env-template" .Chart.Name -}}
+{{- $extraEnv := (include $chartTemplate . | default "" | trim) -}}
+{{- if or .Values.env .Values.extraEnv $extraEnv }}
 env:
 {{- if .Values.env }}
 {{- range $k, $v := .Values.env }}
@@ -27,8 +28,8 @@ env:
     {{- end }}
 {{- end }}
 {{- end }}
-{{- if $extra }}
-{{ tpl $extra . | nindent 2 }}
+{{- if $extraEnv }}
+{{ tpl $extraEnv . | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

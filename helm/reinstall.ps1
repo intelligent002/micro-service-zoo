@@ -1,6 +1,6 @@
 #!/usr/bin/pwsh
 
-Set-Location D:\www\testedrecruits\micro-service-zoo\helm
+Set-Location D:\www\micro-service-zoo\helm
 
 # First thing first - prerequisites ...
 . ./../powershell_scripts/logs.ps1
@@ -23,12 +23,12 @@ $charts = @(
 
 foreach ($chart in $charts) {
     Write-Logs "Updating $chart"
-    helm dependency update "D:\www\testedrecruits\micro-service-zoo\helm\$chart"
+    helm dependency update "D:\www\micro-service-zoo\helm\$chart"
 }
 
 Write-logs "deploying the zoo-all"
 
-Set-Location D:\www\testedrecruits\micro-service-zoo\helm
+Set-Location D:\www\micro-service-zoo\helm
 helm upgrade --install stage .\zoo-all\ --namespace zoo --create-namespace
 
 # helm uninstall stage --namespace zoo
