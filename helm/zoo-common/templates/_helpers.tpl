@@ -1,10 +1,36 @@
+{{/*
+    Return the base chart name.
+    Usage:
+      {{ include "zoo-common.name" . }}
+      {{ include "zoo-common.name" (dict "root" . "name" "zoo-python-flask") }}
+*/}}
 {{- define "zoo-common.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end }}
+{{- $ctx := (hasKey . "root" | ternary .root .) -}}
+{{- default .name $ctx.Chart.Name -}}
+{{- end -}}
 
+{{/*
+    Return a fully qualified release-scoped name.
+    Usage:
+      {{ include "zoo-common.fullname" . }}
+      {{ include "zoo-common.fullname" (dict "root" . "name" "zoo-python-flask") }}
+*/}}
 {{- define "zoo-common.fullname" -}}
-{{- printf "%s-%s" .Release.Name (include "zoo-common.name" .) | trunc 63 | trimSuffix "-" -}}
-{{- end }}
+{{- $ctx := (hasKey . "root" | ternary .root .) -}}
+{{- $name := (default .name (include "zoo-common.name" $ctx)) -}}
+{{ printf "%s-%s" $ctx.Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end -}}
+
+{{- define "zoo-common.labels" -}}
+{{- $root := (hasKey . "root" | ternary .root .) -}}
+{{- $chart := (default $root.Chart .Chart) -}}
+{{- $release := (default $root.Release .Release) -}}
+{{- $name := (default .name (include "zoo-common.name" (default $root .))) -}}
+app.kubernetes.io/name: {{ $name }}
+app.kubernetes.io/instance: {{ $release.Name }}
+app.kubernetes.io/managed-by: {{ $release.Service }}
+helm.sh/chart: {{ $chart.Name }}-{{ $chart.Version | replace "+" "_" }}
+{{- end -}}
 
 {{- define "zoo-common.chart" -}}
 {{ .Chart.Name }}-{{ .Chart.Version }}

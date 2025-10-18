@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "zoo-common.fullname" (dict "root" . "name" "zoo-php-laravel") }}
+  labels:
+    {{- include "zoo-common.labels" (dict "root" . "name" "zoo-php-laravel") | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        {{- include "zoo-common.labels" (dict "root" . "name" "zoo-php-laravel") | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "[migrate] waiting for mysql..."
+              /mysql-wait.sh
+              echo "[migrate] running migrations..."
+              php artisan migrate --force
+          env:
+            - name: APP_ENV
+              value: "production"
+            - name: DB_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
+                  key: MYSQL_HOST
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
+                  key: MYSQL_PORT
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
+                  key: MYSQL_BASE
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zoo-common.zoo-db-SecretName" . }}
+                  key: MYSQL_PASS
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
