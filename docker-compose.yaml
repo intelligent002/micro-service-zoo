@@ -92,6 +92,7 @@ services:
       - LOG_LEVEL=debug
       - NGINX_PORT=8104
       - SERVICE_NAME=zoo-php-laravel-http2fpm
+      - ZOO_PHP_LARAVEL_HOST=zoo-php-laravel
       - ZOO_PHP_LARAVEL_PORT=8103
     labels:
       - "traefik.enable=true"

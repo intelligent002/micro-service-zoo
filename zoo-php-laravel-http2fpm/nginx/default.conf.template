@@ -15,7 +15,7 @@ server {
 
     # PHP file handling
     location ~ \.php$ {
-        fastcgi_pass zoo-php-laravel:${ZOO_PHP_LARAVEL_PORT};
+        fastcgi_pass ${ZOO_PHP_LARAVEL_HOST}:${ZOO_PHP_LARAVEL_PORT};
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root/public$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;

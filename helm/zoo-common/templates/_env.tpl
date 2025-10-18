@@ -1,5 +1,5 @@
 {{- define "zoo-common.env" -}}
-{{- $chartTemplate := printf "%s.env-template" .Chart.Name -}}
+{{- $chartTemplate := printf "%s.env_template" .Chart.Name -}}
 {{- $extraEnv := (include $chartTemplate . | default "" | trim) -}}
 {{- if or .Values.env .Values.extraEnv $extraEnv }}
 env:
