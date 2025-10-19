@@ -24,7 +24,7 @@ def custom_format_error(error):
 
 # Create the GraphQL view with GraphiQL disabled
 route_graphql.add_url_rule(
-    '/graphql',
+    '/',
     view_func=GraphQLView.as_view(
         'graphql',
         schema=schema,
