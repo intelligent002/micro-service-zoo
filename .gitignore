@@ -2,6 +2,7 @@
 .env
 .idea
 .idea/*
+helm/**/*.tgz
 build
 coverage
 dist
