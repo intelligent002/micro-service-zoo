@@ -32,5 +32,5 @@ graphql_view = GraphQLView.as_view(
 )
 
 # Handle both /graphql and /graphql/ (Flask otherwise redirects one to the other)
-route_graphql.add_url_rule('/', view_func=graphql_view, methods=['GET', 'POST', 'OPTIONS'])
-route_graphql.add_url_rule('',  view_func=graphql_view, methods=['GET', 'POST', 'OPTIONS'])
+route_graphql.add_url_rule('/', view_func=graphql_view, methods=['GET', 'POST'])
+route_graphql.add_url_rule('',  view_func=graphql_view, methods=['GET', 'POST'])

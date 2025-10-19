@@ -17,6 +17,13 @@ if not all([db_username, db_password, db_hostname, db_database]):
 
 
 class Config:
+
+    # CORS origins (comma-separated list)
+    CORS_ALLOWED_ORIGINS = os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "*"  # default: allow all
+    ).split(",")
+
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{db_username}:{db_password}@{db_hostname}:{db_port}/{db_database}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG_MODE = os.getenv('DEBUG_MODE', 'False').lower() == 'true'

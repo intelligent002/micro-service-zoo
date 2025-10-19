@@ -31,7 +31,18 @@ def create_app():
     method will instantiate a flask app
     """
     app = Flask(__name__)
-    CORS(app)  # Enable CORS
+
+    CORS(
+        app,
+        resources={r"/graphql*": {
+            "origins": Config.CORS_ALLOWED_ORIGINS,
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }},
+        automatic_options=True  # <-- makes Flask handle preflight automatically
+    )
+
     app.config.from_object(Config)
 
     # Register all namespaces
