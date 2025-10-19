@@ -23,14 +23,14 @@ def custom_format_error(error):
     return formatted_error
 
 # Create the GraphQL view with GraphiQL disabled
-route_graphql.add_url_rule(
-    '/',
-    view_func=GraphQLView.as_view(
-        'graphql',
-        schema=schema,
-        batch=False,  # Enable batch processing for GraphQL queries
-        graphiql=True,  # Disable the GraphiQL interface for security purposes
-        format_error=custom_format_error    # Custom error handler
-    ),
-    methods=['GET', 'POST']  # Allow GET and POST requests for the GraphQL endpoint
+graphql_view = GraphQLView.as_view(
+    'graphql',
+    schema=schema,
+    batch=False,           # Enable batch processing for GraphQL queries
+    graphiql=True,         # Enable GraphiQL web UI
+    format_error=custom_format_error
 )
+
+# Handle both /graphql and /graphql/ (Flask otherwise redirects one to the other)
+route_graphql.add_url_rule('/', view_func=graphql_view, methods=['GET', 'POST', 'OPTIONS'])
+route_graphql.add_url_rule('',  view_func=graphql_view, methods=['GET', 'POST', 'OPTIONS'])
