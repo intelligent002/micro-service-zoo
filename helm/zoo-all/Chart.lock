@@ -14,8 +14,11 @@ dependencies:
 - name: zoo-php-laravel-http2fpm
   repository: file://../zoo-php-laravel-http2fpm
   version: 0.1.0
+- name: zoo-typescript-angular
+  repository: file://../zoo-typescript-angular
+  version: 0.1.0
 - name: zoo-typescript-react
   repository: file://../zoo-typescript-react
   version: 0.1.0
-digest: sha256:83a38834596021ab3c4b4c12772c7e0eb21e2022e3d0b6b268592f8a7aca16fb
-generated: "2025-10-07T16:50:49.1714619-07:00"
+digest: sha256:71b5d12f8d028bbf084164b96f50e3dad8bfa0ad6e05865629b6b06aaae17354
+generated: "2025-10-18T21:28:16.3917048-07:00"

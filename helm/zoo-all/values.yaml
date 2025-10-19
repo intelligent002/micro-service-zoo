@@ -50,6 +50,16 @@ zoo-typescript-react:
     enabled: true
     className: nginx
 
+zoo-typescript-angular:
+  replicaCount: 2
+  image:
+    tag: latest
+  service:
+    port: 8080
+  ingress:
+    enabled: true
+    className: nginx
+
 zoo-php-laravel:
   replicaCount: 2
   image:

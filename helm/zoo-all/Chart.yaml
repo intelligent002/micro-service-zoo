@@ -28,6 +28,10 @@ dependencies:
     version: 0.1.0
     repository: "file://../zoo-php-laravel-http2fpm"
 
+  - name: zoo-typescript-angular
+    version: 0.1.0
+    repository: "file://../zoo-typescript-angular"
+
   - name: zoo-typescript-react
     version: 0.1.0
     repository: "file://../zoo-typescript-react"
