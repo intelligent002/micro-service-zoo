@@ -40,7 +40,7 @@ def create_app():
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
         }},
-        automatic_options=True  # <-- makes Flask handle preflight automatically
+        automatic_options=True
     )
 
     app.config.from_object(Config)
