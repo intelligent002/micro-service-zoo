@@ -30,8 +30,8 @@ fi
 
 # Step 6: Upgrade pip and install pip-tools
 echo "🛠 Installing pip-tools..."
-python -m pip install --upgrade pip setuptools wheel > /dev/null
-python -m pip install pip-tools > /dev/null
+python -m pip install --upgrade "pip<24.3" setuptools wheel
+python -m pip install "pip-tools>=7.4,<7.6"
 
 # Step 7: Use pip-compile to get the latest compatible versions
 echo "📡 Upgrading dependencies using pip-compile..."
