@@ -3,6 +3,7 @@ aiomysql
 alembic
 cryptography
 fastapi
+pip-tools
 prometheus-fastapi-instrumentator
 python-json-logger
 strawberry-graphql
