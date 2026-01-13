@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.3",
         "ext-pdo": "*",
-        "darkaonline/l5-swagger": "^9.0",
+        "darkaonline/l5-swagger": "^10.0",
         "laravel/framework": "^v12.2.0",
         "laravel/tinker": "^2.9",
         "predis/predis": "^3.0",
